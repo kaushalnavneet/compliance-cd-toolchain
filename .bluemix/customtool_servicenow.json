@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "messages": {
+      "$i18n": "locales.yml"
+  },
+  "title": {
+    "$ref": "#/messages/servicenow.title"
+  },
+  "description": {
+    "$ref": "#/messages/servicenow.description"
+  },
+  "longDescription": {
+    "$ref": "#/messages/servicenow.longDescription"
+  },
+  "type": "object",
+  "properties": {
+    "api-token": {
+      "description": {
+        "$ref": "#/messages/servicenow.apitokenDescription"
+      },
+      "type": "string",
+      "pattern": "\\S"
+    }
+  },
+  "required": [
+    "api-token"
+  ],
+  "form": [
+    {
+      "title": "ServiceNow Token",
+      "key": "api-token",
+      "type": "password",
+      "readonly": false
+    },
+    {
+      "type": "table",
+      "columnCount": 1,
+      "widths": ["100%"],
+      "items": [
+        {
+          "type": "label",
+          "title": {
+            "$ref": "#/messages/servicenow.apitokenHelp"
+          }
+        }
+      ]
+    }
+  ]
+}

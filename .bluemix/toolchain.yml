@@ -1,0 +1,151 @@
+version: '2'
+messages:
+  $i18n: locales.yml
+template:
+  name:
+    $ref: "#/messages/template.name"
+  description:
+    $ref: "#/messages/template.description"
+  header: '![](toolchain.svg?localize)'
+  icon: secure-lock-kubernetes.svg
+  required:
+    - build
+    - tekton-definition-repo
+    - application-repo
+    - evidence-locker-repo
+    - incident-issues-repo
+    - servicenow
+ 
+  info:
+    git url: >
+      "[" + $env.repository + "]" +
+        "(" + $env.repository + ")"
+    git branch: >
+      "[" + $env.branch + "]" +
+        "(" + $env.repository +
+          "/tree/" + $env.branch + ")"
+toolchain:
+  name: 'tekton-cd-compliance-{{timestamp}}'
+  template:
+    getting_started:
+      $ref: "#/messages/template.gettingStarted" 
+services:
+
+  tekton-definition-repo:
+    service_id: githubpublic
+    parameters:
+      repo_url: $env.repository
+      type: link
+      has_issues: false
+      enable_traceability: false
+      legal: true
+
+  tekton-catalog-repo:
+    service_id: github_integrated
+    parameters:
+      repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
+      type: link
+      has_issues: false
+      enable_traceability: false
+      legal: true  
+
+  application-repo:   
+    service_id: github_integrated  
+    parameters:
+      source_repo_url: 'https://github.ibm.com/cocoa/cocoa-example-app'
+      type: clone
+      has_issues: false
+      enable_traceability: true
+      legal: true
+
+  incident-issues-repo:
+    service_id: github_integrated
+    parameters:
+      repo_name: 'issues-{{toolchain.name}}'
+      type: new
+      has_issues: false
+      enable_traceability: false
+      legal: true
+
+  evidence-locker-repo:
+    service_id: github_integrated
+    parameters:
+      repo_name: 'evidences-{{toolchain.name}}'
+      type: new
+      has_issues: false
+      enable_traceability: false
+      legal: true      
+
+  build:
+    service_id: pipeline
+    parameters:
+      services:
+        - tekton-definition-repo
+        - tekton-catalog-repo
+        - application-repo
+        - incident-issues-repo
+        - evidence-locker-repo
+        - customtool_servicenow
+      name: '{{services.repo.parameters.repo_name}}'
+      type: tekton
+      ui-pipeline: true
+      configuration:
+        content:
+          $text: tekton.yaml
+        env:
+          # repo for Tekton definitions
+          TEKTON_DEFINITION_REPO: tekton-definition-repo
+          TEKTON_CATALOG_REPO: tekton-catalog-repo
+          APPLICATION_REPO: application-repo
+          # repo of your application to be build/deployed
+          REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
+          REVISION: master
+          # IBM Cloud cluster data
+          API_KEY: '{{form.pipeline.parameters.api-key}}'
+          REGISTRY_NAMESPACE: '{{form.pipeline.parameters.registry-namespace}}'
+          REGISTRY_REGION_ID: '{{form.pipeline.parameters.registry-region}}'
+          PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
+          PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
+          PROD_REGION_ID: '{{form.pipeline.parameters.prod-region}}'
+          # ServiceNow API token to create Change Requests
+          SERVICE_NOW_TOKEN: '{{form.customtool_servicenow.parameters.api-token}}'
+          # GitHub Enterprise credentials to access the v3 REST API
+          GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
+          GHE_USER: '{{services.application-repo.parameters.owner_id}}'
+          # Issues repo to raise compliance related issues from the CI/CD
+          GHE_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_name}}'
+          EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_name}}'
+          EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
+          CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
+        execute: true
+
+  servicenow:
+    service_id: customtool
+    parameters:
+      type: 'servicenow'
+      lifecyclePhase: 'THINK'
+      imageUrl:
+        $ref: customtool_servicenow.png
+        $refType: image-data-uri
+      documentationUrl: 'https://watson.service-now.com/ess_portal?id=kb_category&kb_category=92518934db4e3300fc0e389f9d961990'
+      name: 'ServiceNow Change Management'
+      dashboard_url: 'https://watson.service-now.com/ess_portal?id=ss_homepage'
+      description: 'IBM Cloud Employee Service Portal'
+      
+form:
+  
+  pipeline:
+    parameters:
+      app-name: '{{services.application-repo.parameters.repo_name}}'
+      prod-cluster-namespace: prod
+      build-cluster-namespace: staging
+      emergency-label: EMERGENCY
+      ghe-token: 
+    schema:
+      $ref: deploy.json
+  
+  customtool_servicenow:
+    parameters:
+      api-token:
+    schema:
+      $ref: customtool_servicenow.json
