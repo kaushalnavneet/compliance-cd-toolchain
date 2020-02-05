@@ -5,6 +5,40 @@ TODO: documentation
 ### To get started, click this button:
 [![Deploy To Bluemix](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy?repository=https://github.ibm.com/one-pipeline/compliance-cd-toolchain)
 
+
+## Inputs
+
+The following `Secret` and `ConfigMap` resources are created for the tasks in the pipeline
+
+### Context
+
+ - Type: `ConfigMap`
+ - Name: `cd-context`
+
+Content: 
+
+ - **CR_NAMESPACE**: Container Registry namespace
+ - **CR_REGION**: Container Registry region
+ - **CLUSTER_NAME**: Cluster Name
+ - **CLUSTER_REGION**: Cluster region
+ - **CLUSTER_NAMESPACE**: Cluster namespace
+ - **EMERGENCY_LABEL**: Label used for your Emergency releases, issues and PRs on GitHub
+ - **APPLICATION**: the application/service name for images and ServiceNow
+ - **INCIDENT_ISSUE_REPO**: Repo URL to manage Compliance Incident issues
+ - **EVIDENCE_LOCKER_REPO**: Repo URL as an Evidence Locker
+
+### Secrets
+
+ - Type: `Secret`
+ - Name: `cd-secrets`
+
+Content: 
+
+ - **API_KEY**: IBM Cloud API key
+ - **GHE_USER**: GitHub Enterprise user
+ - **GHE_TOKEN**: GitHub Enterprise API token
+ - **SERVICENOW_TOKEN**: ServiceNow Change Management console API token
+
 ---
 ### Learn more 
 
