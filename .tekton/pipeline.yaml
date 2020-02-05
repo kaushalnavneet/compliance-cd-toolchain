@@ -9,33 +9,8 @@ spec:
     - name: revision
       description: the branch for the git repo
       default: master
-    - name: apikey
-      description: the ibmcloud api key
-    - name: registryNamespace
-      description: the ibmcloud registry namespace
-    - name: cluster
-      description: The IBM Cloud Kubernetes cluster name
-    - name: registryRegion
-      description: the ibmcloud registry region
-      default: us-south
-    - name: clusterRegion
-      description: The IBM Cloud Kubernetes cluster region
-      default: us-south
-    - name: clusterNamespace
-      description: The Kubernetes cluster namespace
-      default: prod
-    - name: gheToken
-      description: the GHE token
-    - name: gheUser
-      description: the GHE user
-    - name: ghEmergencyLabel
-      description: the name of the emergency label
     - name: image
       description: the image to be deployed
-    - name: app
-      description: name of the deployed app or service
-    - name: serviceNowToken
-      description: API token for ServiceNow to handle Change Requests
     - name: changeRequestNumber
       description: ServiceNow CR number
       default: "notAvailable"
@@ -48,25 +23,7 @@ spec:
           value: $(params.repository)
         - name: revision
           value: $(params.revision)
-        - name: apikey
-          value: $(params.apikey)
-        - name: cluster
-          value: $(params.cluster)
-        - name: clusterRegion
-          value: $(params.clusterRegion)
-        - name: clusterNamespace
-          value: $(params.clusterNamespace)
-        - name: gheToken
-          value: $(params.gheToken)
-        - name: gheUser
-          value: $(params.gheUser)
         - name: image
           value: $(params.image)
-        - name: app
-          value: $(params.app)
-        - name: ghEmergencyLabel
-          value: $(params.ghEmergencyLabel)
-        - name: serviceNowToken
-          value: $(params.serviceNowToken)
         - name: changeRequestNumber
           value: $(params.changeRequestNumber)
