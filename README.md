@@ -8,12 +8,16 @@ TODO: documentation
 
 ## Inputs
 
-The following `Secret` and `ConfigMap` resources are created for the tasks in the pipeline
+The following `Secret` and `ConfigMap` resources are created for the tasks in the pipeline.
+Each name for these resources will be passed on for the tasks in the following parameters
+
+- `configurationContext`
+- `configurationSecrets`
 
 ### Context
 
  - Type: `ConfigMap`
- - Name: `cd-context`
+ - Default name: `cd-context`
 
 Content: 
 
@@ -30,7 +34,7 @@ Content:
 ### Secrets
 
  - Type: `Secret`
- - Name: `cd-secrets`
+ - Default name: `cd-secrets`
 
 Content: 
 
