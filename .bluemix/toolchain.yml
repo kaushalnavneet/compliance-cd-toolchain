@@ -32,7 +32,7 @@ toolchain:
 services:
 
   tekton-definition-repo:
-    service_id: githubpublic
+    service_id: github_integrated
     parameters:
       repo_url: $env.repository
       type: link
