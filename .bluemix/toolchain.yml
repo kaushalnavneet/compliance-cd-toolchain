@@ -10,6 +10,7 @@ template:
   icon: secure-lock-kubernetes.svg
   required:
     - build
+#    - tekton-catalog-repo
     - tekton-definition-repo
     - application-repo
     - evidence-locker-repo
@@ -34,20 +35,21 @@ services:
   tekton-definition-repo:
     service_id: github_integrated
     parameters:
-      repo_url: $env.repository
+      # repo_url: $env.repository
+      repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
       type: link
       has_issues: false
       enable_traceability: false
       legal: true
 
-  tekton-catalog-repo:
-    service_id: github_integrated
-    parameters:
-      repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
-      type: link
-      has_issues: false
-      enable_traceability: false
-      legal: true  
+#   tekton-catalog-repo:
+#     service_id: github_integrated
+#     parameters:
+#       repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
+#       type: link
+#       has_issues: false
+#       enable_traceability: false
+#       legal: true  
 
   application-repo:   
     service_id: github_integrated  
@@ -81,7 +83,7 @@ services:
     parameters:
       services:
         - tekton-definition-repo
-        - tekton-catalog-repo
+        # - tekton-catalog-repo
         - application-repo
         - incident-issues-repo
         - evidence-locker-repo
@@ -95,7 +97,7 @@ services:
         env:
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
-          TEKTON_CATALOG_REPO: tekton-catalog-repo
+          # TEKTON_CATALOG_REPO: tekton-catalog-repo
           APPLICATION_REPO: application-repo
           # repo of your application to be build/deployed
           REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
