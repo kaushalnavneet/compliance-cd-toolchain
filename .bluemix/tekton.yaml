@@ -2,10 +2,6 @@
 inputs:
 - type: git
   branch: master
-  service: ${TEKTON_DEFINITION_REPO}
-  path: .tekton
-- type: git
-  branch: master
   service: ${TEKTON_CATALOG_REPO}
   path: .tekton
 triggers:
