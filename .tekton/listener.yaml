@@ -4,6 +4,12 @@ metadata:
   name: cd-template
 spec:
   params:
+    - name: configurationContext
+      description: Name of the configmap containing the pipeline context
+      default: cd-context
+    - name: configurationSecrets
+      description: Name of the configmap containing the pipeline context secrets
+      default: cd-secrets    
     - name: repository
       description: The git repo
     - name: revision
@@ -73,6 +79,10 @@ spec:
         pipelineRef:
           name: cd-pipeline
         params:
+          - name: configurationContext
+            value: $(params.configurationContext) 
+          - name: configurationSecrets
+            value: $(params.configurationSecrets)        
           - name: repository
             value: $(params.repository)          
           - name: revision
