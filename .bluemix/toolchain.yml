@@ -98,7 +98,7 @@ services:
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           # TEKTON_CATALOG_REPO: tekton-catalog-repo
-          APPLICATION_REPO: application-repo
+          # APPLICATION_REPO: application-repo
           # repo of your application to be build/deployed
           REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
           REVISION: master
@@ -110,10 +110,13 @@ services:
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
           PROD_REGION_ID: '{{form.pipeline.parameters.prod-region}}'
           # ServiceNow API token to create Change Requests
-          SERVICE_NOW_TOKEN: '{{form.customtool_servicenow.parameters.api-token}}'
+          # SERVICE_NOW_TOKEN: '{{form.customtool_servicenow.parameters.api-token}}'
+          SERVICE_NOW_TOKEN: 'foobar'
           # GitHub Enterprise credentials to access the v3 REST API
-          GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
-          GHE_USER: '{{services.application-repo.parameters.owner_id}}'
+          # GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
+          # GHE_USER: '{{services.application-repo.parameters.owner_id}}'
+          GHE_TOKEN: 'foobar'
+          GHE_USER: 'foobar'
           # Issues repo to raise compliance related issues from the CI/CD
           GHE_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_name}}'
           EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_name}}'
