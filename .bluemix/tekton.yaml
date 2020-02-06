@@ -12,6 +12,9 @@ properties:
 - name: repository
   value: ${REPOSITORY}
   type: text
+- name: repo
+  value: ${REPOSITORY}
+  type: text
 - name: revision
   value: ${REVISION}
   type: text
