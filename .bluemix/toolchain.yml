@@ -34,7 +34,7 @@ services:
   tekton-definition-repo:
     service_id: github_integrated
     parameters:
-      repo_url: 'https://github.ibm.com/padraic-edwards/compliance-cd-toolchain/'
+      repo_url: 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
       type: link
       has_issues: false
       enable_traceability: false
