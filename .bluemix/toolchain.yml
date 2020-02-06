@@ -96,9 +96,9 @@ services:
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           TEKTON_CATALOG_REPO: tekton-catalog-repo
-          APPLICATION_REPO: application-repo
-          # repo of your application to be build/deployed
-          REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
+          APPLICATION_REPO: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
+          # repo of your application to be build/deployed tekton-definition-repo
+          REPOSITORY: tekton-definition-repo
           REVISION: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
