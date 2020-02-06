@@ -125,7 +125,7 @@ services:
     service_id: customtool
     parameters:
       type: 'servicenow'
-      lifecyclePhase: 'THINK'
+      lifecyclePhase: 'MANAGE'
       imageUrl:
         $ref: servicenow.svg
         $refType: image-data-uri
