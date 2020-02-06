@@ -131,6 +131,7 @@ services:
       name: 'ServiceNow Change Management'
       dashboard_url: 'https://watson.service-now.com/ess_portal?id=ss_homepage'
       description: 'IBM Cloud Employee Service Portal'
+      additional-properties:
       
 form:
   
