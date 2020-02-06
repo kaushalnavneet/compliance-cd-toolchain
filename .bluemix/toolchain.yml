@@ -11,6 +11,7 @@ template:
   required:
     - build
     - tekton-definition-repo
+    - tekton-catalog-repo
     - application-repo
     - evidence-locker-repo
     - incident-issues-repo
