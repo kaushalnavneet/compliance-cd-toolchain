@@ -123,7 +123,7 @@ services:
     service_id: customtool
     parameters:
       type: 'servicenow'
-      lifecyclePhase: 'THINK'
+      lifecyclePhase: 'MANAGE'
       imageUrl:
         $ref: customtool_servicenow.png
         $refType: image-data-uri
