@@ -125,7 +125,7 @@ services:
       type: 'servicenow'
       lifecyclePhase: 'MANAGE'
       imageUrl:
-        $ref: customtool_servicenow.png
+        $ref: service-now.svg
         $refType: image-data-uri
       documentationUrl: 'https://watson.service-now.com/ess_portal?id=kb_category&kb_category=92518934db4e3300fc0e389f9d961990'
       name: 'ServiceNow Change Management'
