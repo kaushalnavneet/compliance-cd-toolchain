@@ -14,7 +14,7 @@ triggers:
   eventListener: listener
 properties:
 - name: repository
-  value: ${REPOSITORY}
+  value: ${APPLICATION_REPO}
   type: text
 - name: repo
   value: ${REPOSITORY}
