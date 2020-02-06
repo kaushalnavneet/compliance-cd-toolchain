@@ -45,7 +45,7 @@ services:
     service_id: github_integrated
     parameters:
       repo_url: 'https://github.ibm.com/padraic-edwards/tekton-compliance-catalog'
-      type: link
+      type: clone
       has_issues: false
       enable_traceability: false
       legal: true  
