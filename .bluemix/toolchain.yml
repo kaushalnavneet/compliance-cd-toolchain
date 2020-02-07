@@ -15,6 +15,7 @@ template:
     - application-repo
     - evidence-locker-repo
     - incident-issues-repo
+    - servicenow
  
   info:
     git url: >
