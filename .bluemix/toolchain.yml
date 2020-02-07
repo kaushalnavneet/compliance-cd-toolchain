@@ -88,7 +88,7 @@ services:
         - incident-issues-repo
         - evidence-locker-repo
         - customtool_servicenow
-      name: '{{services.repo.parameters.repo_name}}'
+      name: 'tekton-pipeline-{{timestamp}}'
       type: tekton
       ui-pipeline: true
       configuration:
