@@ -5,7 +5,7 @@ inputs:
 #   service: ${TEKTON_CATALOG_REPO}
 #   path: .tekton
 - type: git
-  branch: "fix/contain-cd-pipeline"
+  branch: master
   service: ${TEKTON_DEFINITION_REPO}
   path: .tekton
 triggers:
