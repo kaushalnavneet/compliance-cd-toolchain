@@ -100,7 +100,8 @@ services:
           # TEKTON_CATALOG_REPO: tekton-catalog-repo
           # APPLICATION_REPO: application-repo
           # repo of your application to be build/deployed
-          REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
+          # REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
+          REPOSITORY: 'foo/bar'
           # REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
           REVISION: master
           # IBM Cloud cluster data
@@ -119,8 +120,10 @@ services:
           # GHE_USER: '{{services.application-repo.parameters.owner_id}}'
           GHE_USER: "asdasdasdasdasda"
           # Issues repo to raise compliance related issues from the CI/CD
-          GHE_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_name}}'
-          EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_name}}'
+          # GHE_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_name}}'
+          # EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_name}}'
+          GHE_ISSUES_REPO: 'ASDASD'
+          EVIDENCE_LOCKER_REPO: 'ASDASDSA'
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
         execute: true
