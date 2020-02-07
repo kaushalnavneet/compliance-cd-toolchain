@@ -100,9 +100,8 @@ services:
           # TEKTON_CATALOG_REPO: tekton-catalog-repo
           # APPLICATION_REPO: application-repo
           # repo of your application to be build/deployed
-          # REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
-          # REPOSITORY: 'foo/bar'
-          REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
+          # REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
+          REPOSITORY: 'if-i-clone-repo-this-will-break'
           REVISION: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
@@ -114,7 +113,6 @@ services:
           # ServiceNow API token to create Change Requests
           SERVICE_NOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
           # GitHub Enterprise credentials to access the v3 REST API
-          # HERE BE DRAGONS
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
           GHE_USER: '{{services.application-repo.parameters.owner_id}}'
           # Issues repo to raise compliance related issues from the CI/CD
