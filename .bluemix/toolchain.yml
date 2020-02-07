@@ -113,12 +113,11 @@ services:
           PROD_REGION_ID: '{{form.pipeline.parameters.prod-region}}'
           # ServiceNow API token to create Change Requests
           SERVICE_NOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
-          # SERVICENOW_TOKEN: 'foobar'
           # GitHub Enterprise credentials to access the v3 REST API
           # HERE BE DRAGONS
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
-          # GHE_USER: '{{services.application-repo.parameters.owner_id}}'
-          GHE_USER: "asdasdasdasdasda"
+          GHE_USER: '{{services.application-repo.parameters.owner_id}}'
+          # GHE_USER: "asdasdasdasdasda"
           # Issues repo to raise compliance related issues from the CI/CD
           # GHE_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_name}}'
           # EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_name}}'
