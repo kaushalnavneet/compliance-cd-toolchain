@@ -125,9 +125,7 @@ services:
     parameters:
       type: 'servicenow'
       lifecyclePhase: 'MANAGE'
-      imageUrl:
-        $ref: service-now.svg
-        $refType: image-data-uri
+      imageUrl: 'https://github.ibm.com/padraic-edwards/compliance-cd-toolchain/blob/master/.bluemix/service-now.svg'
       documentationUrl: 'https://watson.service-now.com/ess_portal?id=kb_category&kb_category=92518934db4e3300fc0e389f9d961990'
       name: 'ServiceNow Change Management'
       dashboard_url: 'https://watson.service-now.com/ess_portal?id=ss_homepage'
