@@ -101,6 +101,7 @@ services:
           # APPLICATION_REPO: application-repo
           # repo of your application to be build/deployed
           REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
+          # REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
           REVISION: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
