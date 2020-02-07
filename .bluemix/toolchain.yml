@@ -10,10 +10,11 @@ template:
   icon: secure-lock-kubernetes.svg
   required:
     - build
+#    - tekton-catalog-repo
     - tekton-definition-repo
     - application-repo
-    - evidence-locker-repo
-    - incident-issues-repo
+    # - evidence-locker-repo
+    # - incident-issues-repo
     - servicenow
  
   info:
@@ -34,20 +35,21 @@ services:
   tekton-definition-repo:
     service_id: github_integrated
     parameters:
-      repo_url: $env.repository
+      # repo_url: $env.repository
+      repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
       type: link
       has_issues: false
       enable_traceability: false
       legal: true
 
-  tekton-catalog-repo:
-    service_id: github_integrated
-    parameters:
-      repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
-      type: link
-      has_issues: false
-      enable_traceability: false
-      legal: true  
+#   tekton-catalog-repo:
+#     service_id: github_integrated
+#     parameters:
+#       repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
+#       type: link
+#       has_issues: false
+#       enable_traceability: false
+#       legal: true  
 
   application-repo:   
     service_id: github_integrated  
@@ -81,12 +83,12 @@ services:
     parameters:
       services:
         - tekton-definition-repo
-        - tekton-catalog-repo
+        # - tekton-catalog-repo
         - application-repo
         - incident-issues-repo
         - evidence-locker-repo
         - customtool_servicenow
-      name: '{{services.repo.parameters.repo_name}}'
+      name: 'tekton-pipeline-{{timestamp}}'
       type: tekton
       ui-pipeline: true
       configuration:
@@ -95,10 +97,11 @@ services:
         env:
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
-          TEKTON_CATALOG_REPO: tekton-catalog-repo
-          APPLICATION_REPO: application-repo
+          # TEKTON_CATALOG_REPO: tekton-catalog-repo
+          # APPLICATION_REPO: application-repo
           # repo of your application to be build/deployed
-          REPOSITORY: '{{services.application-repo.parameters.owner_id}}/{{services.application-repo.parameters.repo_name}}'
+          REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
+          # REPOSITORY: 'if-i-clone-repo-this-will-break'
           REVISION: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
@@ -108,13 +111,15 @@ services:
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
           PROD_REGION_ID: '{{form.pipeline.parameters.prod-region}}'
           # ServiceNow API token to create Change Requests
-          SERVICE_NOW_TOKEN: '{{form.customtool_servicenow.parameters.api-token}}'
+          SERVICE_NOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
           # GitHub Enterprise credentials to access the v3 REST API
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
           GHE_USER: '{{services.application-repo.parameters.owner_id}}'
           # Issues repo to raise compliance related issues from the CI/CD
-          GHE_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_name}}'
-          EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_name}}'
+          INCIDENT_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_url}}'
+          EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_url}}'
+          # INCIDENT_ISSUES_REPO: 'ASDASD'
+          # EVIDENCE_LOCKER_REPO: 'ASDASDSA'
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
           CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
         execute: true
@@ -123,9 +128,9 @@ services:
     service_id: customtool
     parameters:
       type: 'servicenow'
-      lifecyclePhase: 'THINK'
+      lifecyclePhase: 'MANAGE'
       imageUrl:
-        $ref: customtool_servicenow.png
+        $ref: servicenow.svg
         $refType: image-data-uri
       documentationUrl: 'https://watson.service-now.com/ess_portal?id=kb_category&kb_category=92518934db4e3300fc0e389f9d961990'
       name: 'ServiceNow Change Management'
@@ -144,8 +149,8 @@ form:
     schema:
       $ref: deploy.json
   
-  customtool_servicenow:
+  customtool_servicenow: 
     parameters:
       api-token:
     schema:
-      $ref: customtool_servicenow.json
+      $ref: servicenow.json
