@@ -1,17 +1,17 @@
 ---
 inputs:
-# - type: git
-#   branch: master
-#   service: ${TEKTON_CATALOG_REPO}
-#   path: .tekton
 - type: git
-  branch: "fix/contain-cd-pipeline"
+  branch: master
+  service: ${TEKTON_CATALOG_REPO}
+  path: .tekton
+- type: git
+  branch: "fix/template-init"
   service: ${TEKTON_DEFINITION_REPO}
   path: .tekton
 triggers:
 - type: manual
   name: Manual CD Trigger
-  eventListener: cd-listener
+  eventListener: listener
 properties:
 - name: repository
   value: ${REPOSITORY}
