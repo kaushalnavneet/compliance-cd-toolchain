@@ -5,7 +5,7 @@ inputs:
 #   service: ${TEKTON_CATALOG_REPO}
 #   path: .tekton
 - type: git
-  branch: fix/contain-cd-pipeline
+  branch: "fix/contain-cd-pipeline"
   service: ${TEKTON_DEFINITION_REPO}
   path: .tekton
 triggers:
@@ -38,7 +38,7 @@ properties:
   value: ${PROD_REGION_ID}
   type: text
 - name: serviceNowToken
-  value: ${SERVICE_NOW_TOKEN}
+  value: ${SERVICENOW_TOKEN}
   type: SECURE
 - name: gheToken
   value: ${GHE_TOKEN}
@@ -47,7 +47,7 @@ properties:
   value: ${GHE_USER}
   type: text
 - name: gheIssueRepo
-  value: ${GHE_ISSUES_REPO}
+  value: ${INCIDENT_ISSUES_REPO}
   type: text
 - name: evidenceLockerRepo
   value: ${EVIDENCE_LOCKER_REPO}
