@@ -116,7 +116,7 @@ services:
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
           GHE_USER: '{{services.application-repo.parameters.owner_id}}'
           # Issues repo to raise compliance related issues from the CI/CD
-          GHE_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_url}}'
+          INCIDENT_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_url}}'
           EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_url}}'
           # INCIDENT_ISSUES_REPO: 'ASDASD'
           # EVIDENCE_LOCKER_REPO: 'ASDASDSA'
