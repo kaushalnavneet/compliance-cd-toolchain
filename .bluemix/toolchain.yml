@@ -13,8 +13,8 @@ template:
 #    - tekton-catalog-repo
     - tekton-definition-repo
     - application-repo
-    - evidence-locker-repo
-    - incident-issues-repo
+    # - evidence-locker-repo
+    # - incident-issues-repo
     # - servicenow
  
   info:
@@ -60,23 +60,23 @@ services:
       enable_traceability: true
       legal: true
 
-  incident-issues-repo:
-    service_id: github_integrated
-    parameters:
-      repo_name: 'issues-{{toolchain.name}}'
-      type: new
-      has_issues: false
-      enable_traceability: false
-      legal: true
-
-  evidence-locker-repo:
-    service_id: github_integrated
-    parameters:
-      repo_name: 'evidences-{{toolchain.name}}'
-      type: new
-      has_issues: false
-      enable_traceability: false
-      legal: true      
+#   incident-issues-repo:
+#     service_id: github_integrated
+#     parameters:
+#       repo_name: 'issues-{{toolchain.name}}'
+#       type: new
+#       has_issues: false
+#       enable_traceability: false
+#       legal: true
+# 
+#   evidence-locker-repo:
+#     service_id: github_integrated
+#     parameters:
+#       repo_name: 'evidences-{{toolchain.name}}'
+#       type: new
+#       has_issues: false
+#       enable_traceability: false
+#       legal: true      
 
   build:
     service_id: pipeline
@@ -85,8 +85,8 @@ services:
         - tekton-definition-repo
         # - tekton-catalog-repo
         - application-repo
-        - incident-issues-repo
-        - evidence-locker-repo
+#        - incident-issues-repo
+#        - evidence-locker-repo
         # - customtool_servicenow
       name: 'tekton-pipeline-{{timestamp}}'
       type: tekton
