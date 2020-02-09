@@ -127,7 +127,7 @@ services:
   servicenow:
     service_id: customtool
     parameters:
-      type: 'servicenow'
+      type: servicenow
       lifecyclePhase: 'MANAGE'
       imageUrl:
         $ref: servicenow.svg
