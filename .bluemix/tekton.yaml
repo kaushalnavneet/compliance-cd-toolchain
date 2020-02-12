@@ -46,16 +46,21 @@ properties:
 - name: gheUser
   value: ${GHE_USER}
   type: text
-- name: gheIssueRepo
+- name: incidentIssueRepo
   value: ${INCIDENT_ISSUES_REPO}
   type: text
 - name: evidenceLockerRepo
   value: ${EVIDENCE_LOCKER_REPO}
   type: text
-- name: ghEmergencyLabel
+- name: emergencyLabel
   value: ${EMERGENCY_LABEL}
   type: text
 - name: app
   value: ${CF_APP_NAME}
   type: text
-
+- name: changeRequestID
+  value: "notAvailable"
+  type: text  
+- name: image
+  value: "-"
+  type: text  
