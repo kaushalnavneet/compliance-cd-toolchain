@@ -53,8 +53,7 @@ services:
   incident-issues-repo:
     service_id: github_integrated
     parameters:
-      repo_name: 'issues-{{toolchain.name}}'
-      type: existing
+      type: link
       has_issues: false
       enable_traceability: false
       legal: true
@@ -62,8 +61,7 @@ services:
   evidence-locker-repo:
     service_id: github_integrated
     parameters:
-      repo_name: 'evidences-{{toolchain.name}}'
-      type: existing
+      type: link
       has_issues: false
       enable_traceability: false
       legal: true      
