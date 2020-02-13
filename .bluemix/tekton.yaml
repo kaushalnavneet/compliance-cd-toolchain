@@ -65,5 +65,5 @@ properties:
   value: "notAvailable"
   type: text  
 - name: image
-  value: "-"
+    value: ${IMAGE_TAG}
   type: text  
