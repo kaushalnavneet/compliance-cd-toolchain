@@ -111,8 +111,8 @@ services:
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
           PROD_REGION_ID: '{{form.pipeline.parameters.prod-region}}'
           # ServiceNow API token to create Change Requests
-          SERVICE_NOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
-          SERVICE_NOW_URL: '{{form.servicenow.parameters.api-url}}'
+          SERVICENOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
+          SERVICENOW_URL: '{{form.servicenow.parameters.api-url}}'
           # GitHub Enterprise credentials to access the v3 REST API
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
           GHE_USER: '{{services.application-repo.parameters.owner_id}}'
