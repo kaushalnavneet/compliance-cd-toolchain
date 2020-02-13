@@ -82,7 +82,7 @@ services:
         content:
           $text: tekton.yaml
         env:
-          CF_APP_NAME: '{{form.pipeline.parameters.app-name}}'
+          IMAGE_NAME: '{{form.pipeline.parameters.app-name}}'
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           # TEKTON_CATALOG_REPO: tekton-catalog-repo
