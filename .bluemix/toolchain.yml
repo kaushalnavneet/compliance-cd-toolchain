@@ -12,7 +12,6 @@ template:
     - build
 #    - tekton-catalog-repo
     - tekton-definition-repo
-    - application-repo
     # - evidence-locker-repo
     # - incident-issues-repo
     - servicenow
@@ -51,20 +50,11 @@ services:
 #       enable_traceability: false
 #       legal: true  
 
-  application-repo:   
-    service_id: github_integrated  
-    parameters:
-      source_repo_url: 'https://github.ibm.com/cocoa/cocoa-example-app'
-      type: clone
-      has_issues: false
-      enable_traceability: true
-      legal: true
-
   incident-issues-repo:
     service_id: github_integrated
     parameters:
       repo_name: 'issues-{{toolchain.name}}'
-      type: new
+      type: existing
       has_issues: false
       enable_traceability: false
       legal: true
@@ -73,7 +63,7 @@ services:
     service_id: github_integrated
     parameters:
       repo_name: 'evidences-{{toolchain.name}}'
-      type: new
+      type: existing
       has_issues: false
       enable_traceability: false
       legal: true      
@@ -84,7 +74,6 @@ services:
       services:
         - tekton-definition-repo
         # - tekton-catalog-repo
-        - application-repo
         - incident-issues-repo
         - evidence-locker-repo
         - customtool_servicenow
@@ -99,9 +88,7 @@ services:
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           # TEKTON_CATALOG_REPO: tekton-catalog-repo
-          # APPLICATION_REPO: application-repo
           # repo of your application to be build/deployed
-          REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
           BRANCH: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
@@ -115,7 +102,7 @@ services:
           SERVICENOW_URL: '{{form.servicenow.parameters.api-url}}'
           # GitHub Enterprise credentials to access the v3 REST API
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
-          GHE_USER: '{{services.application-repo.parameters.owner_id}}'
+          GHE_USER: '{{services.evidence-locker-repo.parameters.owner_id}}'
           # Issues repo to raise compliance related issues from the CI/CD
           INCIDENT_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_url}}'
           EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_url}}'
