@@ -12,6 +12,7 @@ template:
     - build
 #    - tekton-catalog-repo
     - tekton-definition-repo
+    - application-repo
     # - evidence-locker-repo
     # - incident-issues-repo
     - servicenow
@@ -49,6 +50,14 @@ services:
 #       has_issues: false
 #       enable_traceability: false
 #       legal: true  
+  application-repo:   
+	  service_id: github_integrated  
+	  parameters:
+	    source_repo_url: 'https://github.ibm.com/cocoa/cocoa-example-app'
+	    type: clone
+	    has_issues: false
+	    enable_traceability: true
+	    legal: true
 
   incident-issues-repo:
     service_id: github_integrated
