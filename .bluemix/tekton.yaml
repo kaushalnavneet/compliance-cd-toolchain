@@ -40,6 +40,9 @@ properties:
 - name: serviceNowToken
   value: ${SERVICENOW_TOKEN}
   type: SECURE
+- name: serviceNowUrl
+  value: ${SERVICENOW_URL}
+  type: text
 - name: gheToken
   value: ${GHE_TOKEN}
   type: SECURE
