@@ -1,22 +1,19 @@
 ---
 inputs:
+# - type: git
+#   branch: master
+#   service: ${TEKTON_CATALOG_REPO}
+#   path: .tekton
 - type: git
   branch: master
   service: ${TEKTON_DEFINITION_REPO}
   path: .tekton
-- type: git
-  branch: master
-  service: ${TEKTON_CATALOG_REPO}
-  path: .tekton
 triggers:
 - type: manual
   name: Manual CD Trigger
-  eventListener: listener
+  eventListener: cd-listener
 properties:
 - name: repository
-  value: ${APPLICATION_REPO}
-  type: text
-- name: repo
   value: ${REPOSITORY}
   type: text
 - name: revision
@@ -41,24 +38,32 @@ properties:
   value: ${PROD_REGION_ID}
   type: text
 - name: serviceNowToken
-  value: ${SERVICE_NOW_TOKEN}
+  value: ${SERVICENOW_TOKEN}
   type: SECURE
+- name: serviceNowUrl
+  value: ${SERVICENOW_URL}
+  type: text
 - name: gheToken
   value: ${GHE_TOKEN}
   type: SECURE
 - name: gheUser
   value: ${GHE_USER}
   type: text
-- name: gheIssueRepo
-  value: ${GHE_ISSUES_REPO}
+- name: incidentIssueRepo
+  value: ${INCIDENT_ISSUES_REPO}
   type: text
 - name: evidenceLockerRepo
   value: ${EVIDENCE_LOCKER_REPO}
   type: text
-- name: ghEmergencyLabel
+- name: emergencyLabel
   value: ${EMERGENCY_LABEL}
   type: text
 - name: app
   value: ${CF_APP_NAME}
   type: text
-
+- name: changeRequestID
+  value: "notAvailable"
+  type: text  
+- name: image
+  value: "-"
+  type: text  
