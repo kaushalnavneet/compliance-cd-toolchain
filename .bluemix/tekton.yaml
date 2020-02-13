@@ -58,12 +58,9 @@ properties:
 - name: emergencyLabel
   value: ${EMERGENCY_LABEL}
   type: text
-- name: app
-  value: ${CF_APP_NAME}
-  type: text
 - name: changeRequestID
   value: "notAvailable"
   type: text  
 - name: image
-  value: ${IMAGE_TAG}
+  value: ${IMAGE_NAME}
   type: text  
