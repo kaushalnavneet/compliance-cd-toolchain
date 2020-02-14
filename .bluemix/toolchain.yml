@@ -144,7 +144,7 @@ form:
   
   customtool_servicenow: 
     parameters:
-      api-url: 'https://watsontest.service-now.com/api/ibmwc/change'
+      api-url: https://watsontest.service-now.com/api/ibmwc/change
       api-token:
     schema:
       $ref: servicenow.json
