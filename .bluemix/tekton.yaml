@@ -13,6 +13,9 @@ triggers:
   name: Manual CD Trigger
   eventListener: cd-listener
 properties:
+- name: repository
+  value: ${REPOSITORY}
+  type: text
 - name: revision
   value: ${BRANCH}
   type: text
