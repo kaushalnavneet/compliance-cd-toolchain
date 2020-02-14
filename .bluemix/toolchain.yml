@@ -113,6 +113,7 @@ services:
           # ServiceNow API token to create Change Requests
           SERVICENOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
           SERVICENOW_URL: '{{form.servicenow.parameters.api-url}}'
+          CHANGEREQUEST_ID: '{{form.servicenow.parameters.changerequest-id}}' 
           # GitHub Enterprise credentials to access the v3 REST API
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
           GHE_USER: '{{services.application-repo.parameters.owner_id}}'
@@ -151,6 +152,7 @@ form:
   customtool_servicenow: 
     parameters:
       api-url: 'https://watsontest.service-now.com/api/ibmwc/change'
+      changerequest-id: 'notAvailable'
       api-token:
     schema:
       $ref: servicenow.json

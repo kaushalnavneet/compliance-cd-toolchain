@@ -62,7 +62,7 @@ properties:
   value: ${CF_APP_NAME}
   type: text
 - name: changeRequestID
-  value: "notAvailable"
+  value: ${CHANGEREQUEST_ID}
   type: text  
 - name: image
   value: "-"
