@@ -17,7 +17,7 @@ properties:
   value: ${REPOSITORY}
   type: text
 - name: revision
-  value: ${REVISION}
+  value: ${BRANCH}
   type: text
 - name: apikey
   value: ${API_KEY}
@@ -58,12 +58,9 @@ properties:
 - name: emergencyLabel
   value: ${EMERGENCY_LABEL}
   type: text
-- name: app
-  value: ${CF_APP_NAME}
-  type: text
 - name: changeRequestID
   value: "notAvailable"
   type: text  
 - name: image
-  value: "-"
+  value: ${IMAGE_NAME}
   type: text  
