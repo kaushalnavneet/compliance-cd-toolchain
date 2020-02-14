@@ -27,16 +27,14 @@
       },
       "type": "string",
       "pattern": "\\S"
-    }
+    },
     "changerequest-id": {
       "description": {
         "$ref": "#/messages/servicenow.crIdDescription"
       },
       "type": "string",
       "pattern": "\\S"
-    }
-
-    
+    }    
   },
   "required": [
     "api-token",
