@@ -44,7 +44,7 @@ properties:
   value: ${SERVICENOW_URL}
   type: text
 - name: app
-  value: ${CF_APP_NAME}
+  value: ${APP_NAME}
   type: text
 - name: gheToken
   value: ${GHE_TOKEN}
