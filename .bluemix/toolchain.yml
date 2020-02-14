@@ -56,7 +56,7 @@ services:
 #       type: link
 #       has_issues: false
 #       enable_traceability: false
-#       legal: true  
+#       legal: true 
 
   incident-issues-repo:
     service_id: github_integrated
