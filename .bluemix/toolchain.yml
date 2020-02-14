@@ -46,6 +46,7 @@ services:
     service_id: github_integrated
     parameters:
       source_repo_url: 'https://github.ibm.com/cocoa/cocoa-example-app'
+      repo_name: 'cocoa-example-app-{{timestamp}}'
       type: clone
       has_issues: false
       enable_traceability: true
@@ -99,7 +100,7 @@ services:
           BRANCH: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
-          REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
+          REPOSITORY: '{{form.application-repo.parameters.repo_url}}'
           REGISTRY_NAMESPACE: '{{form.pipeline.parameters.registry-namespace}}'
           REGISTRY_REGION_ID: '{{form.pipeline.parameters.registry-region}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
@@ -112,8 +113,8 @@ services:
           GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
           GHE_USER: '{{services.evidence-locker-repo.parameters.owner_id}}'
           # Issues repo to raise compliance related issues from the CI/CD
-          INCIDENT_ISSUES_REPO: '{{services.incident-issues-repo.parameters.repo_url}}'
-          EVIDENCE_LOCKER_REPO: '{{services.evidence-locker-repo.parameters.repo_url}}'
+          INCIDENT_ISSUES_REPO: '{{form.incident-issues-repo.parameters.repo_url}}'
+          EVIDENCE_LOCKER_REPO: '{{form.evidence-locker-repo.parameters.repo_url}}'
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
         execute: true
