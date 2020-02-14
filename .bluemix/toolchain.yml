@@ -14,6 +14,7 @@ template:
     - tekton-definition-repo
     # - evidence-locker-repo
     # - incident-issues-repo
+    - application-repo
     - servicenow
  
   info:
@@ -40,7 +41,15 @@ services:
       has_issues: false
       enable_traceability: false
       legal: true
-
+      
+  application-repo:   
+    service_id: github_integrated
+    parameters:
+      source_repo_url: 'https://github.ibm.com/cocoa/cocoa-example-app'
+      type: clone
+      has_issues: false
+      enable_traceability: true
+      legal: true
 #   tekton-catalog-repo:
 #     service_id: github_integrated
 #     parameters:
@@ -90,6 +99,7 @@ services:
           BRANCH: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
+          REPOSITORY: '{{services.application-repo.parameters.repo_url}}'
           REGISTRY_NAMESPACE: '{{form.pipeline.parameters.registry-namespace}}'
           REGISTRY_REGION_ID: '{{form.pipeline.parameters.registry-region}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
