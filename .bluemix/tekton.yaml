@@ -1,9 +1,9 @@
 ---
 inputs:
-# - type: git
-#   branch: master
-#   service: ${TEKTON_CATALOG_REPO}
-#   path: .tekton
+- type: git
+  branch: master
+  service: ${TEKTON_CATALOG_REPO}
+  path: preview/git
 - type: git
   branch: master
   service: ${TEKTON_DEFINITION_REPO}
@@ -19,7 +19,7 @@ properties:
 - name: revision
   value: ${BRANCH}
   type: text
-- name: apikey
+- name: ibmcloud-api-key
   value: ${API_KEY}
   type: SECURE
 - name: registryNamespace
@@ -43,14 +43,11 @@ properties:
 - name: serviceNowUrl
   value: ${SERVICENOW_URL}
   type: text
+- name: serviceNowConfigurationItem
+  value: ${SERVICENOW_CONFIGURATION_ITEM}
+  type: text
 - name: app
   value: ${APP_NAME}
-  type: text
-- name: gheToken
-  value: ${GHE_TOKEN}
-  type: SECURE
-- name: gheUser
-  value: ${GHE_USER}
   type: text
 - name: incidentIssueRepo
   value: ${INCIDENT_ISSUES_REPO}
@@ -62,7 +59,7 @@ properties:
   value: ${EMERGENCY_LABEL}
   type: text
 - name: changeRequestID
-  value: "notAvailable"
+  value: ${CHANGEREQUEST_ID}
   type: text  
 - name: image
   value: ${IMAGE_NAME}

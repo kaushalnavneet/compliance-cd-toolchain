@@ -97,13 +97,6 @@
         "type": "string",
         "pattern": "\\S"
       },
-      "ghe-token": {
-        "description": {
-          "$ref": "#/messages/deploy.gheToken"
-        },
-        "type": "string",
-        "pattern": "\\S"
-      },
       "emergency-label": {
         "description": {
           "$ref": "#/messages/deploy.emergencyLabel"
@@ -121,8 +114,7 @@
     "prod-resource-group", 
     "prod-cluster-name", 
     "prod-cluster-namespace",
-    "emergency-label",
-    "ghe-token"
+    "emergency-label"
   ],
   "form": [
      {
@@ -248,30 +240,13 @@
           ]
       },
       {
-        "title": "Emergency Label for PR",
+        "title": {
+          "$ref": "#/messages/deploy.emergencyLabelTitle"
+        },
         "key": "emergency-label",
         "type": "text",
         "readonly": false,
         "value": "EMERGENCY"
-      },
-      {
-        "title": "GHE Token",
-        "key": "ghe-token",
-        "type": "password",
-        "readonly": false
-      },
-      {
-        "type": "table",
-        "columnCount": 1,
-          "widths": ["100%"],
-          "items": [
-              {
-                "type": "label",
-                "title": {
-                  "$ref": "#/messages/deploy.gheTokenDescription"
-                }
-              }
-          ]
       },
       {
         "type": "table",

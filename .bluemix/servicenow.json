@@ -27,14 +27,32 @@
       },
       "type": "string",
       "pattern": "\\S"
+    },
+    "changerequest-id": {
+      "description": {
+        "$ref": "#/messages/servicenow.initialCrDescription"
+      },
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "configuration-item": {
+      "description": {
+        "$ref": "#/messages/servicenow.configurationItemDescription"
+      },
+      "type": "string",
+      "pattern": "\\S"
     }
   },
   "required": [
-    "api-token"
+    "api-token",
+    "changerequest-id",
+    "configuration-item"
   ],
   "form": [
     {
-      "title": "ServiceNow Token",
+      "title": {
+        "$ref": "#/messages/servicenow.apitokenTitle"
+      },
       "key": "api-token",
       "type": "password",
       "readonly": false
@@ -53,7 +71,51 @@
       ]
     },
     {
-      "title": "ServiceNow API URL",
+      "title": {
+        "$ref": "#/messages/servicenow.configurationItemTitle"
+      },
+      "key": "configuration-item",
+      "type": "text",
+      "readonly": false
+    },
+    {
+      "type": "table",
+      "columnCount": 1,
+      "widths": ["100%"],
+      "items": [
+        {
+          "type": "label",
+          "title": {
+            "$ref": "#/messages/servicenow.configurationItemHelp"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "$ref": "#/messages/servicenow.initialCrTitle"
+      },
+      "key": "changerequest-id",
+      "type": "text",
+      "readonly": false
+    },
+    {
+      "type": "table",
+      "columnCount": 1,
+      "widths": ["100%"],
+      "items": [
+        {
+          "type": "label",
+          "title": {
+            "$ref": "#/messages/servicenow.initialCrHelp"
+          }
+        }
+      ]
+    },    
+    {
+      "title": {
+        "$ref": "#/messages/servicenow.apiUrlTitle"
+      },      
       "key": "api-url",
       "type": "text",
       "readonly": false
