@@ -10,7 +10,7 @@ template:
   icon: secure-lock-kubernetes.svg
   required:
     - build
-#    - tekton-catalog-repo
+    - tekton-catalog-repo
     - tekton-definition-repo
     # - evidence-locker-repo
     # - incident-issues-repo
@@ -41,7 +41,16 @@ services:
       has_issues: false
       enable_traceability: false
       legal: true
-      
+
+  tekton-catalog-repo:
+    service_id: github_integrated
+    parameters:
+      repo_url: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
+      type: link
+      has_issues: false
+      enable_traceability: false
+      legal: true 
+          
   application-repo:   
     service_id: github_integrated
     parameters:
@@ -49,14 +58,6 @@ services:
       has_issues: false
       enable_traceability: true
       legal: true
-#   tekton-catalog-repo:
-#     service_id: github_integrated
-#     parameters:
-#       repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
-#       type: link
-#       has_issues: false
-#       enable_traceability: false
-#       legal: true 
 
   incident-issues-repo:
     service_id: github_integrated
@@ -79,7 +80,7 @@ services:
     parameters:
       services:
         - tekton-definition-repo
-        # - tekton-catalog-repo
+        - tekton-catalog-repo
         - incident-issues-repo
         - evidence-locker-repo
         - customtool_servicenow
@@ -93,7 +94,7 @@ services:
           IMAGE_NAME: '{{form.pipeline.parameters.app-name}}'
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
-          # TEKTON_CATALOG_REPO: tekton-catalog-repo
+          TEKTON_CATALOG_REPO: tekton-catalog-repo
           # repo of your application to be build/deployed
           APP_NAME: 'app-{{timestamp}}'
           BRANCH: master
@@ -108,9 +109,6 @@ services:
           # ServiceNow API token to create Change Requests
           SERVICENOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
           SERVICENOW_URL: '{{form.customtool_servicenow.parameters.api-url}}'
-          # GitHub Enterprise credentials to access the v3 REST API
-          GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
-          GHE_USER: '{{services.evidence-locker-repo.parameters.owner_id}}'
           # Issues repo to raise compliance related issues from the CI/CD
           INCIDENT_ISSUES_REPO: '{{form.incident-issues-repo.parameters.repo_url}}'
           EVIDENCE_LOCKER_REPO: '{{form.evidence-locker-repo.parameters.repo_url}}'
@@ -139,7 +137,6 @@ form:
       prod-cluster-namespace: prod
       build-cluster-namespace: staging
       emergency-label: EMERGENCY
-      ghe-token: 
     schema:
       $ref: deploy.json
   
