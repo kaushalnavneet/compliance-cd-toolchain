@@ -56,3 +56,6 @@ servicenow.apiUrlHelp: "The ServiceNow API endpoint for Change Management integr
 servicenow.initialCrTitle: "Initial ServiceNow Change Request ID"
 servicenow.initialCrDescription: "Initial Change Request ID"
 servicenow.initialCrHelp: "For the initial deployment of the service you'll need a Change Request ID in ServiceNow. To create one, [visit this link on the live SN instance](https://watson.service-now.com/change_request.do) or [this link to create one in dev](https://watsontest.service-now.com/change_request.do)"
+servicenow.configurationItemTitle: "ServiceNow Configuration Item"
+servicenow.configurationItemHelp: "Registered name in ServiceNow of the service/app to be associated with Change Requests"
+servicenow.configurationItemDescription: "ServiceNow Configuration Item name, exactly as it is registered in ServiceNow"
