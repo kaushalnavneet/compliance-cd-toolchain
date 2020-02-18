@@ -56,7 +56,7 @@ properties:
   value: ${EMERGENCY_LABEL}
   type: text
 - name: changeRequestID
-  value: "notAvailable"
+  value: ${CHANGEREQUEST_ID}
   type: text  
 - name: image
   value: ${IMAGE_NAME}

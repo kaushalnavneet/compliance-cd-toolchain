@@ -109,6 +109,7 @@ services:
           # ServiceNow API token to create Change Requests
           SERVICENOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
           SERVICENOW_URL: '{{form.customtool_servicenow.parameters.api-url}}'
+          CHANGEREQUEST_ID: '{{form.customtool_servicenow.parameters.changerequest-id}}' 
           # Issues repo to raise compliance related issues from the CI/CD
           INCIDENT_ISSUES_REPO: '{{form.incident-issues-repo.parameters.repo_url}}'
           EVIDENCE_LOCKER_REPO: '{{form.evidence-locker-repo.parameters.repo_url}}'
@@ -143,6 +144,7 @@ form:
   customtool_servicenow: 
     parameters:
       api-url: https://watsontest.service-now.com/api/ibmwc/change
+      changerequest-id: notAvailable
       api-token:
     schema:
       $ref: servicenow.json
