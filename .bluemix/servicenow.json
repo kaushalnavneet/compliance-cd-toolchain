@@ -50,14 +50,6 @@
   ],
   "form": [
     {
-      "title": {
-        "$ref": "#/messages/servicenow.apitokenTitle"
-      },
-      "key": "api-token",
-      "type": "password",
-      "readonly": false
-    },
-    {
       "type": "table",
       "columnCount": 1,
       "widths": ["100%"],
@@ -69,6 +61,14 @@
           }
         }
       ]
+    },
+    {
+      "title": {
+        "$ref": "#/messages/servicenow.apitokenTitle"
+      },
+      "key": "api-token",
+      "type": "password",
+      "readonly": false
     },
     {
       "title": {
