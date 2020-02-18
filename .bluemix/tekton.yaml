@@ -17,7 +17,7 @@ properties:
   value: ${REPOSITORY}
   type: text
 - name: revision
-  value: ${REVISION}
+  value: ${BRANCH}
   type: text
 - name: apikey
   value: ${API_KEY}
@@ -43,6 +43,9 @@ properties:
 - name: serviceNowUrl
   value: ${SERVICENOW_URL}
   type: text
+- name: app
+  value: ${APP_NAME}
+  type: text
 - name: gheToken
   value: ${GHE_TOKEN}
   type: SECURE
@@ -58,12 +61,9 @@ properties:
 - name: emergencyLabel
   value: ${EMERGENCY_LABEL}
   type: text
-- name: app
-  value: ${CF_APP_NAME}
-  type: text
 - name: changeRequestID
   value: ${CHANGEREQUEST_ID}
   type: text  
 - name: image
-  value: "-"
+  value: ${IMAGE_NAME}
   type: text  
