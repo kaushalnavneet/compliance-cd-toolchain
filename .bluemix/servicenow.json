@@ -71,14 +71,6 @@
       "readonly": false
     },
     {
-      "title": {
-        "$ref": "#/messages/servicenow.configurationItemTitle"
-      },
-      "key": "configuration-item",
-      "type": "text",
-      "readonly": false
-    },
-    {
       "type": "table",
       "columnCount": 1,
       "widths": ["100%"],
@@ -90,6 +82,14 @@
           }
         }
       ]
+    },
+    {
+      "title": {
+        "$ref": "#/messages/servicenow.configurationItemTitle"
+      },
+      "key": "configuration-item",
+      "type": "text",
+      "readonly": false
     },
     {
       "title": {
