@@ -43,6 +43,9 @@ properties:
 - name: serviceNowUrl
   value: ${SERVICENOW_URL}
   type: text
+- name: serviceNowConfigurationItem
+  value: ${SERVICENOW_CONFIGURATION_ITEM}
+  type: text
 - name: app
   value: ${APP_NAME}
   type: text

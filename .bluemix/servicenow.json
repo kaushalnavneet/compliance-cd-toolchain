@@ -27,10 +27,18 @@
       },
       "type": "string",
       "pattern": "\\S"
+    },
+    "configuration-item": {
+      "description": {
+        "$ref": "#/messages/servicenow.configurationItemDescription"
+      },
+      "type": "string",
+      "pattern": "\\S"
     }
   },
   "required": [
-    "api-token"
+    "api-token",
+    "configuration-item"
   ],
   "form": [
     {
@@ -52,6 +60,27 @@
         }
       ]
     },
+    {
+      "title": {
+        "$ref": "#/messages/servicenow.configurationItemTitle"
+      },
+      "key": "configuration-item",
+      "type": "text",
+      "readonly": false
+    },
+    {
+      "type": "table",
+      "columnCount": 1,
+      "widths": ["100%"],
+      "items": [
+        {
+          "type": "label",
+          "title": {
+            "$ref": "#/messages/servicenow.configurationItemHelp"
+          }
+        }
+      ]
+    },    
     {
       "title": "ServiceNow API URL",
       "key": "api-url",
