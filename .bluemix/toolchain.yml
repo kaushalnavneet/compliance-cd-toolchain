@@ -108,9 +108,6 @@ services:
           # ServiceNow API token to create Change Requests
           SERVICENOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
           SERVICENOW_URL: '{{form.customtool_servicenow.parameters.api-url}}'
-          # GitHub Enterprise credentials to access the v3 REST API
-          GHE_TOKEN: '{{form.pipeline.parameters.ghe-token}}'
-          GHE_USER: '{{services.evidence-locker-repo.parameters.owner_id}}'
           # Issues repo to raise compliance related issues from the CI/CD
           INCIDENT_ISSUES_REPO: '{{form.incident-issues-repo.parameters.repo_url}}'
           EVIDENCE_LOCKER_REPO: '{{form.evidence-locker-repo.parameters.repo_url}}'
@@ -139,7 +136,6 @@ form:
       prod-cluster-namespace: prod
       build-cluster-namespace: staging
       emergency-label: EMERGENCY
-      ghe-token: 
     schema:
       $ref: deploy.json
   
