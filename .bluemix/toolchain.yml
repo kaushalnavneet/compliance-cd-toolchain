@@ -145,7 +145,6 @@ form:
     parameters:
       api-url: https://watsontest.service-now.com/api/ibmwc/change
       changerequest-id: notAvailable
-      api-url: https://watsontest.service-now.com/api/ibmwc/change
       api-token:
     schema:
       $ref: servicenow.json
