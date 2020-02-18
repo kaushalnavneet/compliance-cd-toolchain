@@ -248,7 +248,9 @@
           ]
       },
       {
-        "title": "Emergency Label for PR",
+        "title": {
+          "$ref": "#/messages/deploy.emergencyLabelTitle"
+        },
         "key": "emergency-label",
         "type": "text",
         "readonly": false,

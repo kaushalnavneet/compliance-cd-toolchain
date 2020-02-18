@@ -42,7 +42,9 @@
   ],
   "form": [
     {
-      "title": "ServiceNow Token",
+      "title": {
+        "$ref": "#/messages/servicenow.apitokenTitle"
+      },
       "key": "api-token",
       "type": "password",
       "readonly": false
@@ -61,7 +63,9 @@
       ]
     },
     {
-      "title": "Initial ServiceNow Change Request ID",
+      "title": {
+        "$ref": "#/messages/servicenow.initialCrTitle"
+      },
       "key": "changerequest-id",
       "type": "text",
       "readonly": false
@@ -80,7 +84,9 @@
       ]
     },    
     {
-      "title": "ServiceNow API URL",
+      "title": {
+        "$ref": "#/messages/servicenow.apiUrlTitle"
+      },      
       "key": "api-url",
       "type": "text",
       "readonly": false
