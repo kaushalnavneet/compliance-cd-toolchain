@@ -39,8 +39,6 @@ Content:
 Content: 
 
  - **API_KEY**: IBM Cloud API key
- - **GHE_USER**: GitHub Enterprise user
- - **GHE_TOKEN**: GitHub Enterprise API token
  - **SERVICENOW_TOKEN**: ServiceNow Change Management console API token
 
 ---
