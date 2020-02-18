@@ -92,6 +92,19 @@
       "readonly": false
     },
     {
+      "type": "table",
+      "columnCount": 1,
+      "widths": ["100%"],
+      "items": [
+        {
+          "type": "label",
+          "title": {
+            "$ref": "#/messages/servicenow.initialCrHelp"
+          }
+        }
+      ]
+    },  
+    {
       "title": {
         "$ref": "#/messages/servicenow.initialCrTitle"
       },
@@ -107,11 +120,11 @@
         {
           "type": "label",
           "title": {
-            "$ref": "#/messages/servicenow.initialCrHelp"
+            "$ref": "#/messages/servicenow.apiUrlHelp"
           }
         }
       ]
-    },    
+    }
     {
       "title": {
         "$ref": "#/messages/servicenow.apiUrlTitle"
@@ -119,19 +132,6 @@
       "key": "api-url",
       "type": "text",
       "readonly": false
-    },
-    {
-      "type": "table",
-      "columnCount": 1,
-      "widths": ["100%"],
-      "items": [
-        {
-          "type": "label",
-          "title": {
-            "$ref": "#/messages/servicenow.apiUrlHelp"
-          }
-        }
-      ]
     }
   ]
 }
