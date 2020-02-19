@@ -50,6 +50,19 @@
   ],
   "form": [
     {
+      "type": "table",
+      "columnCount": 1,
+      "widths": ["100%"],
+      "items": [
+        {
+          "type": "label",
+          "title": {
+            "$ref": "#/messages/servicenow.apitokenHelp"
+          }
+        }
+      ]
+    },
+    {
       "title": {
         "$ref": "#/messages/servicenow.apitokenTitle"
       },
@@ -65,7 +78,7 @@
         {
           "type": "label",
           "title": {
-            "$ref": "#/messages/servicenow.apitokenHelp"
+            "$ref": "#/messages/servicenow.configurationItemHelp"
           }
         }
       ]
@@ -86,11 +99,11 @@
         {
           "type": "label",
           "title": {
-            "$ref": "#/messages/servicenow.configurationItemHelp"
+            "$ref": "#/messages/servicenow.initialCrHelp"
           }
         }
       ]
-    },
+    },  
     {
       "title": {
         "$ref": "#/messages/servicenow.initialCrTitle"
@@ -107,11 +120,11 @@
         {
           "type": "label",
           "title": {
-            "$ref": "#/messages/servicenow.initialCrHelp"
+            "$ref": "#/messages/servicenow.apiUrlHelp"
           }
         }
       ]
-    },    
+    },
     {
       "title": {
         "$ref": "#/messages/servicenow.apiUrlTitle"
@@ -119,19 +132,6 @@
       "key": "api-url",
       "type": "text",
       "readonly": false
-    },
-    {
-      "type": "table",
-      "columnCount": 1,
-      "widths": ["100%"],
-      "items": [
-        {
-          "type": "label",
-          "title": {
-            "$ref": "#/messages/servicenow.apiUrlHelp"
-          }
-        }
-      ]
     }
   ]
 }
