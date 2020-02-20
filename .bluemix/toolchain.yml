@@ -10,13 +10,12 @@ template:
   icon: secure-lock-kubernetes.svg
   required:
     - build
-    - tekton-catalog-repo
     - tekton-definition-repo
-    # - evidence-locker-repo
-    # - incident-issues-repo
+    - tekton-catalog-repo
     - application-repo
+    - incident-issues-repo
+    - evidence-locker-repo
     - servicenow
- 
   info:
     git url: >
       "[" + $env.repository + "]" +
@@ -36,7 +35,7 @@ services:
     service_id: github_integrated
     parameters:
       # repo_url: $env.repository
-      repo_url: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
+      repo_url: '{{form.github_integrated.parameters.tekton-definition-repo}}'
       type: link
       has_issues: false
       enable_traceability: false
@@ -45,7 +44,7 @@ services:
   tekton-catalog-repo:
     service_id: github_integrated
     parameters:
-      repo_url: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
+      repo_url: '{{form.github_integrated.parameters.tekton-catalog-repo}}'
       type: link
       has_issues: false
       enable_traceability: false
@@ -54,6 +53,7 @@ services:
   application-repo:   
     service_id: github_integrated
     parameters:
+      repo_url: '{{form.github_integrated.parameters.application-repo}}'
       type: link
       has_issues: false
       enable_traceability: true
@@ -62,6 +62,7 @@ services:
   incident-issues-repo:
     service_id: github_integrated
     parameters:
+      repo_url: '{{form.github_integrated.parameters.incident-issues-repo}}'
       type: link
       has_issues: false
       enable_traceability: false
@@ -70,6 +71,7 @@ services:
   evidence-locker-repo:
     service_id: github_integrated
     parameters:
+      repo_url: '{{form.github_integrated.parameters.evidence-locker-repo}}'
       type: link
       has_issues: false
       enable_traceability: false
@@ -132,7 +134,17 @@ services:
       description: IBM Cloud Employee Service Portal
       
 form:
-  
+   
+  github_integrated: 
+    parameters:
+      tekton-catalog-repo: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
+      tekton-definition-repo: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
+      application-repo:
+      incident-issues-repo:
+      evidence-locker-repo:
+    schema:
+      $ref: repos.json
+
   pipeline:
     parameters:
       app-name: '{{services.application-repo.parameters.repo_name}}'
