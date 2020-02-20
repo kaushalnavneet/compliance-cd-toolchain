@@ -148,7 +148,7 @@ form:
   pipeline:
     parameters:
       app-name: '{{services.application-repo.parameters.repo_name}}'
-      prod-cluster-namespace: prod
+      prod-cluster-namespace: default
       build-cluster-namespace: staging
       emergency-label: EMERGENCY
     schema:
