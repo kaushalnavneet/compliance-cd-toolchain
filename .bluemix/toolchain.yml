@@ -93,16 +93,16 @@ services:
         content:
           $text: tekton.yaml
         env:
-          IMAGE_NAME: '{{form.pipeline.parameters.app-name}}'
-          # repo for Tekton definitions
+          IMAGE_NAME: '{{form.pipeline.parameters.initial-image-name}}'
+          APP_NAME: '{{form.pipeline.parameters.app-name}}'
+          # repo for Tekton definitions and catalog
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           TEKTON_CATALOG_REPO: tekton-catalog-repo
           # repo of your application to be build/deployed
-          APP_NAME: 'app-{{timestamp}}'
+          REPOSITORY: '{{form.application-repo.parameters.repo_url}}'
           BRANCH: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
-          REPOSITORY: '{{form.application-repo.parameters.repo_url}}'
           REGISTRY_NAMESPACE: '{{form.pipeline.parameters.registry-namespace}}'
           REGISTRY_REGION_ID: '{{form.pipeline.parameters.registry-region}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
@@ -147,7 +147,8 @@ form:
 
   pipeline:
     parameters:
-      app-name: '{{services.application-repo.parameters.repo_name}}'
+      initial-image-name:
+      app-name: hello-compliance-app
       prod-cluster-namespace: default
       build-cluster-namespace: staging
       emergency-label: EMERGENCY
