@@ -109,7 +109,7 @@ services:
           PROD_CLUSTER_NAMESPACE: '{{form.pipeline.parameters.prod-cluster-namespace}}'
           PROD_REGION_ID: '{{form.pipeline.parameters.prod-region}}'
           # ServiceNow API token to create Change Requests
-          SERVICENOW_TOKEN: '{{form.servicenow.parameters.api-token}}'
+          SERVICENOW_TOKEN: '{{form.customtool_servicenow.parameters.api-token}}'
           SERVICENOW_URL: '{{form.customtool_servicenow.parameters.api-url}}'
           SERVICENOW_CONFIGURATION_ITEM: '{{form.customtool_servicenow.parameters.configuration-item}}'
           CHANGEREQUEST_ID: '{{form.customtool_servicenow.parameters.changerequest-id}}' 
@@ -155,7 +155,7 @@ form:
     schema:
       $ref: deploy.json
   
-  customtool_servicenow: 
+  customtool_servicenow:
     parameters:
       api-url: https://watsontest.service-now.com/api/ibmwc/change
       changerequest-id: notAvailable
