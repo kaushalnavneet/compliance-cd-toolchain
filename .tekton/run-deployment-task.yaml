@@ -1,0 +1,79 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: run-deployment-task
+spec:
+  inputs:
+    params:
+      - name: repository
+        description: the git repo
+      - name: revision
+        description: the branch for the git repo
+        default: master
+      - name: task-pvc
+        description: the output pvc - this is where the cloned repository will be stored
+      - name: cluster
+      - name: cluster-region
+        description:
+      - name: cluster-namespace
+        description:
+      - name: image
+        description: image to deploy
+        default: "n/a"
+      - name: ibmcloud-api-key
+      - name: ibmcloud-api
+        description: IBM API url
+        default: "https://cloud.ibm.com"
+      - name: deployment-file
+        description: deployment file name
+        default: "deployment.yml"
+  steps:
+
+    - name: deploy
+      image: ibmcom/pipeline-base-image
+      env:
+        - name: HOME
+          value: "/root"
+        - name: REPOSITORY
+          value: $(inputs.params.repository)
+        - name: REVISION
+          value: $(inputs.params.revision)
+        - name: API
+          value: $(inputs.params.ibmcloud-api)
+        - name: DEPLOYMENT_FILE
+          value: $(inputs.params.deployment-file)
+        - name: IMAGE
+          value: $(inputs.params.image)
+        - name: IBMCLOUD_API_KEY
+          value: $(inputs.params.ibmcloud-api-key)
+        - name: REGION
+          value: $(inputs.params.cluster-region)
+        - name: CLUSTER_NAMESPACE
+          value: $(inputs.params.cluster-namespace)
+        - name: PIPELINE_KUBERNETES_CLUSTER_NAME
+          value: $(inputs.params.cluster)
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          set -e -o pipefail
+          ibmcloud login -a $API -r $REGION
+          $(ibmcloud ks cluster config --cluster "${PIPELINE_KUBERNETES_CLUSTER_NAME}" --export)
+
+          if [[ -z "${DIRECTORY_NAME}" ]]; then
+            # Find the "humanish" part of the git source repository that corresponds to the clone directory
+            # REPOSITORY contains the repository url with .git suffix
+            DIRECTORY_NAME=$(basename "${REPOSITORY##*/}" .git)
+          fi
+
+          cd /artifacts/${DIRECTORY_NAME}
+
+          source deploy-to-kubernetes.sh
+      volumeMounts:
+        - mountPath: /artifacts
+          name: task-volume
+
+  volumes:
+    - name: task-volume
+      persistentVolumeClaim:
+        claimName: $(inputs.params.task-pvc)
