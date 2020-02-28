@@ -24,7 +24,7 @@ spec:
     - name: cluster-namespace
       description: The Kubernetes cluster namespace
       default: default
-    - name: incident-issue-url
+    - name: incident-issues-url
       description: Incident issues repo url
     - name: evidence-locker-url
       description: Evidence locker repo url
