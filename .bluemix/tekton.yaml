@@ -53,7 +53,7 @@ properties:
   - name: application
     value: ${APP_NAME}
     type: text
-  - name: incident-issue-url
+  - name: incident-issues-url
     value: ${INCIDENT_ISSUES_REPO}
     type: text
   - name: evidence-locker-url
