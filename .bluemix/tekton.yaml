@@ -4,10 +4,10 @@ inputs:
     branch: master
     service: ${TEKTON_CATALOG_REPO}
     path: preview/git
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
-    path: preview/servicenow
+  # - type: git
+  #   branch: master
+  #   service: ${TEKTON_CATALOG_REPO}
+  #   path: preview/servicenow
   - type: git
     branch: master
     service: ${TEKTON_DEFINITION_REPO}
