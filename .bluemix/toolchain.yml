@@ -16,6 +16,7 @@ template:
     - application-repo
     - incident-issues-repo
     - evidence-locker-repo
+    - inventory-repo
     - servicenow
   info:
     git url: >
@@ -77,6 +78,15 @@ services:
       enable_traceability: false
       legal: true
 
+  inventory-repo:
+    service_id: github_integrated
+    parameters:
+      repo_url: '{{form.github_integrated.parameters.inventory-repo}}'
+      type: link
+      has_issues: false
+      enable_traceability: false
+      legal: true
+
   build:
     service_id: pipeline
     parameters:
@@ -85,6 +95,7 @@ services:
         - tekton-catalog-repo
         - incident-issues-repo
         - evidence-locker-repo
+        - inventory-repo
         - customtool_servicenow
       name: 'tekton-pipeline-{{timestamp}}'
       type: tekton
@@ -116,6 +127,7 @@ services:
           # Issues repo to raise compliance related issues from the CI/CD
           INCIDENT_ISSUES_REPO: '{{form.incident-issues-repo.parameters.repo_url}}'
           EVIDENCE_LOCKER_REPO: '{{form.evidence-locker-repo.parameters.repo_url}}'
+          INVENTORY_REPO: '{{form.inventory-repo.parameters.repo_url}}'
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
         execute: true
@@ -142,6 +154,7 @@ form:
       application-repo:
       incident-issues-repo:
       evidence-locker-repo:
+      inventory-repo:
     schema:
       $ref: repos.json
 

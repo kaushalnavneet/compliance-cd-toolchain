@@ -48,14 +48,22 @@
             },
             "type": "string",
             "pattern": "\\S"
-        }                        
+        },
+        "inventory-repo": {
+            "description": {
+                "$ref": "#/messages/repos.inventoryRepoDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
+        }
     },
     "required": [
         "tekton-catalog-repo",
         "tekton-definition-repo",
         "application-repo",
         "incident-issues-repo",
-        "evidence-locker-repo"
+        "evidence-locker-repo",
+        "inventory-repo"
     ],
     "form": [
         {
@@ -83,7 +91,7 @@
                     "key": "tekton-catalog-repo",
                     "type": "text",
                     "readonly": true
-                },                
+                },
                 {
                     "type": "label",
                     "title": {
@@ -149,6 +157,20 @@
                         "$ref": "#/messages/repos.evidenceLockerRepoTitle"
                     },
                     "key": "evidence-locker-repo",
+                    "type": "text",
+                    "readonly": false
+                },
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.inventoryRepoTitle"
+                    }
+                },
+                {
+                    "title": {
+                        "$ref": "#/messages/repos.inventoryRepoTitle"
+                    },
+                    "key": "inventory-repo",
                     "type": "text",
                     "readonly": false
                 }
