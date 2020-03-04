@@ -35,7 +35,6 @@ services:
   tekton-definition-repo:
     service_id: github_integrated
     parameters:
-      # repo_url: $env.repository
       repo_url: '{{form.github_integrated.parameters.tekton-definition-repo}}'
       type: link
       has_issues: false
@@ -139,7 +138,7 @@ form:
   github_integrated:
     parameters:
       tekton-catalog-repo: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
-      tekton-definition-repo: 'https://github.ibm.com/cocoa/tekton-compliance-catalog'
+      tekton-definition-repo: 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
       application-repo:
       incident-issues-repo:
       evidence-locker-repo:
