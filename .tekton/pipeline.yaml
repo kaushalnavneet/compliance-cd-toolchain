@@ -70,7 +70,7 @@ spec:
       taskRef:
         name: create-change-request
       runAfter:
-        - git-clone
+        - pipeline-clone-repo
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
