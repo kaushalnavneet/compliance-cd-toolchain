@@ -1,0 +1,158 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "messages": {
+       "$i18n": "locales.yml"
+    },
+    "title": {
+        "$ref": "#/messages/repos.title"
+    },
+    "description": {
+        "$ref": "#/messages/repos.description"
+    },
+    "longDescription": {
+        "$ref": "#/messages/repos.longDescription"
+    },
+    "type": "object",
+    "properties": {
+        "tekton-catalog-repo": {
+            "description": {
+                "$ref": "#/messages/repos.tektonCatalogRepoDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
+        },
+        "tekton-definition-repo": {
+            "description": {
+                "$ref": "#/messages/repos.tektonDefinitionRepoDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
+        },
+        "application-repo": {
+            "description": {
+                "$ref": "#/messages/repos.applicationRepoDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
+        },
+        "incident-issues-repo": {
+            "description": {
+                "$ref": "#/messages/repos.incidentIssuesRepoDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
+        },
+        "evidence-locker-repo": {
+            "description": {
+                "$ref": "#/messages/repos.evidenceLockerRepoDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
+        }                        
+    },
+    "required": [
+        "tekton-catalog-repo",
+        "tekton-definition-repo",
+        "application-repo",
+        "incident-issues-repo",
+        "evidence-locker-repo"
+    ],
+    "form": [
+        {
+            "type": "validator",
+            "url": "/devops/setup/bm-helper/custom_github_helper.html"
+        },
+        {
+            "type": "table",
+            "columnCount": 2,
+            "widths": [
+                "22%",
+                "78%"
+            ],
+            "items": [
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.tektonCatalogRepoTitle"
+                    }
+                },
+                {
+                    "title": {
+                        "$ref": "#/messages/repos.tektonCatalogRepoTitle"
+                    },
+                    "key": "tekton-catalog-repo",
+                    "type": "text",
+                    "readonly": true
+                },                
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.tektonDefinitionRepoTitle"
+                    }
+                },
+                {
+                    "title": {
+                        "$ref": "#/messages/repos.tektonDefinitionRepoTitle"
+                    },
+                    "key": "tekton-definition-repo",
+                    "type": "text",
+                    "readonly": true
+                },
+
+                {
+                    "type": "label",
+                    "title": ""
+                },
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.existingHelp"
+                    }
+                },
+
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.applicationRepoTitle"
+                    }
+                },
+                {
+                    "title": {
+                        "$ref": "#/messages/repos.applicationRepoTitle"
+                    },
+                    "key": "application-repo",
+                    "type": "text",
+                    "readonly": false
+                },
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.incidentIssuesRepoTitle"
+                    }
+                },
+                {
+                    "title": {
+                        "$ref": "#/messages/repos.incidentIssuesRepoTitle"
+                    },
+                    "key": "incident-issues-repo",
+                    "type": "text",
+                    "readonly": false
+                },
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.evidenceLockerRepoTitle"
+                    }
+                },
+                {
+                    "title": {
+                        "$ref": "#/messages/repos.evidenceLockerRepoTitle"
+                    },
+                    "key": "evidence-locker-repo",
+                    "type": "text",
+                    "readonly": false
+                }
+            ]
+        }
+    ]
+}
