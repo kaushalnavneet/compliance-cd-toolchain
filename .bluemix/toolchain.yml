@@ -138,7 +138,7 @@ form:
   github_integrated:
     parameters:
       tekton-catalog-repo: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
-      tekton-definition-repo: 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
+      tekton-definition-repo: 'https://github.ibm.com/padraic-edwards/compliance-cd-toolchain'
       application-repo:
       incident-issues-repo:
       evidence-locker-repo:
