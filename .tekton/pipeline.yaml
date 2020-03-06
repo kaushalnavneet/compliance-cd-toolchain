@@ -66,41 +66,60 @@ spec:
         - name: branch
           value: $(params.revision)
           
-    - name: pipeline-create-cr
+    - name: pipeline-check-cr-approval
       taskRef:
-        name: create-change-request
+        name: check-change-request-approval
       runAfter:
-        - get-git-credentials
+        - git-clone
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
-        - name: repository
-          value: $(params.repository)
-        - name: ibmcloud-api-key
-          value: $(params.ibmcloud-api-key)
+        - name: evidence-locker-url
+          value: $(params.evidence-locker-url)
+        - name: pipeline-run-id
+          value: $(params.pipeline-run-id)
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
-        - name: servicenow-configuration-item
-          value: $(params.servicenow-configuration-item)
+
+    - name: pipeline-deployment
+      taskRef:
+        name: run-deployment-task
+      runAfter:
+        - pipeline-clone-repo
+        - pipeline-check-cr-approval
+      params:
+        - name: task-pvc
+          value: $(params.pipeline-pvc)
+        - name: ibmcloud-api-key
+          value: $(params.ibmcloud-api-key)
+        - name: repository
+          value: $(params.repository)
+        - name: revision
+          value: $(params.revision)
         - name: cluster
           value: $(params.cluster)
         - name: cluster-region
           value: $(params.cluster-region)
         - name: cluster-namespace
           value: $(params.cluster-namespace)
-        - name: application
-          value: $(params.application)
-        - name: emergency-label
-          value: $(params.emergency-label)
+        - name: image
+          value: $(params.image)
+
+    - name: pipeline-close-cr
+      taskRef:
+        name: close-change-request
+      runAfter:
+        - pipeline-deployment
+      params:
+        - name: pipeline-pvc
+          value: $(params.pipeline-pvc)
         - name: evidence-locker-url
           value: $(params.evidence-locker-url)
         - name: pipeline-run-id
           value: $(params.pipeline-run-id)
-        - name: image
-          value: $(params.image)
-        - name: change-request-id
-          value: $(params.change-request-id)
-        - name: ibmcloud-api-key
-          value: $(params.ibmcloud-api-key)
+        - name: servicenow-api-token
+          value: $(params.servicenow-api-token)
+        - name: servicenow-api-url
+          value: $(params.servicenow-api-url)
