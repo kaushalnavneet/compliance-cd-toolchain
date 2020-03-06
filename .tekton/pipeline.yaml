@@ -70,7 +70,7 @@ spec:
       taskRef:
         name: create-change-request
       runAfter:
-        - pipeline-clone-repo
+        - get-git-credentials
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
@@ -102,6 +102,7 @@ spec:
           value: $(params.image)
         - name: change-request-id
           value: $(params.change-request-id)
+
 
     - name: pipeline-check-cr-approval
       taskRef:
