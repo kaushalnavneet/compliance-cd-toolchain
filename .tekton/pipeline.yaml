@@ -102,8 +102,6 @@ spec:
           value: $(params.image)
         - name: change-request-id
           value: $(params.change-request-id)
-        - name: ibmcloud-api-key
-          value: $(params.ibmcloud-api-key)
 
     - name: pipeline-check-cr-approval
       taskRef:
