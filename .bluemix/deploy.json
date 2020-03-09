@@ -110,13 +110,6 @@
         "type":"string",
         "pattern":"\\S"
      },
-     "initial-image-name":{ 
-        "description":{ 
-           "$ref":"#/messages/deploy.initialImageDescription"
-        },
-        "type":"string",
-        "pattern":"\\S"
-     },
      "emergency-label":{ 
         "description":{ 
            "$ref":"#/messages/deploy.emergencyLabel"
@@ -127,7 +120,6 @@
   },
   "required":[ 
      "app-name",
-     "initial-image-name",
      "api-key",
      "registry-region",
      "registry-namespace",
@@ -150,14 +142,6 @@
         },
         "key":"app-name"
      },
-     { 
-      "type":"text",
-      "readonly":false,
-      "title":{ 
-         "$ref":"#/messages/deploy.initialImageDescription"
-      },
-      "key":"initial-image-name"
-      },
      { 
         "type":"password",
         "readonly":false,
