@@ -44,6 +44,17 @@ spec:
       description: ServiceNow registered Configuration Item
 
   resourcetemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: pipelinerun-$(uid)-pvc
+      spec:
+        resources:
+          requests:
+            storage: 5Gi
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
     - apiVersion: tekton.dev/v1alpha1
       kind: PipelineRun
       metadata:
@@ -79,8 +90,6 @@ spec:
           - name: evidence-locker-url
             value: $(params.evidence-locker-url)
           - name: pipeline-run-id
-            value: $(params.pipeline-run-id)
-          - name: image
-            value: $(params.image)
+            value: $(uid)
           - name: change-request-id
             value: $(params.change-request-id)

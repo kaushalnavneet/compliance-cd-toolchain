@@ -68,6 +68,3 @@ properties:
   - name: change-request-id
     value: ${CHANGEREQUEST_ID}
     type: text
-  - name: image
-    value: ${IMAGE_NAME}
-    type: text
