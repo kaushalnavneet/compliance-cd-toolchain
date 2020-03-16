@@ -18,9 +18,6 @@ spec:
         description:
       - name: cluster-namespace
         description:
-      - name: image
-        description: image to deploy
-        default: "n/a"
       - name: ibmcloud-api-key
       - name: ibmcloud-api
         description: IBM API url
@@ -43,8 +40,6 @@ spec:
           value: $(inputs.params.ibmcloud-api)
         - name: DEPLOYMENT_FILE
           value: $(inputs.params.deployment-file)
-        - name: IMAGE
-          value: $(inputs.params.image)
         - name: IBMCLOUD_API_KEY
           value: $(inputs.params.ibmcloud-api-key)
         - name: REGION
@@ -57,10 +52,14 @@ spec:
       args:
         - |
           set -e -o pipefail
+
           ibmcloud login -a $API -r $REGION
           $(ibmcloud ks cluster config --cluster "${PIPELINE_KUBERNETES_CLUSTER_NAME}" --export)
 
+          source /artifacts/build.properties
+
           cd /artifacts
+          cd $GHE_REPO
 
           source deploy-to-kubernetes.sh
       volumeMounts:

@@ -51,7 +51,7 @@ spec:
       spec:
         resources:
           requests:
-            storage:  5Gi
+            storage: 5Gi
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
@@ -90,8 +90,6 @@ spec:
           - name: evidence-locker-url
             value: $(params.evidence-locker-url)
           - name: pipeline-run-id
-            value: $(params.pipeline-run-id)
-          - name: image
-            value: $(params.image)
+            value: $(uid)
           - name: change-request-id
             value: $(params.change-request-id)

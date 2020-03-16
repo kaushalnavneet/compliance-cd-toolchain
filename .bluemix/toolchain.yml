@@ -13,9 +13,10 @@ template:
     - build
     - tekton-definition-repo
     - tekton-catalog-repo
-    - application-repo
+    - app-repo
     - incident-issues-repo
     - evidence-locker-repo
+    - inventory-repo
     - servicenow
   info:
     git url: >
@@ -50,10 +51,10 @@ services:
       enable_traceability: false
       legal: true
 
-  application-repo:
+  app-repo:
     service_id: github_integrated
     parameters:
-      repo_url: '{{form.github_integrated.parameters.application-repo}}'
+      repo_url: '{{form.github_integrated.parameters.app-repo}}'
       type: link
       has_issues: false
       enable_traceability: true
@@ -77,6 +78,15 @@ services:
       enable_traceability: false
       legal: true
 
+  inventory-repo:
+    service_id: github_integrated
+    parameters:
+      repo_url: '{{form.github_integrated.parameters.inventory-repo}}'
+      type: link
+      has_issues: false
+      enable_traceability: false
+      legal: true
+
   build:
     service_id: pipeline
     parameters:
@@ -85,6 +95,7 @@ services:
         - tekton-catalog-repo
         - incident-issues-repo
         - evidence-locker-repo
+        - inventory-repo
         - customtool_servicenow
       name: 'tekton-pipeline-{{timestamp}}'
       type: tekton
@@ -93,13 +104,12 @@ services:
         content:
           $text: tekton.yaml
         env:
-          IMAGE_NAME: '{{form.pipeline.parameters.initial-image-name}}'
           APP_NAME: '{{form.pipeline.parameters.app-name}}'
           # repo for Tekton definitions and catalog
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           TEKTON_CATALOG_REPO: tekton-catalog-repo
           # repo of your application to be build/deployed
-          REPOSITORY: '{{form.application-repo.parameters.repo_url}}'
+          REPOSITORY: '{{form.app-repo.parameters.repo_url}}'
           BRANCH: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
@@ -116,6 +126,7 @@ services:
           # Issues repo to raise compliance related issues from the CI/CD
           INCIDENT_ISSUES_REPO: '{{form.incident-issues-repo.parameters.repo_url}}'
           EVIDENCE_LOCKER_REPO: '{{form.evidence-locker-repo.parameters.repo_url}}'
+          INVENTORY_REPO: '{{form.inventory-repo.parameters.repo_url}}'
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
         execute: true
@@ -139,15 +150,15 @@ form:
     parameters:
       tekton-catalog-repo: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
       tekton-definition-repo: 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
-      application-repo:
+      app-repo:
       incident-issues-repo:
       evidence-locker-repo:
+      inventory-repo:
     schema:
       $ref: repos.json
 
   pipeline:
     parameters:
-      initial-image-name:
       app-name: hello-compliance-app
       prod-cluster-namespace: default
       build-cluster-namespace: staging

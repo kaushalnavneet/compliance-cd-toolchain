@@ -34,9 +34,6 @@ spec:
       description:
     - name: pipeline-run-id
       description:
-    - name: image
-      description: the docker image to be deployed
-      default: "noImage"
     - name: change-request-id
       description: optional ServiceNow Change Request ID
       default: "notAvailable"
@@ -66,11 +63,21 @@ spec:
         - name: branch
           value: $(params.revision)
 
+    - name: pipeline-clone-inventory-repo
+      taskRef:
+        name: clone-inventory-repo
+      runAfter:
+        - pipeline-clone-repo
+      params:
+        - name: task-pvc
+          value: $(params.pipeline-pvc)
+
     - name: pipeline-create-cr
       taskRef:
         name: create-change-request
       runAfter:
         - get-git-credentials
+        - pipeline-clone-inventory-repo
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
@@ -98,11 +105,8 @@ spec:
           value: $(params.evidence-locker-url)
         - name: pipeline-run-id
           value: $(params.pipeline-run-id)
-        - name: image
-          value: $(params.image)
         - name: change-request-id
           value: $(params.change-request-id)
-
 
     - name: pipeline-check-cr-approval
       taskRef:
@@ -142,8 +146,6 @@ spec:
           value: $(params.cluster-region)
         - name: cluster-namespace
           value: $(params.cluster-namespace)
-        - name: image
-          value: $(params.image)
 
     - name: pipeline-close-cr
       taskRef:
