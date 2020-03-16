@@ -28,7 +28,7 @@
             "type": "string",
             "pattern": "\\S"
         },
-        "application-repo": {
+        "app-repo": {
             "description": {
                 "$ref": "#/messages/repos.applicationRepoDescription"
             },
@@ -60,7 +60,7 @@
     "required": [
         "tekton-catalog-repo",
         "tekton-definition-repo",
-        "application-repo",
+        "app-repo",
         "incident-issues-repo",
         "evidence-locker-repo",
         "inventory-repo"
@@ -128,7 +128,7 @@
                     "title": {
                         "$ref": "#/messages/repos.applicationRepoTitle"
                     },
-                    "key": "application-repo",
+                    "key": "app-repo",
                     "type": "text",
                     "readonly": false
                 },

@@ -13,7 +13,7 @@ template:
     - build
     - tekton-definition-repo
     - tekton-catalog-repo
-    - application-repo
+    - app-repo
     - incident-issues-repo
     - evidence-locker-repo
     - inventory-repo
@@ -51,10 +51,10 @@ services:
       enable_traceability: false
       legal: true
 
-  application-repo:
+  app-repo:
     service_id: github_integrated
     parameters:
-      repo_url: '{{form.github_integrated.parameters.application-repo}}'
+      repo_url: '{{form.github_integrated.parameters.app-repo}}'
       type: link
       has_issues: false
       enable_traceability: true
@@ -109,7 +109,7 @@ services:
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           TEKTON_CATALOG_REPO: tekton-catalog-repo
           # repo of your application to be build/deployed
-          REPOSITORY: '{{form.application-repo.parameters.repo_url}}'
+          REPOSITORY: '{{form.app-repo.parameters.repo_url}}'
           BRANCH: master
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
@@ -150,7 +150,7 @@ form:
     parameters:
       tekton-catalog-repo: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
       tekton-definition-repo: 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
-      application-repo:
+      app-repo:
       incident-issues-repo:
       evidence-locker-repo:
       inventory-repo:
