@@ -107,6 +107,8 @@ spec:
           value: $(params.pipeline-run-id)
         - name: change-request-id
           value: $(params.change-request-id)
+        - name: collect-evidence
+          value: "1"
 
     - name: pipeline-check-cr-approval
       taskRef:
