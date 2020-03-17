@@ -167,3 +167,5 @@ spec:
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
+        - name: collect-evidence
+          value: "1"
