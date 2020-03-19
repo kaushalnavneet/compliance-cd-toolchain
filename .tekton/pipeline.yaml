@@ -129,7 +129,7 @@ spec:
 
     - name: pipeline-deployment
       taskRef:
-        name: run-deployment-task
+        name: deploy-to-cluster
       runAfter:
         - pipeline-clone-repo
         - pipeline-check-cr-approval
@@ -142,12 +142,14 @@ spec:
           value: $(params.repository)
         - name: revision
           value: $(params.revision)
-        - name: cluster
+        - name: cluster-name
           value: $(params.cluster)
         - name: cluster-region
           value: $(params.cluster-region)
         - name: cluster-namespace
           value: $(params.cluster-namespace)
+        - name: allow-create-route
+          value: "false"
 
     - name: pipeline-close-cr
       taskRef:
