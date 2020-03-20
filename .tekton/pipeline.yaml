@@ -149,11 +149,20 @@ spec:
         - name: cluster-namespace
           value: $(params.cluster-namespace)
 
+    - name: pipeline-merge-changes
+      taskRef:
+        name: git-merge-changes
+      runAfter:
+        - pipeline-deployment
+      params:
+        - name: task-pvc
+          value: $(params.pipeline-pvc)
+
     - name: pipeline-close-cr
       taskRef:
         name: close-change-request
       runAfter:
-        - pipeline-deployment
+        - pipeline-merge-changes
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
