@@ -10,6 +10,10 @@ inputs:
     path: preview/servicenow
   - type: git
     branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: preview/iks
+  - type: git
+    branch: master
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
