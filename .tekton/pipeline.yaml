@@ -126,6 +126,8 @@ spec:
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
+        - name: collect-evidence
+          value: "1"
 
     - name: pipeline-deployment
       taskRef:
@@ -176,3 +178,5 @@ spec:
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
+        - name: collect-evidence
+          value: "1"
