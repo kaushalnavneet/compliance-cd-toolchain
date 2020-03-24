@@ -18,6 +18,7 @@ template:
     - evidence-locker-repo
     - inventory-repo
     - servicenow
+    - artifactoryComp
   info:
     git url: >
       "[" + $env.repository + "]" +
@@ -32,6 +33,13 @@ toolchain:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
 services:
+  artifactoryComp:
+    service_id: artifactory
+    parameters:
+      name: 'artifactory-{{timestamp}}'
+      dashboard_url: 'https://wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com'
+      release_url: 'wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com'
+      type: docker
 
   tekton-definition-repo:
     service_id: github_integrated
@@ -129,6 +137,7 @@ services:
           INVENTORY_REPO: '{{form.inventory-repo.parameters.repo_url}}'
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
+          DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
         execute: true
 
   servicenow:

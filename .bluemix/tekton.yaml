@@ -72,3 +72,6 @@ properties:
   - name: change-request-id
     value: ${CHANGEREQUEST_ID}
     type: text
+  - name: dockerconfigjson
+    value: ${DOCKER_CONFIG_JSON}
+    type: text
