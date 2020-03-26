@@ -108,7 +108,7 @@ spec:
         - name: change-request-id
           value: $(params.change-request-id)
         - name: collect-evidence
-          value: "1"
+          value: "true"
 
     - name: pipeline-check-cr-approval
       taskRef:
@@ -127,7 +127,7 @@ spec:
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
         - name: collect-evidence
-          value: "1"
+          value: "true"
 
     - name: pipeline-deployment
       taskRef:
@@ -179,4 +179,4 @@ spec:
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
         - name: collect-evidence
-          value: "1"
+          value: "true"
