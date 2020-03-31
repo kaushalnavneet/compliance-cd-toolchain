@@ -44,6 +44,8 @@ spec:
       description: ServiceNow registered Configuration Item
     - name: dockerconfigjson
       description: dockerconfigjson
+    - name: pipeline-debug
+      description: toggles debug mode for the pipeline
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -107,4 +109,6 @@ spec:
             value: $(uid)
           - name: change-request-id
             value: $(params.change-request-id)
+          - name: pipeline-debug
+            value: $(params.pipeline-debug)
         serviceAccountName: sa-pullsecret
