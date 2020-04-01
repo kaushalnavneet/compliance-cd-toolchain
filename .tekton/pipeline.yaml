@@ -37,6 +37,8 @@ spec:
     - name: change-request-id
       description: optional ServiceNow Change Request ID
       default: "notAvailable"
+    - name: pipeline-debug
+      description: toggles debug mode for the pipeline
   tasks:
 
     - name: get-git-credentials
@@ -49,6 +51,8 @@ spec:
           value: $(params.ibmcloud-api-key)
         - name: repository
           value: $(params.repository)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: pipeline-clone-repo
       taskRef:
@@ -62,6 +66,8 @@ spec:
           value: $(params.repository)
         - name: branch
           value: $(params.revision)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: pipeline-clone-inventory-repo
       taskRef:
@@ -71,6 +77,8 @@ spec:
       params:
         - name: task-pvc
           value: $(params.pipeline-pvc)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: pipeline-create-cr
       taskRef:
@@ -109,6 +117,8 @@ spec:
           value: $(params.change-request-id)
         - name: collect-evidence
           value: "true"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: pipeline-check-cr-approval
       taskRef:
@@ -128,6 +138,8 @@ spec:
           value: $(params.servicenow-api-url)
         - name: collect-evidence
           value: "true"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: pipeline-deployment
       taskRef:
@@ -152,6 +164,8 @@ spec:
           value: $(params.cluster-namespace)
         - name: allow-create-route
           value: "false"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: pipeline-merge-changes
       taskRef:
@@ -161,6 +175,8 @@ spec:
       params:
         - name: task-pvc
           value: $(params.pipeline-pvc)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: pipeline-close-cr
       taskRef:
@@ -180,3 +196,5 @@ spec:
           value: $(params.servicenow-api-url)
         - name: collect-evidence
           value: "true"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
