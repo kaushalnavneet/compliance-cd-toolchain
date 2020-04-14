@@ -167,9 +167,9 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-merge-changes
+    - name: pipeline-merge-cr-inventory-branch
       taskRef:
-        name: git-merge-changes
+        name: merge-cr-inventory-branch
       runAfter:
         - pipeline-deployment
       params:
