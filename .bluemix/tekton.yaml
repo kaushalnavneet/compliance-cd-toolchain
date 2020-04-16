@@ -7,6 +7,10 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
+    path: preview/inventory
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
     path: preview/servicenow
   - type: git
     branch: master
