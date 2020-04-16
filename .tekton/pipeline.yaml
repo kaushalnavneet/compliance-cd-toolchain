@@ -182,7 +182,7 @@ spec:
       taskRef:
         name: close-change-request
       runAfter:
-        - pipeline-merge-changes
+        - pipeline-merge-cr-inventory-branch
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
