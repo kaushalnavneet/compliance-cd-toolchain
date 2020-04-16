@@ -39,6 +39,8 @@ spec:
       default: "notAvailable"
     - name: pipeline-debug
       description: toggles debug mode for the pipeline
+    - name: version
+      description: App version
   tasks:
 
     - name: get-git-credentials
@@ -79,6 +81,8 @@ spec:
           value: $(params.pipeline-pvc)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: version
+          value: $(params.version)
 
     - name: pipeline-create-cr
       taskRef:
@@ -120,11 +124,24 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: pipeline-inventory-cr-add
+      taskRef:
+        name: inventory-cr-add
+      runAfter:
+        - pipeline-create-cr
+      params:
+        - name: task-pvc
+          value: $(params.pipeline-pvc)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: version
+          value: $(params.version)
+
     - name: pipeline-check-cr-approval
       taskRef:
         name: check-change-request-approval
       runAfter:
-        - pipeline-create-cr
+        - pipeline-inventory-cr-add
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
