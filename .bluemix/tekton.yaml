@@ -78,7 +78,7 @@ properties:
     type: text
   - name: dockerconfigjson
     value: ${DOCKER_CONFIG_JSON}
-    type: text
+    type: SECURE
   - name: pipeline-debug
     value: "0"
     type: text
