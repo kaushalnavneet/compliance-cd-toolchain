@@ -1,6 +1,6 @@
 # ![Icon](./.bluemix/secure-lock-kubernetes.png) Tekton CD Pipeline with Compliance automation for Kubernetes
 
-This is the toolchain template for continuous development with Compliance for Kubernetes. It is preconfigured for continuous delivery with inventory integration, change management with Servicenow, evidence collection and deployment to the IBM Kubernetes Service.
+This is the toolchain template for continuous deployment with Compliance for Kubernetes. It is preconfigured for continuous delivery with inventory integration, change management with Servicenow, evidence collection and deployment to the IBM Kubernetes Service.
 
 The integrated repositories, target cluster and artifactory integrations are configured during the setup process.
 
