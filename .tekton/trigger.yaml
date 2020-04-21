@@ -46,6 +46,8 @@ spec:
       description: dockerconfigjson
     - name: pipeline-debug
       description: toggles debug mode for the pipeline
+    - name: version
+      description: App version
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -111,4 +113,6 @@ spec:
             value: $(params.change-request-id)
           - name: pipeline-debug
             value: $(params.pipeline-debug)
+          - name: version
+            value: $(params.version)
         serviceAccountName: sa-pullsecret
