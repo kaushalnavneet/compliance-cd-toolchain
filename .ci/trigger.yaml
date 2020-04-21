@@ -1,0 +1,65 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: template
+spec:
+  params:
+    - name: pipeline-debug
+      default: 0
+    - name: repository
+      description: The git repo
+    - name: branch
+      description: branch
+    - name: target-branch
+      description: target branch
+    - name: ibmcloud-api-key
+      description: ibmcloud api key
+    - name: statuses-url
+      description: github statuses url
+  resourcetemplates:
+
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: pipelinerun-$(uid)-pvc
+      spec:
+        resources:
+          requests:
+            storage:  5Gi
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+
+    - apiVersion: v1
+      kind: Secret
+      metadata:
+        name: cd-secret
+      type: Opaque
+      stringData:
+        API_KEY: $(params.ibmcloud-api-key)
+
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        name: pipelinerun-$(uid)
+      spec:
+        pipelineRef:
+          name: pipeline
+        params:
+          - name: pipeline-debug
+            value: $(params.pipeline-debug)
+          - name: pipeline-pvc
+            value: pipelinerun-$(uid)-pvc
+          - name: repository
+            value: $(params.repository)
+          - name: branch
+            value: $(params.branch)
+          - name: pipeline-run-id
+            value: $(uid)
+          - name: target-branch
+            value: $(params.target-branch)
+          - name: ibmcloud-api-key
+            value: $(params.ibmcloud-api-key)
+          - name: statuses-url
+            value: $(params.statuses-url)
