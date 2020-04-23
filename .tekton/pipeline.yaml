@@ -145,8 +145,6 @@ spec:
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
-        - name: evidence-locker-url
-          value: $(params.evidence-locker-url)
         - name: pipeline-run-id
           value: $(params.pipeline-run-id)
         - name: servicenow-api-token
@@ -203,8 +201,6 @@ spec:
       params:
         - name: pipeline-pvc
           value: $(params.pipeline-pvc)
-        - name: evidence-locker-url
-          value: $(params.evidence-locker-url)
         - name: pipeline-run-id
           value: $(params.pipeline-run-id)
         - name: servicenow-api-token
