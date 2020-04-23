@@ -1,0 +1,85 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline
+spec:
+  params:
+    - name: repository
+      description: the git repo
+    - name: branch
+      description: branch
+    - name: pipeline-run-id
+      description: pipelineRunId unique ID
+    - name: pipeline-pvc
+      description: pipeline pvc name place holder
+    - name: target-branch
+      description: target branch
+    - name: ibmcloud-api-key
+      description: ibmcloud api key
+    - name: statuses-url
+      description: github statuses url
+    - name: pipeline-debug
+
+  tasks:
+    - name: get-git-credentials
+      taskRef:
+        name: get-git-credentials
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: credentials-pvc
+          value: $(params.pipeline-pvc)
+        - name: repository
+          value: $(params.repository)
+        - name: ibmcloud-api-key
+          value: $(params.ibmcloud-api-key)
+
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+      runAfter:
+        - get-git-credentials
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: task-pvc
+          value: $(params.pipeline-pvc)
+        - name: repository
+          value: $(params.repository)
+        - name: branch
+          value: $(params.branch)
+
+    - name: clone-common-tasks
+      taskRef:
+        name: git-clone
+      runAfter:
+        - get-git-credentials
+      params:
+        - name: task-pvc
+          value: $(params.pipeline-pvc)
+        - name: repository
+          value: "https://github.ibm.com/one-pipeline/common-tekton-tasks"
+        - name: branch
+          value: "master"
+        - name: directoryName
+          value: "common-tekton-tasks"
+
+
+    - name: tekton-linter
+      taskRef:
+        name: tekton-lint
+      runAfter:
+        - clone-common-tasks
+        - clone-repo
+      params:
+        - name: definitions
+          value: |
+            compliance-cd-toolchain/.tekton/**/*.yaml
+            common-tekton-tasks/preview/**/*.yaml
+            common-tekton-tasks/preview/**/*.yml
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: statuses-url
+          value: $(params.statuses-url)
+        - name: task-pvc
+          value: $(params.pipeline-pvc)
