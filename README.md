@@ -14,6 +14,8 @@ The toolchain can use a Key-Protect vault instance to store the required tokens 
 
 [Setup Guide](/setup.md)
 
+If you get stuck or experience a problem during setup, or running your pipelines, check out our [troubleshooting guide](https://github.ibm.com/one-pipeline/docs/blob/master/faq.md) before raising an issue.
+
 ---
 ### Learn more
 * [Getting Started with Continuous Delivery](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-getting-started&pos=2)
