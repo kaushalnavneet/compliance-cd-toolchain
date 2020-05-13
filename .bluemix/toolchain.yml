@@ -37,8 +37,9 @@ services:
     service_id: artifactory
     parameters:
       name: 'artifactory-{{timestamp}}'
-      dashboard_url: 'https://wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com'
-      release_url: 'wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com'
+      dashboard_url: 'https://na.artifactory.swg-devops.com'
+      repository_url: 'https://wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com'
+      repository_name: 'wcp-compliance-automation-team-docker-local'
       type: docker
 
   tekton-definition-repo:
