@@ -30,8 +30,6 @@ spec:
       description: emergency label for change request generation
     - name: evidence-locker-url
       description: evidence locker repo
-    - name: pipeline-run-id
-      description: ID of the current pipeline run
     - name: change-request-id
       description: optional ServiceNow Change Request ID
       default: "notAvailable"
@@ -150,8 +148,6 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
-        - name: pipeline-run-id
-          value: $(params.pipeline-run-id)
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
@@ -207,8 +203,6 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
-        - name: pipeline-run-id
-          value: $(params.pipeline-run-id)
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url

@@ -101,8 +101,6 @@ spec:
             value: $(params.emergency-label)
           - name: evidence-locker-url
             value: $(params.evidence-locker-url)
-          - name: pipeline-run-id
-            value: $(uid)
           - name: change-request-id
             value: $(params.change-request-id)
           - name: pipeline-debug

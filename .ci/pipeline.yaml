@@ -9,8 +9,6 @@ spec:
       description: the git repo
     - name: branch
       description: branch
-    - name: pipeline-run-id
-      description: pipelineRunId unique ID
     - name: target-branch
       description: target branch
     - name: ibmcloud-api-key
