@@ -1,12 +1,12 @@
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: template
 spec:
   params:
     - name: pipeline-debug
-      default: 0
+      default: "0"
     - name: repository
       description: The git repo
     - name: branch
@@ -17,8 +17,8 @@ spec:
       description: ibmcloud api key
     - name: statuses-url
       description: github statuses url
-  resourcetemplates:
 
+  resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
@@ -46,11 +46,13 @@ spec:
       spec:
         pipelineRef:
           name: pipeline
+        workspaces:
+          - name: artifacts
+            persistentVolumeClaim:
+              claimName: pipelinerun-$(uid)-pvc
         params:
           - name: pipeline-debug
             value: $(params.pipeline-debug)
-          - name: pipeline-pvc
-            value: pipelinerun-$(uid)-pvc
           - name: repository
             value: $(params.repository)
           - name: branch

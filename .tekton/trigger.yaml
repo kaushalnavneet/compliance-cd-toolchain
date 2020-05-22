@@ -1,5 +1,5 @@
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: cd-template
@@ -11,10 +11,6 @@ spec:
       description: the branch for the git repo
     - name: ibmcloud-api-key
       description: IBM Cloud API key
-    - name: registry-namespace
-      description: the ibmcloud registry namespace
-    - name: registry-region
-      description: the ibmcloud registry region
       default: us-south
     - name: cluster
       description: The IBM Cloud Kubernetes cluster name
@@ -24,8 +20,6 @@ spec:
     - name: cluster-namespace
       description: The Kubernetes cluster namespace
       default: default
-    - name: incident-issues-url
-      description: Incident issues repo url
     - name: evidence-locker-url
       description: Evidence locker repo url
     - name: emergency-label
@@ -42,8 +36,6 @@ spec:
       default: "notAvailable"
     - name: servicenow-configuration-item
       description: ServiceNow registered Configuration Item
-    - name: dockerconfigjson
-      description: dockerconfigjson
     - name: pipeline-debug
       description: toggles debug mode for the pipeline
     - name: version
@@ -73,16 +65,18 @@ spec:
         - name: artifactory-pull-secret
       metadata:
         name: sa-pullsecret
-    - apiVersion: tekton.dev/v1alpha1
+    - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
         name: pipelinerun-$(uid)
       spec:
         pipelineRef:
           name: cd-pipeline
+        workspaces:
+          - name: artifacts
+            persistentVolumeClaim:
+              claimName: pipelinerun-$(uid)-pvc
         params:
-          - name: pipeline-pvc
-            value: pipelinerun-$(uid)-pvc
           - name: revision
             value: $(params.revision)
           - name: repository

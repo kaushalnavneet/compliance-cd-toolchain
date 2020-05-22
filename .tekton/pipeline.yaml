@@ -1,39 +1,37 @@
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: cd-pipeline
 spec:
   params:
-    - name: pipeline-pvc
-      description: pipeline pvc name place holder
     - name: repository
       description: the git repo
     - name: revision
       description: the git repo
       default: master
     - name: ibmcloud-api-key
-      description:
+      description: IBM Cloud API key with access to the toolchain
     - name: servicenow-api-token
-      description:
+      description: A valid ServiceNow API token
     - name: servicenow-api-url
-      description:
+      description: The ServiceNow API URL you wish to use (test or live)
     - name: servicenow-configuration-item
-      description:
+      description: The name of the service to be deployed as it is registered in ServiceNow
     - name: cluster
-      description:
+      description: iks cluster name
     - name: cluster-region
-      description:
+      description: iks cluster region
     - name: cluster-namespace
-      description:
+      description: iks cluster namespace
     - name: application
-      description:
+      description: application name
     - name: emergency-label
-      description:
+      description: emergency label for change request generation
     - name: evidence-locker-url
-      description:
+      description: evidence locker repo
     - name: pipeline-run-id
-      description:
+      description: ID of the current pipeline run
     - name: change-request-id
       description: optional ServiceNow Change Request ID
       default: "notAvailable"
@@ -41,14 +39,18 @@ spec:
       description: toggles debug mode for the pipeline
     - name: version
       description: App version
-  tasks:
 
+  workspaces:
+    - name: artifacts
+
+  tasks:
     - name: get-git-credentials
       taskRef:
-        name: get-git-credentials
+        name: git-get-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: credentials-pvc
-          value: $(params.pipeline-pvc)
         - name: ibmcloud-api-key
           value: $(params.ibmcloud-api-key)
         - name: repository
@@ -61,9 +63,10 @@ spec:
         name: git-clone
       runAfter:
         - get-git-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
         - name: repository
           value: $(params.repository)
         - name: branch
@@ -73,12 +76,13 @@ spec:
 
     - name: pipeline-clone-inventory-repo
       taskRef:
-        name: clone-inventory-repo
+        name: git-clone-inventory-repo
       runAfter:
         - pipeline-clone-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: version
@@ -86,13 +90,14 @@ spec:
 
     - name: pipeline-create-cr
       taskRef:
-        name: create-change-request
+        name: servicenow-create-change-request
       runAfter:
         - get-git-credentials
         - pipeline-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: pipeline-pvc
-          value: $(params.pipeline-pvc)
         - name: repository
           value: $(params.repository)
         - name: ibmcloud-api-key
@@ -115,8 +120,6 @@ spec:
           value: $(params.emergency-label)
         - name: evidence-locker-url
           value: $(params.evidence-locker-url)
-        - name: pipeline-run-id
-          value: $(params.pipeline-run-id)
         - name: change-request-id
           value: $(params.change-request-id)
         - name: collect-evidence
@@ -129,9 +132,10 @@ spec:
         name: inventory-cr-add
       runAfter:
         - pipeline-create-cr
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: version
@@ -139,18 +143,21 @@ spec:
 
     - name: pipeline-check-cr-approval
       taskRef:
-        name: check-change-request-approval
+        name: servicenow-check-change-request-approval
       runAfter:
         - pipeline-inventory-cr-add
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: pipeline-pvc
-          value: $(params.pipeline-pvc)
         - name: pipeline-run-id
           value: $(params.pipeline-run-id)
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
+        - name: evidence-locker-url
+          value: $(params.evidence-locker-url)
         - name: collect-evidence
           value: "true"
         - name: pipeline-debug
@@ -158,19 +165,16 @@ spec:
 
     - name: pipeline-deployment
       taskRef:
-        name: deploy-to-cluster
+        name: iks-deploy
       runAfter:
         - pipeline-clone-repo
         - pipeline-check-cr-approval
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
         - name: ibmcloud-api-key
           value: $(params.ibmcloud-api-key)
-        - name: repository
-          value: $(params.repository)
-        - name: revision
-          value: $(params.revision)
         - name: cluster-name
           value: $(params.cluster)
         - name: cluster-region
@@ -184,29 +188,33 @@ spec:
 
     - name: pipeline-merge-cr-inventory-branch
       taskRef:
-        name: merge-cr-inventory-branch
+        name: inventory-apply
       runAfter:
         - pipeline-deployment
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
     - name: pipeline-close-cr
       taskRef:
-        name: close-change-request
+        name: servicenow-close-change-request
       runAfter:
         - pipeline-merge-cr-inventory-branch
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: pipeline-pvc
-          value: $(params.pipeline-pvc)
         - name: pipeline-run-id
           value: $(params.pipeline-run-id)
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(params.servicenow-api-url)
+        - name: evidence-locker-url
+          value: $(params.evidence-locker-url)
         - name: collect-evidence
           value: "true"
         - name: pipeline-debug
