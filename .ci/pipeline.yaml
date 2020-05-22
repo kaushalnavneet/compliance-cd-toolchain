@@ -1,4 +1,5 @@
-apiVersion: tekton.dev/v1alpha1
+---
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: pipeline
@@ -10,8 +11,6 @@ spec:
       description: branch
     - name: pipeline-run-id
       description: pipelineRunId unique ID
-    - name: pipeline-pvc
-      description: pipeline pvc name place holder
     - name: target-branch
       description: target branch
     - name: ibmcloud-api-key
@@ -20,15 +19,19 @@ spec:
       description: github statuses url
     - name: pipeline-debug
 
+  workspaces:
+    - name: artifacts
+
   tasks:
     - name: get-git-credentials
       taskRef:
-        name: get-git-credentials
+        name: git-get-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: credentials-pvc
-          value: $(params.pipeline-pvc)
         - name: repository
           value: $(params.repository)
         - name: ibmcloud-api-key
@@ -39,11 +42,12 @@ spec:
         name: git-clone
       runAfter:
         - get-git-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
         - name: repository
           value: $(params.repository)
         - name: branch
@@ -54,16 +58,16 @@ spec:
         name: git-clone
       runAfter:
         - get-git-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
         - name: repository
           value: "https://github.ibm.com/one-pipeline/common-tekton-tasks"
         - name: branch
-          value: "master"
-        - name: directoryName
+          value: "tekton-beta"
+        - name: directory-name
           value: "common-tekton-tasks"
-
 
     - name: tekton-linter
       taskRef:
@@ -71,6 +75,9 @@ spec:
       runAfter:
         - clone-common-tasks
         - clone-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       params:
         - name: definitions
           value: |
@@ -81,5 +88,3 @@ spec:
           value: $(params.pipeline-debug)
         - name: statuses-url
           value: $(params.statuses-url)
-        - name: task-pvc
-          value: $(params.pipeline-pvc)
