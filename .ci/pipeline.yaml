@@ -63,7 +63,7 @@ spec:
         - name: repository
           value: "https://github.ibm.com/one-pipeline/common-tekton-tasks"
         - name: branch
-          value: "tekton-beta"
+          value: $(params.branch)
         - name: directory-name
           value: "common-tekton-tasks"
 
