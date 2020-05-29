@@ -56,11 +56,27 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-clone-repo
+    - name: pipeline-clone-evidence-repo
       taskRef:
         name: git-clone
       runAfter:
         - get-git-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: repository
+          value: $(params.evidence-locker-url)
+        - name: branch
+          value: "master"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: pipeline-clone-repo
+      taskRef:
+        name: git-clone
+      runAfter:
+        - pipeline-clone-evidence-repo
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -86,10 +102,61 @@ spec:
         - name: version
           value: $(params.version)
 
+    - name: pipeline-get-evidence-locker-path
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: .services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .parameters.repo_name
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: pipeline-get-toolchain-crn
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: .crn
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: pipeline-get-evidence-path
+      taskRef:
+        name: inventory-get-pipeline-run-id
+      runAfter:
+        - pipeline-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: app-name
+          value: $(params.application)
+        - name: version
+          value: $(params.version)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: pipeline-evidence-summarize
+      taskRef:
+        name: evidence-summarize
+      workspaces:
+        - name: evidence-locker
+          workspace: artifacts
+      params:
+        - name: evidence-repo-path
+          value: $(tasks.pipeline-get-evidence-locker-path.results.extracted-value)
+        - name: path-list
+          value: ci/$(tasks.pipeline-get-evidence-path.results.pipeline-run-id)
+        - name: toolchain-crn
+          value: $(tasks.pipeline-get-toolchain-crn.results.extracted-value)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: pipeline-create-cr
       taskRef:
         name: servicenow-create-change-request
       runAfter:
+        - pipeline-evidence-summarize
         - get-git-credentials
         - pipeline-clone-inventory-repo
       workspaces:
