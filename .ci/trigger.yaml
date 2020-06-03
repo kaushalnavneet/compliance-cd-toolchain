@@ -5,18 +5,20 @@ metadata:
   name: template
 spec:
   params:
-    - name: pipeline-debug
-      default: "0"
     - name: repository
       description: The git repo
+      default: ""
     - name: branch
-      description: branch
-    - name: target-branch
-      description: target branch
+      description: the branch for the git repo
+    - name: revision
+      description: |
+        the git revision/commit to update the git HEAD to.
+        Default is to mean only use the branch
+      default: ""
     - name: ibmcloud-api-key
-      description: ibmcloud api key
-    - name: statuses-url
-      description: github statuses url
+      description: ibm cloud api key
+    - name: pipeline-debug
+      default: "0"
 
   resourcetemplates:
     - apiVersion: v1
@@ -26,7 +28,7 @@ spec:
       spec:
         resources:
           requests:
-            storage:  5Gi
+            storage: 5Gi
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
@@ -53,13 +55,11 @@ spec:
         params:
           - name: pipeline-debug
             value: $(params.pipeline-debug)
+          - name: ibmcloud-api-key
+            value: $(params.ibmcloud-api-key)
           - name: repository
             value: $(params.repository)
           - name: branch
             value: $(params.branch)
-          - name: target-branch
-            value: $(params.target-branch)
-          - name: ibmcloud-api-key
-            value: $(params.ibmcloud-api-key)
-          - name: statuses-url
-            value: $(params.statuses-url)
+          - name: revision
+            value: $(params.revision)

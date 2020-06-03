@@ -1,13 +1,15 @@
 ---
-  apiVersion: tekton.dev/v1beta1
-  kind: TriggerBinding
-  metadata:
-    name: binding
-  spec:
-    params:
+apiVersion: tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: binding
+spec:
+  params:
+    - name: repository
+      value: $(event.pull_request.head.repo.html_url)
     - name: branch
       value: $(event.pull_request.head.ref)
-    - name: target-branch
+    - name: origin
       value: $(event.pull_request.base.ref)
-    - name: statuses-url
-      value: $(event.pull_request.statuses_url)
+    - name: revision
+      value: $(event.pull_request.head.sha)

@@ -5,23 +5,25 @@ metadata:
   name: pipeline
 spec:
   params:
+    - name: ibmcloud-api-key
+      description: ibm cloud api key
     - name: repository
       description: the git repo
     - name: branch
-      description: branch
-    - name: target-branch
-      description: target branch
-    - name: ibmcloud-api-key
-      description: ibmcloud api key
-    - name: statuses-url
-      description: github statuses url
+      description: the branch for the git repo
+    - name: revision
+      description: |
+        the git revision/commit to update the git HEAD to.
+        Default is to mean only use the branch
     - name: pipeline-debug
+      description: Pipeline debug ("verbose") mode
+      default: "0"
 
   workspaces:
     - name: artifacts
 
   tasks:
-    - name: get-git-credentials
+    - name: git-get-credentials
       taskRef:
         name: git-get-credentials
       workspaces:
@@ -35,11 +37,23 @@ spec:
         - name: ibmcloud-api-key
           value: $(params.ibmcloud-api-key)
 
+    - name: save-git-token
+      taskRef:
+        name: save-git-token
+      runAfter:
+        - git-get-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: clone-repo
       taskRef:
         name: git-clone
       runAfter:
-        - get-git-credentials
+        - git-get-credentials
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -50,12 +64,14 @@ spec:
           value: $(params.repository)
         - name: branch
           value: $(params.branch)
+        - name: directory-name
+          value: "compliance-cd-toolchain"
 
     - name: clone-common-tasks
       taskRef:
         name: git-clone
       runAfter:
-        - get-git-credentials
+        - git-get-credentials
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -63,13 +79,37 @@ spec:
         - name: repository
           value: "https://github.ibm.com/one-pipeline/common-tekton-tasks"
         - name: branch
-          value: $(params.branch)
+          value: "master"
         - name: directory-name
           value: "common-tekton-tasks"
 
-    - name: tekton-linter
+    - name: yaml-lint-github-status-pending
       taskRef:
-        name: tekton-lint
+        name: github-set-status
+      runAfter:
+        - save-git-token
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: secret-name
+          value: github-token
+        - name: repo-url
+          value: $(params.repository)
+        - name: commit-sha
+          value: $(params.revision)
+        - name: state
+          value: pending
+        - name: context
+          value: Tekton YAML Lint
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: description
+          value: Tekton Yaml Lint
+
+    - name: yaml-lint
+      taskRef:
+        name: yaml-lint
       runAfter:
         - clone-common-tasks
         - clone-repo
@@ -77,12 +117,93 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
-        - name: definitions
-          value: |
-            compliance-cd-toolchain/.tekton/**/*.yaml
-            common-tekton-tasks/preview/**/*.yaml
-            common-tekton-tasks/preview/**/*.yml
+        - name: rules
+          value: "/artifacts/compliance-cd-toolchain/yamllint-rules.yaml"
+        - name: path
+          value: "/artifacts/compliance-cd-toolchain"
+        - name: strict-mode
+          value: "false"
+
+    - name: yaml-lint-github-status-result
+      taskRef:
+        name: github-set-status
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: secret-name
+          value: github-token
+        - name: repo-url
+          value: $(params.repository)
+        - name: commit-sha
+          value: $(params.revision)
+        - name: state
+          value: $(tasks.yaml-lint.results.status)
+        - name: context
+          value: Tekton YAML Lint
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: statuses-url
-          value: $(params.statuses-url)
+        - name: description
+          value: Tekton Yaml Lint
+
+    - name: tekton-lint-github-status-pending
+      taskRef:
+        name: github-set-status
+      runAfter:
+        - save-git-token
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: secret-name
+          value: github-token
+        - name: repo-url
+          value: $(params.repository)
+        - name: commit-sha
+          value: $(params.revision)
+        - name: state
+          value: pending
+        - name: context
+          value: Tekton
+        - name: description
+          value: Running Tekton Linter...
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: tekton-lint
+      taskRef:
+        name: tekton-lint
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      runAfter:
+        - yaml-lint
+      params:
+        - name: definitions
+          value: |
+            compliance-ci-toolchain/.tekton/**/*.yaml
+            common-tekton-tasks/preview/*/*.yaml
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: tekton-lint-github-status-result
+      taskRef:
+        name: github-set-status
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: secret-name
+          value: github-token
+        - name: repo-url
+          value: $(params.repository)
+        - name: commit-sha
+          value: $(params.revision)
+        - name: state
+          value: $(tasks.tekton-lint.results.status)
+        - name: context
+          value: Tekton
+        - name: description
+          value: Running Tekton Linter...
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
