@@ -138,7 +138,7 @@ services:
           INVENTORY_REPO: '{{form.inventory-repo.parameters.repo_url}}'
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
-          DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
+          ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
         execute: true
 
   servicenow:
