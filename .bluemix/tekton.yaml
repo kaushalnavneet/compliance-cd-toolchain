@@ -76,8 +76,8 @@ properties:
   - name: change-request-id
     value: ${CHANGEREQUEST_ID}
     type: text
-  - name: dockerconfigjson
-    value: ${DOCKER_CONFIG_JSON}
+  - name: artifactory-dockerconfigjson
+    value: ${ARTIFACTORY_DOCKER_CONFIG_JSON}
     type: SECURE
   - name: pipeline-debug
     value: "0"
