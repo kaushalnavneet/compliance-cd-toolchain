@@ -40,6 +40,8 @@ spec:
       description: toggles debug mode for the pipeline
     - name: version
       description: App version
+    - name: artifactory-dockerconfigjson
+      description: dockerconfigjson for pullsecrets
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
