@@ -18,6 +18,14 @@ inputs:
     path: preview/iks
   - type: git
     branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: preview/toolchain
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: preview/evidence
+  - type: git
+    branch: master
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
