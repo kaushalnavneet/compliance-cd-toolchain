@@ -42,7 +42,7 @@ spec:
     - name: artifacts
 
   tasks:
-    - name: get-git-credentials
+    - name: prod-get-git-credentials
       taskRef:
         name: git-get-credentials
       workspaces:
@@ -56,11 +56,11 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-clone-evidence-repo
+    - name: prod-clone-evidence-repo
       taskRef:
         name: git-clone
       runAfter:
-        - get-git-credentials
+        - prod-get-git-credentials
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -72,11 +72,11 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-clone-repo
+    - name: prod-clone-repo
       taskRef:
         name: git-clone
       runAfter:
-        - pipeline-clone-evidence-repo
+        - prod-clone-evidence-repo
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -88,11 +88,11 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-clone-inventory-repo
+    - name: prod-clone-inventory-repo
       taskRef:
         name: git-clone-inventory-repo
       runAfter:
-        - pipeline-clone-repo
+        - prod-clone-repo
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -102,7 +102,7 @@ spec:
         - name: version
           value: $(params.version)
 
-    - name: pipeline-get-evidence-locker-path
+    - name: prod-get-evidence-locker-path
       taskRef:
         name: toolchain-extract-value
       params:
@@ -111,7 +111,7 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-get-toolchain-crn
+    - name: prod-get-toolchain-crn
       taskRef:
         name: toolchain-extract-value
       params:
@@ -120,11 +120,11 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-get-evidence-path
+    - name: prod-get-evidence-path
       taskRef:
         name: inventory-get-pipeline-run-id
       runAfter:
-        - pipeline-clone-inventory-repo
+        - prod-clone-inventory-repo
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -136,7 +136,7 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-evidence-summarize
+    - name: prod-summarize-evidence
       taskRef:
         name: evidence-summarize
       workspaces:
@@ -144,21 +144,21 @@ spec:
           workspace: artifacts
       params:
         - name: evidence-repo-path
-          value: $(tasks.pipeline-get-evidence-locker-path.results.extracted-value)
+          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
         - name: path-list
-          value: ci/$(tasks.pipeline-get-evidence-path.results.pipeline-run-id)
+          value: ci/$(tasks.prod-get-evidence-path.results.pipeline-run-id)
         - name: toolchain-crn
-          value: $(tasks.pipeline-get-toolchain-crn.results.extracted-value)
+          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-create-cr
+    - name: prod-create-cr
       taskRef:
         name: servicenow-create-change-request
       runAfter:
-        - pipeline-evidence-summarize
-        - get-git-credentials
-        - pipeline-clone-inventory-repo
+        - prod-summarize-evidence
+        - prod-get-git-credentials
+        - prod-clone-inventory-repo
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -192,11 +192,11 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-inventory-cr-add
+    - name: prod-add-cr-inventory
       taskRef:
         name: inventory-cr-add
       runAfter:
-        - pipeline-create-cr
+        - prod-create-cr
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -206,11 +206,11 @@ spec:
         - name: version
           value: $(params.version)
 
-    - name: pipeline-check-cr-approval
+    - name: prod-check-cr-approval
       taskRef:
         name: servicenow-check-change-request-approval
       runAfter:
-        - pipeline-inventory-cr-add
+        - prod-add-cr-inventory
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -226,12 +226,12 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-deployment
+    - name: prod-deployment
       taskRef:
         name: iks-deploy
       runAfter:
-        - pipeline-clone-repo
-        - pipeline-check-cr-approval
+        - prod-clone-repo
+        - prod-check-cr-approval
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -249,11 +249,11 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-merge-cr-inventory-branch
+    - name: prod-merge-cr-inventory-branch
       taskRef:
         name: inventory-apply
       runAfter:
-        - pipeline-deployment
+        - prod-deployment
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -261,11 +261,11 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: pipeline-close-cr
+    - name: prod-close-cr
       taskRef:
         name: servicenow-close-change-request
       runAfter:
-        - pipeline-merge-cr-inventory-branch
+        - prod-merge-cr-inventory-branch
       workspaces:
         - name: artifacts
           workspace: artifacts
