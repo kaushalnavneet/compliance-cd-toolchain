@@ -19,6 +19,7 @@ template:
     - inventory-repo
     - servicenow
     - artifactoryComp
+    - privateWorker
   info:
     git url: >
       "[" + $env.repository + "]" +
@@ -33,6 +34,11 @@ toolchain:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
 services:
+  privateWorker:
+    service_id: private_worker
+    parameters:
+      name: private-worker
+
   artifactoryComp:
     service_id: artifactory
     parameters:
@@ -139,6 +145,8 @@ services:
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
           ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
+          # Private Worker for the pipeline
+          PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
         execute: true
 
   servicenow:

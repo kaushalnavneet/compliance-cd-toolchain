@@ -93,3 +93,4 @@ properties:
   - name: version
     value: "v1"
     type: text
+private_worker: ${PRIVATE_WORKER}
