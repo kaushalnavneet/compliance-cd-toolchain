@@ -10,10 +10,6 @@ spec:
     - name: revision
       description: the git repo
       default: master
-    - name: ibmcloud-api-key
-      description: IBM Cloud API key with access to the toolchain
-    - name: servicenow-api-token
-      description: A valid ServiceNow API token
     - name: servicenow-api-base-url
       description: The ServiceNow API Base URL you wish to use (test or live)
     - name: servicenow-configuration-item
@@ -39,8 +35,6 @@ spec:
       default: "notAvailable"
     - name: pipeline-debug
       description: toggles debug mode for the pipeline
-    - name: version
-      description: App version
     - name: slack-notifications
       description: toggles slack notifications
 
@@ -129,51 +123,13 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: ibmcloud-api-key
-          value: $(params.ibmcloud-api-key)
         - name: repository
           value: $(tasks.setup.results.repository)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-
-    - name: prod-save-git-token
-      runAfter:
-        - prod-get-git-credentials
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-      taskSpec:
-        params:
-          - name: pipeline-debug
-        workspaces:
-          - name: artifacts
-            mountPath: /artifacts
-        stepTemplate:
-          env:
-            - name: PIPELINE_DEBUG
-              value: $(params.pipeline-debug)
-        steps:
-          - name: save-git-token-to-file
-            image: ibmcom/pipeline-base-image:2.6
-            workingDir: "/artifacts"
-            command: ["/bin/bash", "-c"]
-            args:
-              - |
-                set -e -o pipefail
-
-                if [ $PIPELINE_DEBUG == 1 ]; then
-                  pwd
-                  env
-                  trap env EXIT
-                  set -x
-                fi
-
-                source ./build.properties
-                echo -n $GIT_TOKEN > ./github-token
 
     - name: prod-clone-evidence-repo
       taskRef:
@@ -183,11 +139,15 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: repository
           value: $(tasks.setup.results.evidence-locker-url)
         - name: branch
           value: "master"
+        - name: git-user
+          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -199,11 +159,15 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: repository
           value: $(tasks.setup.results.repository)
         - name: branch
           value: $(params.revision)
+        - name: git-user
+          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -231,13 +195,15 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: version
-          value: $(params.version)
         - name: app-name
           value: $(params.application)
+        - name: git-auth-user
+          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
 
     - name: prod-get-evidence-locker-path
       taskRef:
@@ -265,11 +231,13 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: app-name
           value: $(params.application)
-        - name: version
-          value: $(params.version)
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -365,6 +333,8 @@ spec:
         - prod-change-request-create-urls
         - prod-change-request-deployment-ready
       workspaces:
+        - name: dynamic-secrets
+          workspace: artifacts
         - name: artifacts
           workspace: artifacts
       params:
@@ -372,14 +342,18 @@ spec:
           value: "$(tasks.prod-get-deployment-app.results.app-name)"
         - name: repository
           value: $(tasks.setup.results.repository)
-        - name: ibmcloud-api-key
-          value: $(params.ibmcloud-api-key)
-        - name: servicenow-api-token
-          value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: servicenow-configuration-item
           value: $(params.servicenow-configuration-item)
+        - name: registry-url
+          value: $(tasks.prod-clone-inventory-repo.results.registry-url)
+        - name: registry-namespace
+          value: $(tasks.prod-clone-inventory-repo.results.registry-namespace)
+        - name: image-name
+          value: $(tasks.prod-clone-inventory-repo.results.image-name)
+        - name: image-tag
+          value: $(tasks.prod-clone-inventory-repo.results.image-tag)
         - name: cluster
           value: $(params.cluster)
         - name: cluster-region
@@ -411,13 +385,17 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: repository
-          value: $(params.application)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: version
-          value: $(params.version)
+        - name: change-request-id
+          value: $(tasks.prod-change-request-create.results.change-request-id)
+        - name: application
+          value: $(params.application)
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
 
     - name: prod-change-request-check-approval
       taskRef:
@@ -425,11 +403,9 @@ spec:
       runAfter:
         - prod-inventory-add-change-request
       workspaces:
-        - name: artifacts
+        - name: dynamic-secrets
           workspace: artifacts
       params:
-        - name: servicenow-api-token
-          value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: evidence-locker-url
@@ -438,6 +414,8 @@ spec:
           value: "true"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: change-request-id
+          value: $(tasks.prod-change-request-create.results.change-request-id)
 
     - name: prod-create-namespace
       taskRef:
@@ -487,8 +465,6 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
-        - name: ibmcloud-api-key
-          value: $(params.ibmcloud-api-key)
         - name: cluster-name
           value: $(params.cluster)
         - name: cluster-region
@@ -497,6 +473,16 @@ spec:
           value: $(params.cluster-namespace)
         - name: allow-create-route
           value: "false"
+        - name: registry-url
+          value: $(tasks.prod-clone-inventory-repo.results.registry-url)
+        - name: registry-namespace
+          value: $(tasks.prod-clone-inventory-repo.results.registry-namespace)
+        - name: image-name
+          value: $(tasks.prod-clone-inventory-repo.results.image-name)
+        - name: image-tag
+          value: $(tasks.prod-clone-inventory-repo.results.image-tag)
+        - name: app-directory
+          value: $(tasks.prod-clone-repo.results.directory-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -529,7 +515,7 @@ spec:
           workspace: artifacts
       params:
         - name: secret-name
-          value: github-token
+          value: git-token
         - name: repository
           value: $(params.repository)
         - name: incident-issue-repo
@@ -691,7 +677,13 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
+        - name: change-request-id
+          value: $(tasks.prod-change-request-create.results.change-request-id)
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -702,6 +694,8 @@ spec:
         - prod-inventory-merge-change-request-branch
       workspaces:
         - name: artifacts
+          workspace: artifacts
+        - name: dynamic-secrets
           workspace: artifacts
       params:
         - name: close-category-script
@@ -730,14 +724,14 @@ spec:
 
             printf "Deployed successful %s\n\nUPDATED EVIDENCE SUMMARY: \n\n%s" "$CLOSE_ISSUES" "$SUMMARY"
 
-        - name: servicenow-api-token
-          value: $(params.servicenow-api-token)
         - name: servicenow-api-url
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: evidence-locker-url
           value: $(tasks.setup.results.evidence-locker-url)
         - name: collect-evidence
           value: "true"
+        - name: change-request-id
+          value: $(tasks.prod-change-request-create.results.change-request-id)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
