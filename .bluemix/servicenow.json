@@ -103,7 +103,7 @@
           }
         }
       ]
-    },  
+    },
     {
       "title": {
         "$ref": "#/messages/servicenow.initialCrTitle"
@@ -128,7 +128,7 @@
     {
       "title": {
         "$ref": "#/messages/servicenow.apiUrlTitle"
-      },      
+      },
       "key": "api-url",
       "type": "text",
       "readonly": false
