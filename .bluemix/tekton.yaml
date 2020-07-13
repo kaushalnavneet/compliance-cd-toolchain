@@ -54,8 +54,8 @@ properties:
   - name: servicenow-api-token
     value: ${SERVICENOW_TOKEN}
     type: SECURE
-  - name: servicenow-api-url
-    value: ${SERVICENOW_URL}
+  - name: servicenow-api-base-url
+    value: ${SERVICENOW_BASE_URL}
     type: text
   - name: servicenow-configuration-item
     value: ${SERVICENOW_CONFIGURATION_ITEM}
