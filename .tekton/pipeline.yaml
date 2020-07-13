@@ -14,8 +14,8 @@ spec:
       description: IBM Cloud API key with access to the toolchain
     - name: servicenow-api-token
       description: A valid ServiceNow API token
-    - name: servicenow-api-url
-      description: The ServiceNow API URL you wish to use (test or live)
+    - name: servicenow-api-base-url
+      description: The ServiceNow API Base URL you wish to use (test or live)
     - name: servicenow-configuration-item
       description: The name of the service to be deployed as it is registered in ServiceNow
     - name: cluster
@@ -168,6 +168,30 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-create-change-request-urls
+      params:
+        - name: servicenow-api-base-url
+          value: $(params.servicenow-api-base-url)
+      taskSpec:
+        params:
+          - name: servicenow-api-base-url
+        results:
+          - name: change-request-url
+          - name: servicenow-api-url
+        steps:
+          - name: create-change-request-urls
+            image: ibmcom/pipeline-base-image:2.6
+            env:
+              - name: CHANGE_API_PATH
+                value: "api/ibmwc/change"
+              - name: CHANGE_REQUEST_URL_PATH
+                value: "nav_to.do?uri=change_request.do?sys_id="
+              - name: SERVICENOW_BASE_URL
+                value: $(params.servicenow-api-base-url)
+            script: |
+              echo -n "${SERVICENOW_BASE_URL}${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
+              echo -n "${SERVICENOW_BASE_URL}${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
+
     - name: prod-create-cr
       taskRef:
         name: servicenow-create-change-request
@@ -175,6 +199,7 @@ spec:
         - prod-summarize-evidence
         - prod-get-git-credentials
         - prod-clone-inventory-repo
+        - prod-create-change-request-urls
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -188,7 +213,7 @@ spec:
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
-          value: $(params.servicenow-api-url)
+          value: $(tasks.prod-create-change-request-urls.results.servicenow-api-url)
         - name: servicenow-configuration-item
           value: $(params.servicenow-configuration-item)
         - name: cluster
@@ -203,6 +228,8 @@ spec:
           value: $(params.evidence-locker-url)
         - name: change-request-id
           value: $(params.change-request-id)
+        - name: change-request-url
+          value: $(tasks.prod-create-change-request-urls.results.change-request-url)
         - name: collect-evidence
           value: "true"
         - name: pipeline-debug
@@ -234,7 +261,7 @@ spec:
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
-          value: $(params.servicenow-api-url)
+          value: $(tasks.prod-create-change-request-urls.results.servicenow-api-url)
         - name: evidence-locker-url
           value: $(params.evidence-locker-url)
         - name: collect-evidence
@@ -327,7 +354,7 @@ spec:
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
-          value: $(params.servicenow-api-url)
+          value: $(tasks.prod-create-change-request-urls.results.servicenow-api-url)
         - name: evidence-locker-url
           value: $(params.evidence-locker-url)
         - name: collect-evidence
