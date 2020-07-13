@@ -144,8 +144,8 @@ Service Now is used to keep tack of change requests.
 - **ServiceNow Configuration Item:** The name of the service/app to be associated with Change Requests
     A ServiceNow Configuration item can be requested for [production](https://watson.service-now.com/nav_to.do?uri=%2Fx_ibmwc_ssef_app.do%23!%2Fhome) or [test](https://watsontest.service-now.com/nav_to.do?uri=%2Fx_ibmwc_ssef_app.do%23!%2Fhome) environments.
 - **ServiceNow Change Request ID:** A manually created Change Request ID can be provided here. Otherwise the pipeline will create a new change request in ServiceNow. This can be changed in environment properties after the toolchain is created.
-- **ServiceNow API URL:** The URL of the ServiceNow API, can be changed to target the production environment, default is test environment.  
-    Default: `https://watsontest.service-now.com/api/ibmwc/change`
+- **ServiceNow API Base URL:** The Base URL of the ServiceNow API, can be changed to target the production environment, default is test environment.  
+    Default: `https://watsontest.service-now.com`
     
 ### 4. Create toolchain and run cd pipeline
 
