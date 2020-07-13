@@ -17,7 +17,7 @@ Using the url, modifications can be tried out before merging into master by chan
 | ![Toolchain Name](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/name.png) |
 | :--: | 
 
-Note: toolchain region can differ from cluster and registry region
+Note: toolchain region can differ from cluster
 
 ### 3. Tool integrations
 
@@ -97,7 +97,7 @@ The API key is used to interact with the ibmcloud CLI tool in several tasks.
    Note: A new Key Protect Instance can be created here: <https://cloud.ibm.com/catalog/services/key-protect>  
    Note: An IBM Cloud API key can also be created here: <https://cloud.ibm.com/iam/apikeys>  
    
-   Once the API Key field is filled out, the registry and cluster related fields will be filled out automatically.
+   Once the API Key field is filled out and cluster related fields will be filled out automatically.
     
 | ![Cluster](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/cluster.png) |
 | :--: | 

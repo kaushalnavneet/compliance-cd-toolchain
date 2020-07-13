@@ -24,33 +24,6 @@
            "v-type":"api-key"
         }
      },
-     "registry-region":{ 
-        "description":{ 
-           "$ref":"#/messages/deploy.registryRegionDescription"
-        },
-        "type":"string",
-        "disabled":false,
-        "validator":{ 
-           "v-type":"cr-region",
-           "params":[ 
-              "api-key"
-           ]
-        }
-     },
-     "registry-namespace":{ 
-        "description":{ 
-           "$ref":"#/messages/deploy.registrynsDescription"
-        },
-        "type":"string",
-        "pattern":"^[a-z0-9][-_a-z0-9]{2,28}[a-z0-9]$",
-        "validator":{ 
-           "v-type":"k8s-registry-namespace",
-           "params":[ 
-              "registry-region"
-           ],
-           "validate":false
-        }
-     },
      "prod-region":{ 
         "description":{ 
            "$ref":"#/messages/deploy.regionDescription"
@@ -121,8 +94,6 @@
   "required":[ 
      "app-name",
      "api-key",
-     "registry-region",
-     "registry-namespace",
      "prod-region",
      "prod-resource-group",
      "prod-cluster-name",
@@ -149,52 +120,6 @@
            "$ref":"#/messages/deploy.apikey"
         },
         "key":"api-key"
-     },
-     { 
-        "type":"table",
-        "columnCount":3,
-        "widths":[ 
-           "50%",
-           "3%",
-           "47%"
-        ],
-        "items":[ 
-           { 
-              "type":"label",
-              "title":{ 
-                 "$ref":"#/messages/deploy.containerregRegion"
-              }
-           },
-           { 
-              "type":"label",
-              "title":""
-           },
-           { 
-              "type":"label",
-              "title":{ 
-                 "$ref":"#/messages/deploy.containerregns"
-              }
-           },
-           { 
-              "type":"select",
-              "title":{ 
-                 "$ref":"#/messages/deploy.imgregRegion"
-              },
-              "key":"registry-region"
-           },
-           { 
-              "type":"label",
-              "title":""
-           },
-           { 
-              "type":"select",
-              "readonly":false,
-              "title":{ 
-                 "$ref":"#/messages/deploy.imgregNs"
-              },
-              "key":"registry-namespace"
-           }
-        ]
      },
      { 
         "type":"table",
