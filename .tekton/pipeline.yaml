@@ -189,8 +189,8 @@ spec:
               - name: SERVICENOW_BASE_URL
                 value: $(params.servicenow-api-base-url)
             script: |
-              echo -n "${SERVICENOW_BASE_URL}${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
-              echo -n "${SERVICENOW_BASE_URL}${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
+              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
+              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
 
     - name: prod-create-cr
       taskRef:

@@ -184,7 +184,7 @@ form:
 
   customtool_servicenow:
     parameters:
-      api-url: https://watsontest.service-now.com/
+      api-url: https://watsontest.service-now.com
       changerequest-id: notAvailable
       api-token:
       configuration-item:
