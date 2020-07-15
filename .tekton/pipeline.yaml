@@ -226,12 +226,50 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-create-namespace
+      taskRef:
+        name: iks-create-namespace
+      runAfter:
+        - prod-check-cr-approval
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: cluster-name
+          value: $(params.cluster)
+        - name: cluster-region
+          value: $(params.cluster-region)
+        - name: cluster-namespace
+          value: $(params.cluster-namespace)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: prod-create-image-pull-secrets
+      taskRef:
+        name: iks-create-pull-secrets
+      runAfter:
+        - prod-create-namespace
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: cluster-name
+          value: $(params.cluster)
+        - name: cluster-region
+          value: $(params.cluster-region)
+        - name: cluster-namespace
+          value: $(params.cluster-namespace)
+        - name: registry-url
+          value: $(tasks.prod-clone-inventory-repo.results.registry-url)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-deployment
       taskRef:
         name: iks-deploy
       runAfter:
         - prod-clone-repo
-        - prod-check-cr-approval
+        - prod-create-image-pull-secrets
       workspaces:
         - name: artifacts
           workspace: artifacts
