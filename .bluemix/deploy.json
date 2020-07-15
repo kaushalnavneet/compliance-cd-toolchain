@@ -1,97 +1,97 @@
-{ 
+{
   "$schema":"http://json-schema.org/draft-04/schema#",
-  "messages":{ 
+  "messages":{
      "$i18n":"locales.yml"
   },
-  "title":{ 
+  "title":{
      "$ref":"#/messages/deploy.title"
   },
-  "description":{ 
+  "description":{
      "$ref":"#/messages/deploy.description"
   },
-  "longDescription":{ 
+  "longDescription":{
      "$ref":"#/messages/deploy.longDescription"
   },
   "type":"object",
-  "properties":{ 
-     "api-key":{ 
-        "description":{ 
+  "properties":{
+     "api-key":{
+        "description":{
            "$ref":"#/messages/deploy.apikeyDescription"
         },
         "type":"string",
         "pattern":"\\S",
-        "validator":{ 
+        "validator":{
            "v-type":"api-key"
         }
      },
-     "prod-region":{ 
-        "description":{ 
+     "prod-region":{
+        "description":{
            "$ref":"#/messages/deploy.regionDescription"
         },
         "type":"string",
         "disabled":false,
-        "validator":{ 
+        "validator":{
            "v-type":"k8s-region",
-           "params":[ 
+           "params":[
               "api-key"
            ]
         }
      },
-     "prod-resource-group":{ 
-        "description":{ 
+     "prod-resource-group":{
+        "description":{
            "$ref":"#/messages/deploy.rgDescription"
         },
         "type":"string",
-        "validator":{ 
+        "validator":{
            "v-type":"resource-group",
-           "params":[ 
+           "params":[
               "api-key"
            ],
-           "validator":{ 
+           "validator":{
               "v-type":"resource-group",
-              "params":[ 
+              "params":[
                  "api-key"
               ]
            }
         }
      },
-     "prod-cluster-name":{ 
-        "description":{ 
+     "prod-cluster-name":{
+        "description":{
            "$ref":"#/messages/deploy.clusterNameDescription"
         },
         "type":"string",
         "pattern":"\\S",
-        "validator":{ 
+        "validator":{
            "v-type":"k8s-cluster-name",
-           "params":[ 
+           "params":[
               "prod-resource-group",
               "prod-region"
            ]
         }
      },
-     "prod-cluster-namespace":{ 
-        "description":{ 
+     "prod-cluster-namespace":{
+        "description":{
            "$ref":"#/messages/deploy.namespaceDescription"
         },
         "type":"string",
         "pattern":"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
      },
-     "app-name":{ 
-        "description":{ 
+     "app-name":{
+        "description":{
            "$ref":"#/messages/deploy.appDescription"
         },
         "type":"string",
         "pattern":"\\S"
      },
-     "emergency-label":{ 
-        "description":{ 
+     "emergency-label":{
+        "description":{
            "$ref":"#/messages/deploy.emergencyLabel"
         },
         "type":"string",
         "pattern":"\\S"
      }
   },
-  "required":[ 
+  "required":[
      "app-name",
      "api-key",
      "prod-region",
@@ -100,31 +100,31 @@
      "prod-cluster-namespace",
      "emergency-label"
   ],
-  "form":[ 
-     { 
+  "form":[
+     {
         "type":"validator",
         "url":"/devops/validator/validator-v1.html"
      },
-     { 
+     {
         "type":"text",
         "readonly":false,
-        "title":{ 
+        "title":{
            "$ref":"#/messages/deploy.appName"
         },
         "key":"app-name"
      },
-     { 
+     {
         "type":"password",
         "readonly":false,
-        "title":{ 
+        "title":{
            "$ref":"#/messages/deploy.apikey"
         },
         "key":"api-key"
      },
-     { 
+     {
         "type":"table",
         "columnCount":7,
-        "widths":[ 
+        "widths":[
            "24%",
            "2%",
            "24%",
@@ -133,78 +133,78 @@
            "1%",
            "23%"
         ],
-        "items":[ 
-           { 
+        "items":[
+           {
               "type":"label",
-              "title":{ 
+              "title":{
                  "$ref":"#/messages/region"
               }
            },
-           { 
+           {
               "type":"label",
               "title":""
            },
-           { 
+           {
               "type":"label",
-              "title":{ 
+              "title":{
                  "$ref":"#/messages/deploy.rg"
               }
            },
-           { 
+           {
               "type":"label",
               "title":""
            },
-           { 
+           {
               "type":"label",
-              "title":{ 
+              "title":{
                  "$ref":"#/messages/deploy.cluster"
               }
            },
-           { 
+           {
               "type":"label",
               "title":""
            },
-           { 
+           {
               "type":"label",
-              "title":{ 
+              "title":{
                  "$ref":"#/messages/deploy.clusterNs"
               }
            },
-           { 
+           {
               "type":"select",
               "key":"prod-region"
            },
-           { 
+           {
               "type":"label",
               "title":""
            },
-           { 
+           {
               "type":"select",
               "key":"prod-resource-group",
               "readonly":false
            },
-           { 
+           {
               "type":"label",
               "title":""
            },
-           { 
+           {
               "type":"select",
               "key":"prod-cluster-name",
               "readonly":false
            },
-           { 
+           {
               "type":"label",
               "title":""
            },
-           { 
+           {
               "type":"text",
               "key":"prod-cluster-namespace",
               "readonly":false
            }
         ]
      },
-     { 
-        "title":{ 
+     {
+        "title":{
            "$ref":"#/messages/deploy.emergencyLabelTitle"
         },
         "key":"emergency-label",
@@ -212,31 +212,31 @@
         "readonly":false,
         "value":"EMERGENCY"
      },
-     { 
+     {
         "type":"table",
         "columnCount":1,
-        "widths":[ 
+        "widths":[
            "100%"
         ],
-        "items":[ 
-           { 
+        "items":[
+           {
               "type":"label",
-              "title":{ 
+              "title":{
                  "$ref":"#/messages/deploy.clusterDescription"
               }
            }
         ]
      },
-     { 
+     {
         "type":"table",
         "columnCount":1,
-        "widths":[ 
+        "widths":[
            "100%"
         ],
-        "items":[ 
-           { 
+        "items":[
+           {
               "type":"label",
-              "title":{ 
+              "title":{
                  "$ref":"#/messages/deploy.clusternsDescription"
               }
            }

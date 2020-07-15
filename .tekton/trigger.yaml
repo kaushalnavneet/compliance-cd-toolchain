@@ -28,9 +28,9 @@ spec:
       description: name of the deployed app or service
     - name: servicenow-api-token
       description: API token for ServiceNow to handle Change Requests
-    - name: servicenow-api-url
-      description: API URL for ServiceNow to handle Change Requests
-      default: "https://watsontest.service-now.com/api/ibmwc/change"
+    - name: servicenow-api-base-url
+      description: Base API URL for ServiceNow to handle Change Requests
+      default: "https://watsontest.service-now.com"
     - name: change-request-id
       description: ServiceNow Change Request ID
       default: "notAvailable"
@@ -87,8 +87,8 @@ spec:
             value: $(params.ibmcloud-api-key)
           - name: servicenow-api-token
             value: $(params.servicenow-api-token)
-          - name: servicenow-api-url
-            value: $(params.servicenow-api-url)
+          - name: servicenow-api-base-url
+            value: $(params.servicenow-api-base-url)
           - name: servicenow-configuration-item
             value: $(params.servicenow-configuration-item)
           - name: cluster
