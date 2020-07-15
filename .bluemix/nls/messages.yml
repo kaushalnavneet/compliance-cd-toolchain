@@ -2,7 +2,7 @@
 #The format for creating a link with a URL and text is [link text](link url) with no spaces or characters between the two sets of brackets- []()
 template.name: "Deploy a FedRAMP compliant Kubernetes app"
 template.description: "TODO: more explanation"
-template.gettingStarted: " **Your toolchain is ready!**\n**Quick start:** Using an already built image from the CI/PR toolchain template and an initial Change Request from ServiceNow this pipeline will check and deploy you application in your Kubernetes cluster. For step-by-step instructions, see the [tutorial](https://www.ibm.com/devops/method/tutorials/tc_secure_kube?task=2) for this toolchain."
+template.gettingStarted: " **Your toolchain is ready!**\n**Quick start:** Using an already built image from the CI/PR toolchain template and an initial Change Request from ServiceNow this pipeline will check and deploy you application in your Kubernetes cluster."
 repos.title: "GitHub Enterprise repositories"
 repos.description: "Tekton definitions, task catalog and application related repo URLs"
 repos.longDescription: "Tekton definitions, task catalog and application related repo URLs"

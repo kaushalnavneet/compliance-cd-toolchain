@@ -88,6 +88,22 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-get-deployment-app
+      taskRef:
+        name: get-deployment-app
+      runAfter:
+        - prod-clone-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: app-directory
+          value: "$(tasks.prod-clone-repo.results.directory-name)"
+        - name: deployment-file
+          value: "deployment.yml"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-clone-inventory-repo
       taskRef:
         name: git-clone-inventory-repo
@@ -163,6 +179,8 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
+        - name: application
+          value: "$(tasks.prod-get-deployment-app.results.app-name)"
         - name: repository
           value: $(params.repository)
         - name: ibmcloud-api-key
@@ -179,8 +197,6 @@ spec:
           value: $(params.cluster-region)
         - name: cluster-namespace
           value: $(params.cluster-namespace)
-        - name: application
-          value: $(params.application)
         - name: emergency-label
           value: $(params.emergency-label)
         - name: evidence-locker-url
