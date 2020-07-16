@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "messages": {
+    "$i18n": "locales.yml"
+  },
+  "title": {
+    "$ref": "#/messages/doiToolchain.title"
+  },
+  "description": {
+    "$ref": "#/messages/doiToolchain.description"
+  },
+  "longDescription": {
+    "$ref": "#/messages/doiToolchain.longDescription"
+  },
+  "type": "object",
+  "properties": {
+    "doi-toolchain-id": {
+      "description": {
+        "$ref": "#/messages/doiToolchain.idDescription"
+      },
+      "type": "string",
+      "pattern": "\\S"
+    }
+  },
+  "required": [
+    "doi-toolchain-id"
+  ],
+  "form": [
+    {
+      "type": "table",
+      "columnCount": 1,
+      "widths": ["100%"],
+      "items": [
+        {
+          "type": "label",
+          "title": {
+            "$ref": "#/messages/doiToolchain.help"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "$ref": "#/messages/doiToolchain.id"
+      },
+      "key": "doi-toolchain-id",
+      "type": "text"
+    }
+  ]
+}
