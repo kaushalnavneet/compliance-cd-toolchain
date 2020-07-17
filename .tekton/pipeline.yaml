@@ -117,6 +117,8 @@ spec:
           value: $(params.pipeline-debug)
         - name: version
           value: $(params.version)
+        - name: app-name
+          value: $(params.application)
 
     - name: prod-get-evidence-locker-path
       taskRef:
