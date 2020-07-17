@@ -102,7 +102,7 @@ The API key is used to interact with the ibmcloud CLI tool in several tasks.
 | ![Cluster](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/cluster.png) |
 | :--: | 
     
-- **EMERGENCY Label for PRs and issues:** If the pull request was labelled with an emergency label, the created change request type will be also emergency instead of standard.  
+- **EMERGENCY Label for PRs and issues:** If the pull request was labelled with an emergency label, e.g. "EMERGENCY", the resulting change request will have its `type` set to that value. You should ensure whatever label you specify here matches the actual label being used to identify the pull request emergency type.
     Default: `EMERGENCY`
     
 #### Artifactory
