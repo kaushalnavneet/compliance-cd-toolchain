@@ -246,6 +246,8 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
+        - name: repository
+          value: $(params.application)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: version
