@@ -14,20 +14,6 @@
     },
     "type": "object",
     "properties": {
-        "tekton-catalog-repo": {
-            "description": {
-                "$ref": "#/messages/repos.tektonCatalogRepoDescription"
-            },
-            "type": "string",
-            "pattern": "\\S"
-        },
-        "tekton-definition-repo": {
-            "description": {
-                "$ref": "#/messages/repos.tektonDefinitionRepoDescription"
-            },
-            "type": "string",
-            "pattern": "\\S"
-        },
         "app-repo": {
             "description": {
                 "$ref": "#/messages/repos.applicationRepoDescription"
@@ -58,8 +44,6 @@
         }
     },
     "required": [
-        "tekton-catalog-repo",
-        "tekton-definition-repo",
         "app-repo",
         "incident-issues-repo",
         "evidence-locker-repo",
@@ -78,35 +62,6 @@
                 "78%"
             ],
             "items": [
-                {
-                    "type": "label",
-                    "title": {
-                        "$ref": "#/messages/repos.tektonCatalogRepoTitle"
-                    }
-                },
-                {
-                    "title": {
-                        "$ref": "#/messages/repos.tektonCatalogRepoTitle"
-                    },
-                    "key": "tekton-catalog-repo",
-                    "type": "text",
-                    "readonly": true
-                },
-                {
-                    "type": "label",
-                    "title": {
-                        "$ref": "#/messages/repos.tektonDefinitionRepoTitle"
-                    }
-                },
-                {
-                    "title": {
-                        "$ref": "#/messages/repos.tektonDefinitionRepoTitle"
-                    },
-                    "key": "tekton-definition-repo",
-                    "type": "text",
-                    "readonly": true
-                },
-
                 {
                     "type": "label",
                     "title": ""
