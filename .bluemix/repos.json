@@ -64,17 +64,6 @@
             "items": [
                 {
                     "type": "label",
-                    "title": ""
-                },
-                {
-                    "type": "label",
-                    "title": {
-                        "$ref": "#/messages/repos.existingHelp"
-                    }
-                },
-
-                {
-                    "type": "label",
                     "title": {
                         "$ref": "#/messages/repos.applicationRepoTitle"
                     }
