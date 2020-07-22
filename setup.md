@@ -105,6 +105,13 @@ The API key is used to interact with the ibmcloud CLI tool in several tasks.
 - **EMERGENCY Label for PRs and issues:** If the pull request was labelled with an emergency label, e.g. "EMERGENCY", the resulting change request will have its `type` set to that value. You should ensure whatever label you specify here matches the actual label being used to identify the pull request emergency type.
     Default: `EMERGENCY`
     
+#### Delivery Pipeline Private Worker
+
+| ![Private Worker](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/private-worker-tool.png) |
+| :--: | 
+
+The Delivery Pipeline Private Worker tool integration connects with one or more private workers that are capable of running Delivery Pipeline workloads in isolation. For more information, see [Working with Private Workers](https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-private-workers).
+    
 #### Artifactory
 
 The template comes with an artifactory integration to enable using cocoa compliance custom base image in the tekton tasks.  
@@ -146,6 +153,15 @@ Service Now is used to keep tack of change requests.
 - **ServiceNow Change Request ID:** A manually created Change Request ID can be provided here. Otherwise the pipeline will create a new change request in ServiceNow. This can be changed in environment properties after the toolchain is created.
 - **ServiceNow API Base URL:** The Base URL of the ServiceNow API, can be changed to target the production environment, default is test environment.  
     Default: `https://watsontest.service-now.com`
+    
+#### Link DOI toolchain
+
+CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so that it is able to publish the deployment records to insights. For now, it should be the CI toolchain ID.
+
+| ![DOI Toolchain ID](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/doi-toolchain.png) |
+| :--: | 
+
+Note: Make sure to only include the ID here, not the full URL.
     
 ### 4. Create toolchain and run cd pipeline
 
