@@ -23,5 +23,4 @@ If you get stuck or experience a problem during setup, or running your pipelines
 * [Creating Toolchains](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-toolchains_getting_started&pos=2)
 * [Working with Tekton Pipelines](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-tekton-pipelines)
 * [Private Workers](https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-install-private-workers)
-* Step by step [tutorial](https://www.ibm.com/devops/method/tutorials/tc_secure_kube) with a demo template
 * [Artifactory](https://taas.w3ibm.mybluemix.net/guides#artifactory)
