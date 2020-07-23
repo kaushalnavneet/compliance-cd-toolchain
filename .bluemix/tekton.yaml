@@ -87,4 +87,7 @@ properties:
   - name: version
     value: "v1"
     type: text
+  - name: doi-toolchain-id
+    value: ${DOI_TOOLCHAIN_ID}
+    type: text
 private_worker: ${PRIVATE_WORKER}

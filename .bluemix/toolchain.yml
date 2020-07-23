@@ -20,6 +20,7 @@ template:
     - servicenow
     - artifactoryComp
     - privateWorker
+    - doi-toolchain
   info:
     git url: >
       "[" + $env.repository + "]" +
@@ -114,6 +115,7 @@ services:
         - evidence-locker-repo
         - inventory-repo
         - customtool_servicenow
+        - customtool_doi-toolchain
       name: 'tekton-pipeline-{{timestamp}}'
       type: tekton
       ui-pipeline: true
@@ -147,6 +149,7 @@ services:
           ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
           # Private Worker for the pipeline
           PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
+          DOI_TOOLCHAIN_ID: '{{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
         execute: true
 
   servicenow:
@@ -161,6 +164,19 @@ services:
       name: ServiceNow Change Management
       dashboard_url: '{{form.customtool_servicenow.parameters.api-url}}'
       description: IBM Cloud Employee Service Portal
+
+  doi-toolchain:
+    service_id: customtool
+    parameters:
+      type: doi-toolchain
+      lifecyclePhase: "LEARN"
+      imageUrl:
+        $ref: devops-insights.png
+        $refType: image-data-uri
+      documentationUrl: 'https://cloud.ibm.com/devops/insights/overviewNew?toolchainId={{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
+      name: Link DOI Toolchain
+      dashboard_url: 'https://cloud.ibm.com/devops/insights/overviewNew?toolchainId={{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
+      description: The toolchain that contains the Devops Insights instance CD interacts with.
 
 form:
 
@@ -192,3 +208,9 @@ form:
       configuration-item:
     schema:
       $ref: servicenow.json
+
+  customtool_doi-toolchain:
+    parameters:
+      doi-toolchain-id:
+    schema:
+      $ref: doi-toolchain.json
