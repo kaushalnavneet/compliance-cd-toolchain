@@ -252,6 +252,8 @@ spec:
           value: "true"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: formatted-summary-path
+          value: $(tasks.prod-format-evidence-summary.results.formatted-summary-path)
 
     - name: prod-add-cr-inventory
       taskRef:
