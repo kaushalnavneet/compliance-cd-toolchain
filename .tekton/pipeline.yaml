@@ -228,6 +228,17 @@ spec:
         - name: summary-path
           value: $(tasks.prod-summarize-evidence.results.summary-path)
 
+    - name: prod-summary-to-deployment-ready
+      runAfter:
+        - prod-summarize-evidence
+      taskRef:
+        name: summary-to-deployment-ready
+      params:
+        - name: failure-count
+          value: $(tasks.prod-summarize-evidence.results.failure-count)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-create-change-request-urls
       params:
         - name: servicenow-api-base-url
@@ -256,7 +267,7 @@ spec:
       taskRef:
         name: servicenow-create-change-request
       runAfter:
-        - prod-summarize-evidence
+        - prod-summary-to-deployment-ready
         - prod-get-git-credentials
         - prod-clone-inventory-repo
         - prod-create-change-request-urls
@@ -296,6 +307,8 @@ spec:
           value: $(params.pipeline-debug)
         - name: formatted-summary-path
           value: $(tasks.prod-format-evidence-summary.results.formatted-summary-path)
+        - name: servicenow-deployment-ready
+          value: $(tasks.prod-summary-to-deployment-ready.results.deployment-ready)
 
     - name: prod-add-cr-inventory
       taskRef:

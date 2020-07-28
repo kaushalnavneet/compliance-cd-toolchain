@@ -1,0 +1,40 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: summary-to-deployment-ready
+spec:
+  params:
+    - name: failure-count
+      default: "0"
+    - name: pipeline-debug
+      default: "0"
+
+  results:
+    - name: deployment-ready
+
+  stepTemplate:
+    env:
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+
+  steps:
+    - name: get-deployment-ready-status
+      image: ibmcom/pipeline-base-image:2.7
+      script: |
+        #!/bin/bash
+
+        if [ $PIPELINE_DEBUG = 1 ]; then
+          pwd
+          env
+          trap env EXIT
+          set -x
+        fi
+
+        DEPLOYMENT_READY="yes"
+
+        if [[ "$(params.failure-count)" -gt 0 ]]; then
+          DEPLOYMENT_READY="no"
+        fi
+
+        echo -n "$DEPLOYMENT_READY" > $(results.deployment-ready.path)
