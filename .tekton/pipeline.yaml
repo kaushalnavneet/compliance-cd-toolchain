@@ -42,7 +42,49 @@ spec:
     - name: artifacts
 
   tasks:
+    - name: setup
+      params:
+        - name: repository
+          value: $(params.repository)
+        - name: evidence-locker-url
+          value: $(params.evidence-locker-url)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+      taskSpec:
+        params:
+          - name: repository
+          - name: evidence-locker-url
+          - name: pipeline-debug
+        results:
+          - name: repository
+          - name: evidence-locker-url
+        stepTemplate:
+          env:
+            - name: PIPELINE_DEBUG
+              value: $(params.pipeline-debug)
+        steps:
+          - name: setup
+            image: ibmcom/pipeline-base-image:2.6
+            script: |
+              #!/bin/bash
+
+              set -e -o pipefail
+
+              if [ $PIPELINE_DEBUG == 1 ]; then
+                pwd
+                env
+                trap env EXIT
+                set -x
+              fi
+
+              REPOSITORY=$(echo -n "$(params.repository)" | sed 's:/*$::')
+              EVIDENCE_URL=$(echo -n "$(params.evidence-locker-url)" | sed 's:/*$::')
+              echo -n "$REPOSITORY" | tee "$(results.repository.path)"
+              echo -n "$EVIDENCE_URL"| tee "$(results.evidence-locker-url.path)"
+
     - name: prod-get-git-credentials
+      runAfter:
+        - setup
       taskRef:
         name: git-get-credentials
       workspaces:
@@ -52,7 +94,7 @@ spec:
         - name: ibmcloud-api-key
           value: $(params.ibmcloud-api-key)
         - name: repository
-          value: $(params.repository)
+          value: $(tasks.setup.results.repository)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -66,7 +108,7 @@ spec:
           workspace: artifacts
       params:
         - name: repository
-          value: $(params.evidence-locker-url)
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: branch
           value: "master"
         - name: pipeline-debug
@@ -82,7 +124,7 @@ spec:
           workspace: artifacts
       params:
         - name: repository
-          value: $(params.repository)
+          value: $(tasks.setup.results.repository)
         - name: branch
           value: $(params.revision)
         - name: pipeline-debug
@@ -225,7 +267,7 @@ spec:
         - name: application
           value: "$(tasks.prod-get-deployment-app.results.app-name)"
         - name: repository
-          value: $(params.repository)
+          value: $(tasks.setup.results.repository)
         - name: ibmcloud-api-key
           value: $(params.ibmcloud-api-key)
         - name: servicenow-api-token
@@ -243,7 +285,7 @@ spec:
         - name: emergency-label
           value: $(params.emergency-label)
         - name: evidence-locker-url
-          value: $(params.evidence-locker-url)
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: change-request-id
           value: $(params.change-request-id)
         - name: change-request-url
@@ -285,7 +327,7 @@ spec:
         - name: servicenow-api-url
           value: $(tasks.prod-create-change-request-urls.results.servicenow-api-url)
         - name: evidence-locker-url
-          value: $(params.evidence-locker-url)
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: collect-evidence
           value: "true"
         - name: pipeline-debug
@@ -378,7 +420,7 @@ spec:
         - name: servicenow-api-url
           value: $(tasks.prod-create-change-request-urls.results.servicenow-api-url)
         - name: evidence-locker-url
-          value: $(params.evidence-locker-url)
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: collect-evidence
           value: "true"
         - name: pipeline-debug
