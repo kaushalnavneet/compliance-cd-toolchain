@@ -43,7 +43,7 @@ services:
   artifactoryComp:
     service_id: artifactory
     parameters:
-      name: 'artifactory-{{timestamp}}'
+      name: 'registry-for-images'
       dashboard_url: 'https://na.artifactory.swg-devops.com'
       repository_url: 'https://wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com'
       repository_name: 'wcp-compliance-automation-team-docker-local'
@@ -116,7 +116,7 @@ services:
         - inventory-repo
         - customtool_servicenow
         - customtool_doi-toolchain
-      name: 'tekton-pipeline-{{timestamp}}'
+      name: 'cd-pipeline'
       type: tekton
       ui-pipeline: true
       configuration:
