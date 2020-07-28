@@ -161,8 +161,13 @@ CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so 
 | ![DOI Toolchain ID](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/doi-toolchain.png) |
 | :--: | 
 
+You can copy the Toolchain ID from the URL of your toolchain.
+A toolchain's URL follows this pattern: `https://cloud.ibm.com/devops/toolchains/<toolchain-ID-comes-here>?env_id=ibm:yp:us-south`
+
+For example, if the URL is: `https://cloud.ibm.com/devops/toolchains/aaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee?env_id=ibm:yp:us-south` then the toolchain's ID is: `aaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee`.
+
 Note: Make sure to only include the ID here, not the full URL.
-    
+
 ### 4. Create toolchain and run cd pipeline
 
 - Click the create button at the bottom of the page, and wait for the toolchain to be created.
