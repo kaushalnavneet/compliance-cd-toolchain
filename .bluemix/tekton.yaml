@@ -30,6 +30,10 @@ inputs:
     path: preview/util
   - type: git
     branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: preview/devops-insights
+  - type: git
+    branch: master
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
