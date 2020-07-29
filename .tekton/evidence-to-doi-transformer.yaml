@@ -1,0 +1,211 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: evidence-to-doi-transformer
+spec:
+  params:
+    - name: result-status
+      description: aggregated status of scan/test/check
+    - name: task-name
+      description: name of task which provides the evidence
+    - name: title
+      description: result title for DOI
+      default: "Task status"
+    - name: full-title
+      description: extended result title for DOI
+      default: ""
+    - name: toolchain-id
+      description: Toolchain service instance id - Default to the toolchain containing the CD Tekton PipelineRun currently executed
+      default: ""
+    - name: continuous-delivery-context-secret
+      description: name of the configmap containing the continuous delivery pipeline context secrets
+      default: "secure-properties"
+    - name: ibmcloud-api-key-secret-key
+      description: field in the secret that contains the api key used to access toolchain and DOI instance
+      default: "api-key"
+    - name: ibmcloud-api
+      description: the ibmcloud api
+      default: https://cloud.ibm.com
+    - name: pipeline-debug
+      description: Pipeline debug mode
+      default: "0"
+
+  results:
+    - name: file-locations
+    - name: test-types
+
+  workspaces:
+    - name: artifacts
+      mountPath: /artifacts
+
+  volumes:
+    - name: cd-config-volume
+      configMap:
+        name: toolchain
+        items:
+          - key: toolchain.json
+            path: toolchain.json
+    - name: secrets
+      secret:
+        secretName: $(params.continuous-delivery-context-secret)
+
+  stepTemplate:
+    env:
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+
+  steps:
+    - name: setup-dataset
+      image: ibmcom/pipeline-base-image:2.7
+      workingDir: /artifacts
+      env:
+        - name: IBM_CLOUD_API
+          value: $(params.ibmcloud-api)
+        - name: TOOLCHAIN_ID
+          value: $(params.toolchain-id)
+        - name: TASK_NAME
+          value: $(params.task-name)
+        - name: TITLE
+          value: $(params.title)
+      script: |
+        #!/bin/bash
+
+        if [ "$PIPELINE_DEBUG" = 1 ]; then
+          pwd
+          env
+          trap env EXIT
+          set -x
+        fi
+
+        CURRENT_TOOLCHAIN_ID=$(jq -r '.toolchain_guid' /cd-config/toolchain.json)
+        DOI_IN_TOOLCHAIN=$(jq -e '[.services[] | select(.service_id=="draservicebroker")] | length' /cd-config/toolchain.json)
+
+        if [ "$DOI_IN_TOOLCHAIN" == 0 ]; then
+          if [ -z "$TOOLCHAIN_ID" ] || [ "$CURRENT_TOOLCHAIN_ID" == "$TOOLCHAIN_ID" ]; then
+            echo "No Devops Insights integration found in toolchain. Skipping ..."
+            exit 0
+          fi
+        fi
+
+        # Default Toolchain ID if needed
+        if [ -z "$TOOLCHAIN_ID" ]; then
+          TOOLCHAIN_ID=$CURRENT_TOOLCHAIN_ID
+        fi
+
+        DATASET_FILE="./doi-dataset-$TASK_NAME.json"
+        DATASET_NAME="compliance-${TASK_NAME}"
+        DATASET_JSON=$(jq \
+          --arg key0 "custom_datasets" \
+          --argjson value0 "[{ \
+              \"lifecycle_stage\": \"${DATASET_NAME}\", \
+              \"type_of_test\": \"test\", \
+              \"label\": \"Evidence of ${TITLE}\" \
+          }]" \
+          --arg key1 "policies" \
+          --argjson value1 "[]" \
+          '. | .[$key0]=$value0 | .[$key1]=$value1' \
+          <<<'{}')
+
+        echo "$DATASET_JSON" > "${DATASET_FILE}"
+
+        IBMCLOUD_API_KEY=$(cat "/secrets/$(params.ibmcloud-api-key-secret-key)")
+
+        ibmcloud login --apikey "${IBMCLOUD_API_KEY}" -a "${IBM_CLOUD_API}" --no-region
+        ibmcloud plugin update doi --force
+        ibmcloud doi policies-update \
+          --file "${DATASET_FILE}" \
+          --toolchainid "${TOOLCHAIN_ID}"
+
+        echo -n "${DATASET_NAME}" > $(results.test-types.path)
+
+      volumeMounts:
+        - name: cd-config-volume
+          mountPath: /cd-config
+        - name: secrets
+          mountPath: /secrets
+
+    - name: transform-data
+      image: ibmcom/pipeline-base-image:2.7
+      env:
+        - name: RESULT_STATUS
+          value: $(params.result-status)
+        - name: TITLE
+          value: $(params.title)
+        - name: FULL_TITLE
+          value: $(params.full-title)
+      workingDir: /artifacts
+      script: |
+        #!/bin/bash
+
+        if [ "$PIPELINE_DEBUG" = 1 ]; then
+          pwd
+          env
+          trap env EXIT
+          set -x
+        fi
+
+        DATE=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+
+        if [ "$RESULT_STATUS" = "success" ]; then
+          FAILURES=0
+          PASSES=1
+        else
+          FAILURES=1
+          PASSES=0
+        fi
+
+        if [ -z "$FULL_TITLE" ]; then
+          FULL_TITLE="$TITLE - aggregated results"
+        fi
+
+        TEST_DATA=$(jq --arg key0   "stats" \
+            --argjson value0 "{ \
+            \"suites\": 1, \
+            \"tests\": 1, \
+            \"passes\": $PASSES, \
+            \"pending\": 0, \
+            \"failures\": $FAILURES, \
+            \"start\": \"${DATE}\", \
+            \"end\": \"${DATE}\" \
+          }" \
+          --arg key1 "tests" \
+          --argjson value1 "[{ \
+              \"title\": \"${TITLE}\", \
+              \"fullTitle\": \"${FULL_TITLE}\", \
+              \"duration\": 0, \
+              \"currentRetry\": 0, \
+              \"err\": {} \
+          }]" \
+          --arg key2 "pending" \
+          --argjson value2 "[]" \
+          '. | .[$key0]=$value0 | .[$key1]=$value1 | .[$key2]=$value2' \
+          <<<'{}')
+
+        if [ "$RESULT_STATUS" = "success" ]; then
+          TEST_DATA=$(echo $TEST_DATA | jq ".passes += [
+            {
+              \"title\": \"${TITLE}\", \
+              \"fullTitle\": \"${FULL_TITLE}\", \
+              \"duration\": 0, \
+              \"currentRetry\": 0, \
+              \"err\": {} \
+            }
+          ]")
+          TEST_DATA=$(echo $TEST_DATA | jq ".failures += []")
+        else
+          TEST_DATA=$(echo $TEST_DATA | jq ".failures += [
+            {
+              \"title\": \"${TITLE}\", \
+              \"fullTitle\": \"${FULL_TITLE}\", \
+              \"duration\": 0, \
+              \"currentRetry\": 0, \
+              \"err\": {} \
+            }
+          ]")
+          TEST_DATA=$(echo $TEST_DATA | jq ".passes += []")
+        fi
+
+        echo "$TEST_DATA" > ./testresult.json
+        cat ./testresult.json
+        echo -n "./testresult.json" > $(results.file-locations.path)
