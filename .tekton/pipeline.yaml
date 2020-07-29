@@ -24,12 +24,16 @@ spec:
       description: iks cluster region
     - name: cluster-namespace
       description: iks cluster namespace
+    - name: doi-toolchain-id
+      description: toolchain ID
     - name: application
       description: application name
     - name: emergency-label
       description: emergency label for change request generation
     - name: evidence-locker-url
       description: evidence locker repo
+    - name: incident-issues-url
+      description: incident issues repo
     - name: change-request-id
       description: optional ServiceNow Change Request ID
       default: "notAvailable"
@@ -48,16 +52,20 @@ spec:
           value: $(params.repository)
         - name: evidence-locker-url
           value: $(params.evidence-locker-url)
+        - name: incident-issues-url
+          value: $(params.incident-issues-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
       taskSpec:
         params:
           - name: repository
           - name: evidence-locker-url
+          - name: incident-issues-url
           - name: pipeline-debug
         results:
           - name: repository
           - name: evidence-locker-url
+          - name: incident-issues-url
         stepTemplate:
           env:
             - name: PIPELINE_DEBUG
@@ -79,8 +87,10 @@ spec:
 
               REPOSITORY=$(echo -n "$(params.repository)" | sed 's:/*$::')
               EVIDENCE_URL=$(echo -n "$(params.evidence-locker-url)" | sed 's:/*$::')
+              INCIDENT_ISSUES_URL=$(echo -n "$(params.incident-issues-url)" | sed 's:/*$::')
               echo -n "$REPOSITORY" | tee "$(results.repository.path)"
-              echo -n "$EVIDENCE_URL"| tee "$(results.evidence-locker-url.path)"
+              echo -n "$EVIDENCE_URL" | tee "$(results.evidence-locker-url.path)"
+              echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
 
     - name: prod-get-git-credentials
       runAfter:
@@ -97,6 +107,44 @@ spec:
           value: $(tasks.setup.results.repository)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+
+    - name: prod-save-git-token
+      runAfter:
+        - prod-get-git-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+      taskSpec:
+        params:
+          - name: pipeline-debug
+        workspaces:
+          - name: artifacts
+            mountPath: /artifacts
+        stepTemplate:
+          env:
+            - name: PIPELINE_DEBUG
+              value: $(params.pipeline-debug)
+        steps:
+          - name: save-git-token-to-file
+            image: ibmcom/pipeline-base-image:2.6
+            workingDir: "/artifacts"
+            command: ["/bin/bash", "-c"]
+            args:
+              - |
+                set -e -o pipefail
+
+                if [ $PIPELINE_DEBUG == 1 ]; then
+                  pwd
+                  env
+                  trap env EXIT
+                  set -x
+                fi
+
+                source ./build.properties
+                echo -n $GIT_TOKEN > ./github-token
 
     - name: prod-clone-evidence-repo
       taskRef:
@@ -404,6 +452,117 @@ spec:
           value: $(params.cluster-namespace)
         - name: allow-create-route
           value: "false"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: prod-acceptance-tests
+      runAfter:
+        - prod-deployment
+      taskRef:
+        name: util-run
+      workspaces:
+        - name: scripts
+          workspace: artifacts
+      params:
+        - name: script
+          value: |
+            #!/bin/bash
+            APP_URL="$(tasks.prod-deployment.results.app-url)"
+            . /root/.nvm/nvm.sh
+            cd /scripts/"$(tasks.prod-clone-repo.results.directory-name)" || exit
+            npm ci -q
+            export APP_URL
+            npm run acceptance-test
+
+    - name: prod-acceptance-tests-create-issue
+      runAfter:
+        - prod-acceptance-tests
+      taskRef:
+        name: evidence-create-incident-issue
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: secret-name
+          value: github-token
+        - name: repository
+          value: $(params.repository)
+        - name: incident-issue-repo
+          value: $(params.incident-issues-url)
+        - name: task-name
+          value: "prod-acceptance-tests"
+        - name: result-status
+          value: $(tasks.prod-acceptance-tests.results.status)
+        - name: commit-hash
+          value: $(params.revision)
+
+    - name: prod-acceptance-tests-create-evidence
+      taskRef:
+        name: evidence-add
+      retries: 2
+      workspaces:
+        - name: evidence-locker
+          workspace: artifacts
+      params:
+        - name: evidence-repo-path
+          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: namespace
+          value: "cd"
+        - name: evidence-name
+          value: "acceptance-test"
+        - name: toolchain-crn
+          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+        - name: evidence-type
+          value: "com.ibm.acceptance_test"
+        - name: evidence-type-version
+          value: "1.0.0"
+        - name: result
+          value: $(tasks.prod-acceptance-tests.results.status)
+        - name: issues
+          value: |
+            "$(tasks.prod-acceptance-tests-create-issue.results.issue-url)"
+
+    - name: prod-acceptance-tests-create-doi-data
+      runAfter:
+        - prod-acceptance-tests
+      taskRef:
+        name: evidence-to-doi-transformer
+      retries: 2
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: title
+          value: "Acceptance tests"
+        - name: task-name
+          value: "prod-acceptance-tests"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: result-status
+          value: $(tasks.prod-acceptance-tests.results.status)
+        - name: toolchain-id
+          value: $(params.doi-toolchain-id)
+
+    - name: prod-acceptance-tests-results-to-doi
+      runAfter:
+        - prod-acceptance-tests-create-doi-data
+      taskRef:
+        name: doi-publish-testrecord
+      retries: 2
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: app-name
+          value: $(params.application)
+        - name: file-locations
+          value: $(tasks.prod-acceptance-tests-create-doi-data.results.file-locations)
+        - name: test-types
+          value: $(tasks.prod-acceptance-tests-create-doi-data.results.test-types)
+        - name: toolchain-apikey-secret-key
+          value: "ibmcloud-api-key"
+        - name: toolchain-id
+          value: $(params.doi-toolchain-id)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
