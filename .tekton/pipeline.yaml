@@ -428,6 +428,10 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
+        - name: close-category
+          value: "successful"
+        - name: close-notes
+          value: "Deployed to kubernetes"
         - name: servicenow-api-token
           value: $(params.servicenow-api-token)
         - name: servicenow-api-url
