@@ -37,6 +37,13 @@ inputs:
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
+  - type: git
+    name: Git CD Trigger
+    service: ${INVENTORY_REPO}
+    branch: prod_candidate
+    events:
+      push: true
+    eventListener: cd-listener
   - type: manual
     name: Manual CD Trigger
     eventListener: cd-listener
