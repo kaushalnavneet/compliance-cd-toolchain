@@ -543,7 +543,7 @@ spec:
         - name: toolchain-id
           value: $(params.doi-toolchain-id)
         - name: ibmcloud-api-key-secret-key
-          value: “ibmcloud-api-key”
+          value: "ibmcloud-api-key"
     - name: prod-acceptance-tests-results-to-doi
       runAfter:
         - prod-acceptance-tests-create-doi-data
