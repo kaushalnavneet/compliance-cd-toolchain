@@ -542,6 +542,8 @@ spec:
           value: $(tasks.prod-acceptance-tests.results.status)
         - name: toolchain-id
           value: $(params.doi-toolchain-id)
+        - name: toolchain-apikey-secret-key
+          value: "ibmcloud-api-key"
 
     - name: prod-acceptance-tests-results-to-doi
       runAfter:
