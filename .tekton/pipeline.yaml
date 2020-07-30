@@ -244,6 +244,22 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-get-build-number
+      taskRef:
+        name: inventory-get-build-number
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: app-name
+          value: $(params.application)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-summarize-evidence
       taskRef:
         name: evidence-summarize
@@ -566,6 +582,28 @@ spec:
           value: $(params.doi-toolchain-id)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+
+    - name: prod-publish-deployrecord
+      taskRef:
+        name: doi-publish-deployrecord
+      runAfter:
+        - prod-deployment
+        - prod-get-build-number
+      params:
+        - name: app-name
+          value: "$(params.application)"
+        - name: toolchain-id
+          value: "$(params.doi-toolchain-id)"
+        - name: build-number
+          value: "$(tasks.prod-get-build-number.results.build-number)"
+        - name: environment
+          value: "prod"
+        - name: app-url
+          value: "$(tasks.prod-deployment.results.app-url)"
+        - name: pipeline-debug
+          value: "$(params.pipeline-debug)"
+        - name: toolchain-apikey-secret-key
+          value: "ibmcloud-api-key"
 
     - name: prod-merge-cr-inventory-branch
       taskRef:
