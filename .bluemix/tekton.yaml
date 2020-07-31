@@ -82,7 +82,7 @@ properties:
     value: ${INCIDENT_ISSUES_REPO}
     type: text
   - name: inventory-url
-    value: ${INVENTORY_REPO}
+    value: ${INVENTORY_REPO_URL}
     type: text
   - name: evidence-locker-url
     value: ${EVIDENCE_LOCKER_REPO}
