@@ -7,6 +7,11 @@ The integrated repositories, target cluster and artifactory integrations are con
 The toolchain includes a Tekton delivery pipeline, which can be manually triggered to initiate a new deployment.
 
 The toolchain can use a Key-Protect vault instance to store the required tokens and API keys.
+
+### Graphic Summary
+
+![Icon](./.bluemix/toolchain.png)
+
 ### To get started, click this button:
 [![Deploy To Bluemix](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy?repository=https://github.ibm.com/one-pipeline/compliance-cd-toolchain&env_id=ibm:yp:us-south)
 
