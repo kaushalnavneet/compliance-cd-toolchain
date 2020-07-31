@@ -168,6 +168,20 @@ For example, if the URL is: `https://cloud.ibm.com/devops/toolchains/aaaaaaa-bbb
 
 Note: Make sure to only include the ID here, not the full URL.
 
+#### Slack Integration (Not Required)
+
+If you want to receive notifications about your CD Pipeline events, you can configure the Slack Tool during the setup from the toolchain template, or you can add the Slack Tool later.
+
+In order for a Slack channel to receive notifications from your tools, you need a Slack webhook URL. To get a webhook URL, see the Incoming Webhooks section of the [Slack API website](https://api.slack.com/messaging/webhooks).
+
+| ![Slack Tool](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/slack.png) |
+| :--: | 
+
+After creating your toolchain, you can toggle sending notifications with the `slack-notifications` Environment Property in your CD Pipeline (0 = off, 1 = on):
+
+| ![Slack Tool Toggle](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/slack-toggle.png) |
+| :--: | 
+
 ### 4. Create toolchain and run cd pipeline
 
 - Click the create button at the bottom of the page, and wait for the toolchain to be created.

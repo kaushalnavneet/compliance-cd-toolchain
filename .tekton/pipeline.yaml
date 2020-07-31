@@ -41,11 +41,34 @@ spec:
       description: toggles debug mode for the pipeline
     - name: version
       description: App version
+    - name: slack-notifications
+      description: toggles slack notifications
 
   workspaces:
     - name: artifacts
 
   tasks:
+    - name: prod-notify-pipeline-start
+      conditions:
+        - conditionRef: util-is-equal
+          params:
+            - name: left
+              value: $(params.slack-notifications)
+            - name: right
+              value: "1"
+      taskRef:
+        name: slack-post-message
+      workspaces:
+        - name: workspace
+          workspace: artifacts
+      params:
+        - name: message-script
+          value: |
+              #!/usr/bin/env python3
+              import os
+              print("CD Pipeline was triggered!")
+              print("<https://cloud.ibm.com/devops/pipelines/tekton/" + os.getenv("PIPELINE_ID") + "/runs/" + os.getenv("PIPELINE_RUN_ID") + "?env_id=ibm:yp:" + os.getenv("TOOLCHAIN_REGION") + "|See the Pipeline Logs>")
+
     - name: setup
       params:
         - name: repository
@@ -717,3 +740,26 @@ spec:
           value: "true"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+
+    - name: prod-notify-pipeline-end
+      conditions:
+        - conditionRef: util-is-equal
+          params:
+            - name: left
+              value: $(params.slack-notifications)
+            - name: right
+              value: "1"
+      taskRef:
+        name: slack-post-message
+      runAfter:
+        - prod-close-change-request
+      workspaces:
+        - name: workspace
+          workspace: artifacts
+      params:
+        - name: message-script
+          value: |
+              #!/usr/bin/env python3
+              import os
+              print("CD Pipeline finished!")
+              print("<https://cloud.ibm.com/devops/pipelines/tekton/" + os.getenv("PIPELINE_ID") + "/runs/" + os.getenv("PIPELINE_RUN_ID") + "?env_id=ibm:yp:" + os.getenv("TOOLCHAIN_REGION") + "|See the Pipeline Logs>")

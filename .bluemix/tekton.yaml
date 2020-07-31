@@ -34,6 +34,10 @@ inputs:
     path: preview/devops-insights
   - type: git
     branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: preview/slack
+  - type: git
+    branch: master
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
@@ -104,5 +108,8 @@ properties:
     type: text
   - name: doi-toolchain-id
     value: ${DOI_TOOLCHAIN_ID}
+    type: text
+  - name: slack-notifications
+    value: "0"
     type: text
 private_worker: ${PRIVATE_WORKER}
