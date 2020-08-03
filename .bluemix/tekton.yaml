@@ -38,6 +38,10 @@ inputs:
     path: preview/slack
   - type: git
     branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: preview/github
+  - type: git
+    branch: master
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
@@ -51,6 +55,9 @@ triggers:
   - type: manual
     name: Manual CD Trigger
     eventListener: cd-listener
+  - type: manual
+    name: Manual Promotion Trigger
+    eventListener: promotion-listener
 properties:
   - name: repository
     value: ${REPOSITORY}

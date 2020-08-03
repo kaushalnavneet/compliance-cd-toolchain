@@ -182,7 +182,7 @@ After creating your toolchain, you can toggle sending notifications with the `sl
 | ![Slack Tool Toggle](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/slack-toggle.png) |
 | :--: |
 
-### 4. Create toolchain and run cd pipeline
+### 4. Create toolchain
 
 - Click the create button at the bottom of the page, and wait for the toolchain to be created.
 
@@ -191,26 +191,14 @@ After creating your toolchain, you can toggle sending notifications with the `sl
 
  Note: The individual toolchain integrations can be configured also after the pipeline has been created.
 
-- To run the pipeline select the Delivery Pipeline card.
+### 5. Run the CD Pipeline
 
-| ![Config](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/config.png) |
-| :--: |
+- The CD Pipeline can be triggered manually or automatically by committing to the `prod_candidate` branch of the inventory repository.
+- Make sure the PR & CI Pipeline ran successfully before running the `Promotion Pipeline`.
+- The Promotion Pipeline creates a `Pull Request` with the content of the inventory on the `master` branch targeting the `prod_candidate` branch. If this `Pull Request` gets merged, it triggers the CD Pipeline.
+- First, use the `Manual Promotion Trigger` to start the `Promotion Pipeline`.
+- _Optional_: To recieve Slack notifications from this pipeline, turn the `slack-notifications` environment variable to `1`.
+- If the `Promotion Pipeline` ran successfully, the `create-promotion-pull-request` Task should provide you a link to the aforementioned `Pull Request`.
+- Merge the `Pull Request` from the Github UI. Merging will trigger the run of `CD Pipeline`.
 
-- Provide version to be deployed
-
-| ![Version](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/version.png) |
-| :--: |
-
-   - method 1: add it to the trigger parameters (click Run Pipeline button)
-
-| ![Trigger](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/trigger.png) |
-| :--: |
-
-   - method 2: add it to the pipeline environmental variables (click Configure Pipeline)
-
-| ![Environmental variables](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/envs.png) |
-| :--: |
-
-Note: The pipeline environment variable overrides the trigger parameter if both are provided. Version changes with almost every pipeline run, it is advisable to provide it as a trigger parameter.
-
- - Run the pipeline by using the manual trigger
+Note: You can also trigger the `CD Pipeline` manually, just make sure the `PR` & `CI` pipelines were successful and the `prod_candidate` branch in the Inventory Repository has the contents of the `master` branch.
