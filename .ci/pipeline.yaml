@@ -5,8 +5,6 @@ metadata:
   name: pipeline
 spec:
   params:
-    - name: ibmcloud-api-key
-      description: ibm cloud api key
     - name: repository
       description: the git repo
     - name: branch
@@ -29,25 +27,13 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: repository
           value: $(params.repository)
-        - name: ibmcloud-api-key
-          value: $(params.ibmcloud-api-key)
-
-    - name: save-git-token
-      taskRef:
-        name: save-git-token
-      runAfter:
-        - git-get-credentials
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
 
     - name: clone-repo
       taskRef:
@@ -56,6 +42,8 @@ spec:
         - git-get-credentials
       workspaces:
         - name: artifacts
+          workspace: artifacts
+        - name: secrets
           workspace: artifacts
       params:
         - name: pipeline-debug
@@ -66,6 +54,8 @@ spec:
           value: $(params.branch)
         - name: directory-name
           value: "compliance-cd-toolchain"
+        - name: git-user
+          value: $(tasks.git-get-credentials.results.git-auth-user)
 
     - name: clone-common-tasks
       taskRef:
@@ -75,6 +65,8 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: repository
           value: "https://github.ibm.com/one-pipeline/common-tekton-tasks"
@@ -82,18 +74,20 @@ spec:
           value: "master"
         - name: directory-name
           value: "common-tekton-tasks"
+        - name: git-user
+          value: $(tasks.git-get-credentials.results.git-auth-user)
 
     - name: yaml-lint-github-status-pending
       taskRef:
         name: github-set-status
       runAfter:
-        - save-git-token
+        - git-get-credentials
       workspaces:
         - name: secrets
           workspace: artifacts
       params:
         - name: secret-name
-          value: github-token
+          value: git-token
         - name: repo-url
           value: $(params.repository)
         - name: commit-sha
@@ -132,7 +126,7 @@ spec:
           workspace: artifacts
       params:
         - name: secret-name
-          value: github-token
+          value: git-token
         - name: repo-url
           value: $(params.repository)
         - name: commit-sha
@@ -150,13 +144,13 @@ spec:
       taskRef:
         name: github-set-status
       runAfter:
-        - save-git-token
+        - git-get-credentials
       workspaces:
         - name: secrets
           workspace: artifacts
       params:
         - name: secret-name
-          value: github-token
+          value: git-token
         - name: repo-url
           value: $(params.repository)
         - name: commit-sha
@@ -176,6 +170,8 @@ spec:
       workspaces:
         - name: artifacts
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       runAfter:
         - yaml-lint
       params:
@@ -194,7 +190,7 @@ spec:
           workspace: artifacts
       params:
         - name: secret-name
-          value: github-token
+          value: git-token
         - name: repo-url
           value: $(params.repository)
         - name: commit-sha
