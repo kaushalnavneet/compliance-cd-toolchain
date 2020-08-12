@@ -1,0 +1,102 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: inventory-promote
+spec:
+  params:
+    - name: app-name
+      description: name of the app to be deployed
+    - name: source
+      description: promotion source
+    - name: target
+      description: promotion target
+    - name: branch
+      description: the branch name
+    - name: git-api-token-key
+      description: github enterprise api token secret name
+      default: "git-token"
+    - name: retry-count
+      description: retry count to pull and push git evidence repo
+      default: "5"
+    - name: retry-delay
+      description: the amount of seconds between the retries
+      default: "5"
+    - name: pipeline-debug
+      description: Pipeline debug mode
+      default: "0"
+
+  stepTemplate:
+    env:
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+
+  steps:
+    - name: inventory-promote
+      image: ibmcom/pipeline-base-image:2.6
+      script: |
+          #!/bin/bash
+          set -e -o pipefail;
+
+          if [ $PIPELINE_DEBUG == 1 ]; then
+            env
+            cat /cd-config/toolchain.json
+            trap env EXIT
+            set -x
+          fi
+
+          export GIT_TOKEN=$(cat "/secrets/$(params.git-api-token-key)")
+          export INVENTORY_FOLDER=$(jq -r '.services[] | select(.toolchain_binding.name=="inventory-repo")
+          | .parameters.repo_name' /cd-config/toolchain.json)
+
+          git config --global user.email "tekton@pipeline.com"
+          git config --global user.name "Tekton"
+
+          clone_inventory_script() {
+            git clone "https://$GIT_TOKEN@github.ibm.com/cocoa/inventory-script.git"
+            export PATH="$(pwd)/inventory-script:$PATH"
+          }
+
+          inventory_promote() {
+            cd /artifacts/$INVENTORY_FOLDER
+            inventory promote "$(params.app-name)" "$(params.source)" "$(params.target)" "$(params.branch)"
+          }
+
+          source /scripts/retry_command.sh
+
+          retry $(params.retry-count) $(params.retry-delay) clone_inventory_script
+          if [  $? -ne 0 ]; then
+            echo "Error getting the pipeline run id from the given version. There might be a github downtime, you can check it here: https://ibmtoolbox.statuspage.io"
+            exit 1
+          fi
+
+          retry $(params.retry-count) $(params.retry-delay) inventory_promote
+          if [  $? -ne 0 ]; then
+            echo "Error promoting build. There might be a github downtime, you can check it here: https://ibmtoolbox.statuspage.io"
+            exit 1
+          fi
+      volumeMounts:
+        - mountPath: /cd-config
+          name: cd-config-volume
+        - mountPath: /scripts
+          name: retry-command
+
+  workspaces:
+    - name: artifacts
+      mountPath: /artifacts
+    - name: secrets
+      mountPath: /secrets
+
+  volumes:
+    - name: cd-config-volume
+      configMap:
+        name: toolchain
+        items:
+          - key: toolchain.json
+            path: toolchain.json
+    - name: retry-command
+      configMap:
+        name: retry-command
+        items:
+          - key: retry_command.sh
+            path: retry_command.sh
