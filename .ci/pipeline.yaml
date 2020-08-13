@@ -203,3 +203,24 @@ spec:
           value: Running Tekton Linter...
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+
+    - name: code-pipeline-evaluator
+      runAfter:
+        - tekton-lint
+      taskRef:
+        name: util-evaluate-pipeline-results
+      params:
+        - name: results
+          value: |
+            [
+              {
+                "name": "yaml-lint",
+                "expected": "success",
+                "actual": "$(tasks.yaml-lint.results.status)"
+              },
+              {
+                "name": "tekton-lint",
+                "expected": "success",
+                "actual": "$(tasks.tekton-lint.results.status)"
+              }
+            ]
