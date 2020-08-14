@@ -135,7 +135,7 @@ spec:
           workspace: artifacts
       params:
         - name: repository
-          value: $(tasks.setup.results.repository)
+          value: $(tasks.setup.results.inventory-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -154,26 +154,6 @@ spec:
           value: $(tasks.setup.results.evidence-locker-url)
         - name: branch
           value: "master"
-        - name: git-user
-          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-clone-repo
-      taskRef:
-        name: git-clone
-      runAfter:
-        - prod-clone-evidence-repo
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: repository
-          value: $(tasks.setup.results.repository)
-        - name: branch
-          value: $(params.revision)
         - name: git-user
           value: $(tasks.prod-get-git-credentials.results.git-auth-user)
         - name: pipeline-debug
@@ -199,7 +179,7 @@ spec:
       taskRef:
         name: git-clone
       runAfter:
-        - prod-clone-repo
+        - prod-clone-evidence-repo
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -279,6 +259,46 @@ spec:
               echo -n "$REGISTRY_NAMESPACE" > $(results.registry-namespace.path)
               echo -n "$IMAGE_NAME" > $(results.image-name.path)
               echo -n "$IMAGE_TAG" > $(results.image-tag.path)
+
+    - name: prod-inventory-get-repository
+      taskRef:
+        name: inventory-get
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: name
+          value: $(params.application)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: property
+          value: repository_url
+        - name: target
+          value: prod_candidate
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+
+    - name: prod-clone-repo
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: repository
+          value: $(tasks.prod-inventory-get-repository.results.value)
+        - name: branch
+          value: $(params.revision)
+        - name: git-user
+          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-get-evidence-locker-path
       taskRef:
@@ -426,7 +446,7 @@ spec:
         - name: application
           value: "$(tasks.prod-get-deployment-app.results.app-name)"
         - name: repository
-          value: $(tasks.setup.results.repository)
+          value: $(tasks.prod-inventory-get-repository.results.value)
         - name: servicenow-api-url
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: servicenow-configuration-item
@@ -602,7 +622,7 @@ spec:
         - name: secret-name
           value: git-token
         - name: repository
-          value: $(params.repository)
+          value: $(tasks.prod-inventory-get-repository.results.value)
         - name: incident-issue-repo
           value: $(params.incident-issues-url)
         - name: task-name
