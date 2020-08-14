@@ -338,7 +338,7 @@ spec:
         - name: target
           value: "prod_candidate"
         - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
