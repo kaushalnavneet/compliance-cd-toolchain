@@ -282,6 +282,28 @@ spec:
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
 
+    - name: prod-inventory-get-commit
+      taskRef:
+        name: inventory-get
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: name
+          value: $(params.application)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: property
+          value: commit_sha
+        - name: target
+          value: prod_candidate
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+
     - name: prod-clone-repo
       taskRef:
         name: git-clone
@@ -293,8 +315,8 @@ spec:
       params:
         - name: repository
           value: $(tasks.prod-inventory-get-repository.results.value)
-        - name: branch
-          value: $(params.revision)
+        - name: revision
+          value: $(tasks.prod-inventory-get-commit.results.value)
         - name: git-user
           value: $(tasks.prod-get-git-credentials.results.git-auth-user)
         - name: pipeline-debug
@@ -630,7 +652,7 @@ spec:
         - name: result-status
           value: $(tasks.prod-acceptance-tests.results.status)
         - name: commit-hash
-          value: $(params.revision)
+          value: $(tasks.prod-inventory-get-commit.results.value)
 
     - name: prod-acceptance-tests-create-evidence
       taskRef:
