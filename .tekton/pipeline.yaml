@@ -225,7 +225,7 @@ spec:
 
     - name: prod-inventory-get-evidence-path
       taskRef:
-        name: inventory-get-pipeline-run-id
+        name: inventory-get
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
@@ -234,8 +234,12 @@ spec:
         - name: secrets
           workspace: artifacts
       params:
-        - name: app-name
+        - name: name
           value: $(params.application)
+        - name: property
+          value: "pipeline_run_id"
+        - name: target
+          value: "prod_candidate"
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
         - name: pipeline-debug
@@ -243,7 +247,7 @@ spec:
 
     - name: prod-inventory-get-build-number
       taskRef:
-        name: inventory-get-build-number
+        name: inventory-get
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
@@ -252,8 +256,14 @@ spec:
         - name: secrets
           workspace: artifacts
       params:
-        - name: app-name
+        - name: name
           value: $(params.application)
+        - name: property
+          value: "build_number"
+        - name: target
+          value: "prod_candidate"
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -267,7 +277,7 @@ spec:
         - name: evidence-repo-path
           value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
         - name: path-list
-          value: ci/$(tasks.prod-inventory-get-evidence-path.results.pipeline-run-id)
+          value: ci/$(tasks.prod-inventory-get-evidence-path.results.value)
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
         - name: pipeline-debug
@@ -611,7 +621,7 @@ spec:
         - name: toolchain-id
           value: "$(params.doi-toolchain-id)"
         - name: build-number
-          value: "$(tasks.prod-inventory-get-build-number.results.build-number)"
+          value: "$(tasks.prod-inventory-get-build-number.results.value)"
         - name: environment
           value: "prod"
         - name: app-url
@@ -633,7 +643,7 @@ spec:
         - name: evidence-repo-path
           value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
         - name: path-list
-          value: "ci/$(tasks.prod-inventory-get-evidence-path.results.pipeline-run-id)cd/$(tasks.setup.results.pipeline-run-id)"
+          value: "ci/$(tasks.prod-inventory-get-evidence-path.results.value)cd/$(tasks.setup.results.pipeline-run-id)"
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
         - name: pipeline-debug
