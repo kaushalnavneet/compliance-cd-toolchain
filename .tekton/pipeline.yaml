@@ -30,6 +30,8 @@ spec:
       description: evidence locker repo
     - name: incident-issues-url
       description: incident issues repo
+    - name: inventory-url
+      description: inventory repo
     - name: change-request-id
       description: optional ServiceNow Change Request ID
       default: "notAvailable"
@@ -73,16 +75,20 @@ spec:
           value: $(params.incident-issues-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: inventory-url
+          value: $(params.inventory-url)
       taskSpec:
         params:
           - name: repository
           - name: evidence-locker-url
           - name: incident-issues-url
+          - name: inventory-url
           - name: pipeline-debug
         results:
           - name: repository
           - name: evidence-locker-url
           - name: incident-issues-url
+          - name: inventory-url
           - name: pipeline-run-id
         stepTemplate:
           env:
@@ -110,9 +116,11 @@ spec:
               REPOSITORY=$(echo -n "$(params.repository)" | sed 's:/*$::')
               EVIDENCE_URL=$(echo -n "$(params.evidence-locker-url)" | sed 's:/*$::')
               INCIDENT_ISSUES_URL=$(echo -n "$(params.incident-issues-url)" | sed 's:/*$::')
+              INVENTORY_URL=$(echo -n "$(params.inventory-url)" | sed 's:/*$::')
               echo -n "$REPOSITORY" | tee "$(results.repository.path)"
               echo -n "$EVIDENCE_URL" | tee "$(results.evidence-locker-url.path)"
               echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
+              echo -n "$INVENTORY_URL" | tee "$(results.inventory-url.path)"
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
 
     - name: prod-get-git-credentials
@@ -189,7 +197,7 @@ spec:
 
     - name: prod-clone-inventory-repo
       taskRef:
-        name: git-clone-inventory-repo
+        name: git-clone
       runAfter:
         - prod-clone-repo
       workspaces:
@@ -198,12 +206,79 @@ spec:
         - name: secrets
           workspace: artifacts
       params:
+        - name: repository
+          value: $(tasks.setup.results.inventory-url)
+        - name: branch
+          value: "master"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: app-name
-          value: $(params.application)
-        - name: git-auth-user
+        - name: git-user
           value: $(tasks.prod-get-git-credentials.results.git-auth-user)
+
+    - name: prod-inventory-get-image
+      taskRef:
+        name: inventory-get
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: name
+          value: $(params.application)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: property
+          value: artifact
+        - name: target
+          value: prod_candidate
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+
+    - name: prod-parse-image-name
+      runAfter:
+        - prod-inventory-get-image
+      params:
+        - name: image-url
+          value: $(tasks.prod-inventory-get-image.results.value)
+      taskSpec:
+        params:
+          - name: image-url
+        results:
+          - name: registry-url
+            description: the image registry url
+          - name: registry-namespace
+            description: the image registry namespace
+          - name: image-name
+            description: the built docker image name
+          - name: image-tag
+            description: the docker image tag, containing the commit hash
+        steps:
+          - name: parse-image
+            image: ibmcom/pipeline-base-image:2.6
+            script: |
+              #!/bin/bash
+
+              set -e -o pipefail;
+
+              if [ "$PIPELINE_DEBUG" = 1 ]; then
+                env
+                cat /cd-config/toolchain.json
+                trap env EXIT
+                set -x
+              fi
+
+              REGISTRY_URL=$(echo "$(params.image-url)" | cut -f1 -d/)
+              REGISTRY_NAMESPACE=$(echo "$(params.image-url)" | cut -f2 -d/)
+              IMAGE_NAME=$(echo "$(params.image-url)" | cut -f1 -d: | cut -f3 -d/)
+              IMAGE_TAG=$(echo "$(params.image-url)" | cut -f2 -d:)
+
+              echo -n "$REGISTRY_URL" > $(results.registry-url.path)
+              echo -n "$REGISTRY_NAMESPACE" > $(results.registry-namespace.path)
+              echo -n "$IMAGE_NAME" > $(results.image-name.path)
+              echo -n "$IMAGE_TAG" > $(results.image-tag.path)
 
     - name: prod-get-evidence-locker-path
       taskRef:
@@ -241,7 +316,7 @@ spec:
         - name: target
           value: "prod_candidate"
         - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -339,7 +414,7 @@ spec:
         name: servicenow-create-change-request
       runAfter:
         - prod-get-git-credentials
-        - prod-clone-inventory-repo
+        - prod-parse-image-name
         - prod-change-request-create-urls
         - prod-change-request-deployment-ready
       workspaces:
@@ -357,13 +432,13 @@ spec:
         - name: servicenow-configuration-item
           value: $(params.servicenow-configuration-item)
         - name: registry-url
-          value: $(tasks.prod-clone-inventory-repo.results.registry-url)
+          value: $(tasks.prod-parse-image-name.results.registry-url)
         - name: registry-namespace
-          value: $(tasks.prod-clone-inventory-repo.results.registry-namespace)
+          value: $(tasks.prod-parse-image-name.results.registry-namespace)
         - name: image-name
-          value: $(tasks.prod-clone-inventory-repo.results.image-name)
+          value: $(tasks.prod-parse-image-name.results.image-name)
         - name: image-tag
-          value: $(tasks.prod-clone-inventory-repo.results.image-tag)
+          value: $(tasks.prod-parse-image-name.results.image-tag)
         - name: cluster
           value: $(params.cluster)
         - name: cluster-region
@@ -405,7 +480,7 @@ spec:
         - name: application
           value: $(params.application)
         - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
 
     - name: prod-change-request-check-approval
       taskRef:
@@ -461,7 +536,7 @@ spec:
         - name: cluster-namespace
           value: $(params.cluster-namespace)
         - name: registry-url
-          value: $(tasks.prod-clone-inventory-repo.results.registry-url)
+          value: $(tasks.prod-parse-image-name.results.registry-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -483,18 +558,18 @@ spec:
           value: $(params.cluster-namespace)
         - name: allow-create-route
           value: "false"
-        - name: registry-url
-          value: $(tasks.prod-clone-inventory-repo.results.registry-url)
-        - name: registry-namespace
-          value: $(tasks.prod-clone-inventory-repo.results.registry-namespace)
-        - name: image-name
-          value: $(tasks.prod-clone-inventory-repo.results.image-name)
-        - name: image-tag
-          value: $(tasks.prod-clone-inventory-repo.results.image-tag)
         - name: app-directory
           value: $(tasks.prod-clone-repo.results.directory-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: registry-url
+          value: $(tasks.prod-parse-image-name.results.registry-url)
+        - name: registry-namespace
+          value: $(tasks.prod-parse-image-name.results.registry-namespace)
+        - name: image-name
+          value: $(tasks.prod-parse-image-name.results.image-name)
+        - name: image-tag
+          value: $(tasks.prod-parse-image-name.results.image-tag)
 
     - name: prod-acceptance-tests
       runAfter:
@@ -692,10 +767,10 @@ spec:
       params:
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.inventory-folder)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
 
     - name: prod-close-change-request
       taskRef:
