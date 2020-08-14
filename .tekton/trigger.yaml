@@ -5,8 +5,6 @@ metadata:
   name: cd-template
 spec:
   params:
-    - name: repository
-      description: The git repo
     - name: revision
       description: the branch for the git repo
     - name: cluster
@@ -82,8 +80,6 @@ spec:
         params:
           - name: revision
             value: $(params.revision)
-          - name: repository
-            value: $(params.repository)
           - name: servicenow-api-base-url
             value: $(params.servicenow-api-base-url)
           - name: servicenow-configuration-item

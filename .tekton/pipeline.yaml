@@ -5,8 +5,6 @@ metadata:
   name: cd-pipeline
 spec:
   params:
-    - name: repository
-      description: the git repo
     - name: revision
       description: the git repo
       default: master
@@ -67,8 +65,6 @@ spec:
 
     - name: setup
       params:
-        - name: repository
-          value: $(params.repository)
         - name: evidence-locker-url
           value: $(params.evidence-locker-url)
         - name: incident-issues-url
@@ -79,13 +75,11 @@ spec:
           value: $(params.inventory-url)
       taskSpec:
         params:
-          - name: repository
           - name: evidence-locker-url
           - name: incident-issues-url
           - name: inventory-url
           - name: pipeline-debug
         results:
-          - name: repository
           - name: evidence-locker-url
           - name: incident-issues-url
           - name: inventory-url
@@ -113,11 +107,9 @@ spec:
                 set -x
               fi
 
-              REPOSITORY=$(echo -n "$(params.repository)" | sed 's:/*$::')
               EVIDENCE_URL=$(echo -n "$(params.evidence-locker-url)" | sed 's:/*$::')
               INCIDENT_ISSUES_URL=$(echo -n "$(params.incident-issues-url)" | sed 's:/*$::')
               INVENTORY_URL=$(echo -n "$(params.inventory-url)" | sed 's:/*$::')
-              echo -n "$REPOSITORY" | tee "$(results.repository.path)"
               echo -n "$EVIDENCE_URL" | tee "$(results.evidence-locker-url.path)"
               echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
               echo -n "$INVENTORY_URL" | tee "$(results.inventory-url.path)"
