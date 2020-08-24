@@ -59,9 +59,6 @@ triggers:
     name: Manual Promotion Trigger
     eventListener: promotion-listener
 properties:
-  - name: repository
-    value: ${REPOSITORY}
-    type: text
   - name: revision
     value: ${BRANCH}
     type: text

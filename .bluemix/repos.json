@@ -14,13 +14,6 @@
     },
     "type": "object",
     "properties": {
-        "app-repo": {
-            "description": {
-                "$ref": "#/messages/repos.applicationRepoDescription"
-            },
-            "type": "string",
-            "pattern": "\\S"
-        },
         "incident-issues-repo": {
             "description": {
                 "$ref": "#/messages/repos.incidentIssuesRepoDescription"
@@ -44,7 +37,6 @@
         }
     },
     "required": [
-        "app-repo",
         "incident-issues-repo",
         "evidence-locker-repo",
         "inventory-repo"
@@ -62,20 +54,6 @@
                 "78%"
             ],
             "items": [
-                {
-                    "type": "label",
-                    "title": {
-                        "$ref": "#/messages/repos.applicationRepoTitle"
-                    }
-                },
-                {
-                    "title": {
-                        "$ref": "#/messages/repos.applicationRepoTitle"
-                    },
-                    "key": "app-repo",
-                    "type": "text",
-                    "readonly": false
-                },
                 {
                     "type": "label",
                     "title": {
