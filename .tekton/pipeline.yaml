@@ -443,6 +443,50 @@ spec:
               echo -n "${SERVICENOW_BASE_URL}/${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
               echo -n "${SERVICENOW_BASE_URL}/${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
 
+    - name: prod-inventory-changelog-from
+      taskRef:
+        name: inventory-get
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: name
+          value: $(params.application)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: property
+          value: commit_sha
+        - name: target
+          value: prod
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+
+    - name: prod-inventory-changelog-to
+      taskRef:
+        name: inventory-get
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: name
+          value: $(params.application)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: property
+          value: commit_sha
+        - name: target
+          value: prod_candidate
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+
     - name: prod-change-request-create
       taskRef:
         name: servicenow-create-change-request
@@ -451,6 +495,8 @@ spec:
         - prod-parse-image-name
         - prod-change-request-create-urls
         - prod-change-request-deployment-ready
+        - prod-inventory-changelog-to
+        - prod-inventory-changelog-from
       workspaces:
         - name: dynamic-secrets
           workspace: artifacts
@@ -461,6 +507,10 @@ spec:
           value: "$(tasks.prod-get-deployment-app.results.app-name)"
         - name: repository
           value: $(tasks.prod-inventory-get-repository.results.value)
+        - name: git-commit-from
+          value: $(tasks.prod-inventory-changelog-from.results.value)
+        - name: git-commit-to
+          value: $(tasks.prod-inventory-changelog-to.results.value)
         - name: servicenow-api-url
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: servicenow-configuration-item
