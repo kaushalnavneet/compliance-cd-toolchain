@@ -136,11 +136,7 @@ services:
           SERVICENOW_BASE_URL: '{{form.customtool_servicenow.parameters.api-url}}'
           SERVICENOW_CONFIGURATION_ITEM: '{{form.customtool_servicenow.parameters.configuration-item}}'
           CHANGEREQUEST_ID: '{{form.customtool_servicenow.parameters.changerequest-id}}'
-          # Issues repo to raise compliance related issues from the CI/CD
-          INCIDENT_ISSUES_REPO: '{{form.incident-issues-repo.parameters.repo_url}}'
-          EVIDENCE_LOCKER_REPO: '{{form.evidence-locker-repo.parameters.repo_url}}'
           INVENTORY_REPO: inventory-repo
-          INVENTORY_REPO_URL: '{{form.inventory-repo.parameters.repo_url}}'
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
           ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'

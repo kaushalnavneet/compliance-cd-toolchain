@@ -17,12 +17,6 @@ spec:
       default: default
     - name: doi-toolchain-id
       description: toolchain ID
-    - name: evidence-locker-url
-      description: Evidence locker repo url
-    - name: incident-issues-url
-      description: Incident issues repo url
-    - name: inventory-url
-      description: Inventory repo url
     - name: emergency-label
       description: the name of the emergency label
     - name: application
@@ -96,12 +90,6 @@ spec:
             value: $(params.application)
           - name: emergency-label
             value: $(params.emergency-label)
-          - name: evidence-locker-url
-            value: $(params.evidence-locker-url)
-          - name: incident-issues-url
-            value: $(params.incident-issues-url)
-          - name: inventory-url
-            value: $(params.inventory-url)
           - name: change-request-id
             value: $(params.change-request-id)
           - name: pipeline-debug
