@@ -574,9 +574,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
@@ -638,9 +640,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
@@ -776,9 +780,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
@@ -980,9 +986,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
