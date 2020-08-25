@@ -464,6 +464,10 @@ spec:
           value: prod
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: allow-default-value
+          value: "true"
+        - name: default-value
+          value: ""
 
     - name: prod-inventory-changelog-to
       taskRef:
