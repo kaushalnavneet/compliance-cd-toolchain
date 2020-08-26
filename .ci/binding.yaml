@@ -5,6 +5,10 @@ metadata:
   name: binding
 spec:
   params:
+    - name: statuses-url
+      value: $(event.pull_request.statuses_url)
+    - name: statuses-repo-url
+      value: $(event.pull_request.base.repo.html_url)
     - name: repository
       value: $(event.pull_request.head.repo.html_url)
     - name: branch
