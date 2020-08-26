@@ -541,8 +541,6 @@ spec:
           value: $(params.change-request-id)
         - name: change-request-url
           value: $(tasks.prod-change-request-create-urls.results.change-request-url)
-        - name: collect-evidence
-          value: "false"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: formatted-summary-path
@@ -611,8 +609,6 @@ spec:
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: evidence-locker-url
           value: $(tasks.setup.results.evidence-locker-url)
-        - name: collect-evidence
-          value: "false"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: change-request-id
@@ -957,8 +953,6 @@ spec:
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: evidence-locker-url
           value: $(tasks.setup.results.evidence-locker-url)
-        - name: collect-evidence
-          value: "false"
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
         - name: pipeline-debug
