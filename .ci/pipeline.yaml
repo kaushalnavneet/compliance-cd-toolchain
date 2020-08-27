@@ -13,6 +13,10 @@ spec:
       description: |
         the git revision/commit to update the git HEAD to.
         Default is to mean only use the branch
+    - name: origin
+      description: origin to merge the code with
+    - name: statuses-repo-url
+      description: the base repository's status URL
     - name: pipeline-debug
       description: Pipeline debug ("verbose") mode
       default: "0"
@@ -33,7 +37,7 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: repository
-          value: $(params.repository)
+          value: "https://github.ibm.com/one-pipeline/compliance-cd-toolchain.git"
 
     - name: clone-repo
       taskRef:
@@ -52,6 +56,10 @@ spec:
           value: $(params.repository)
         - name: branch
           value: $(params.branch)
+        - name: origin
+          value: $(params.origin)
+        - name: revision
+          value: $(params.revision)
         - name: directory-name
           value: "compliance-cd-toolchain"
         - name: git-user
@@ -89,7 +97,7 @@ spec:
         - name: secret-name
           value: git-token
         - name: repo-url
-          value: $(params.repository)
+          value: $(params.statuses-repo-url)
         - name: commit-sha
           value: $(params.revision)
         - name: state
@@ -128,7 +136,7 @@ spec:
         - name: secret-name
           value: git-token
         - name: repo-url
-          value: $(params.repository)
+          value: $(params.statuses-repo-url)
         - name: commit-sha
           value: $(params.revision)
         - name: state
@@ -152,7 +160,7 @@ spec:
         - name: secret-name
           value: git-token
         - name: repo-url
-          value: $(params.repository)
+          value: $(params.statuses-repo-url)
         - name: commit-sha
           value: $(params.revision)
         - name: state
@@ -192,7 +200,7 @@ spec:
         - name: secret-name
           value: git-token
         - name: repo-url
-          value: $(params.repository)
+          value: $(params.statuses-repo-url)
         - name: commit-sha
           value: $(params.revision)
         - name: state

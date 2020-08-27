@@ -8,6 +8,9 @@ spec:
     - name: repository
       description: The git repo
       default: ""
+    - name: origin
+      description: origin to merge the code with
+      default: ""
     - name: branch
       description: the branch for the git repo
     - name: revision
@@ -15,6 +18,8 @@ spec:
         the git revision/commit to update the git HEAD to.
         Default is to mean only use the branch
       default: ""
+    - name: statuses-repo-url
+      description: the base repository's status URL
     - name: pipeline-debug
       default: "0"
 
@@ -47,7 +52,11 @@ spec:
             value: $(params.pipeline-debug)
           - name: repository
             value: $(params.repository)
+          - name: origin
+            value: $(params.origin)
           - name: branch
             value: $(params.branch)
           - name: revision
             value: $(params.revision)
+          - name: statuses-repo-url
+            value: $(params.statuses-repo-url)
