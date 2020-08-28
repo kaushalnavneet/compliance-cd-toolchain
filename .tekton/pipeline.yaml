@@ -556,8 +556,6 @@ spec:
           value: $(params.cluster-namespace)
         - name: emergency-label
           value: $(params.emergency-label)
-        - name: evidence-locker-url
-          value: $(tasks.setup.results.evidence-locker-url)
         - name: change-request-id
           value: $(params.change-request-id)
         - name: change-request-url
@@ -628,8 +626,6 @@ spec:
       params:
         - name: servicenow-api-url
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
-        - name: evidence-locker-url
-          value: $(tasks.setup.results.evidence-locker-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: change-request-id
@@ -972,8 +968,6 @@ spec:
 
         - name: servicenow-api-url
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
-        - name: evidence-locker-url
-          value: $(tasks.setup.results.evidence-locker-url)
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
         - name: pipeline-debug
