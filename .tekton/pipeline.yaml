@@ -595,7 +595,12 @@ spec:
           value: ""
         - name: artifacts
           value: |
-            "$(tasks.prod-change-request-create.results.change-request-url)"
+            [{
+              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
+              "hash": "null"
+            }]
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-inventory-add-change-request
       taskRef:
@@ -661,7 +666,12 @@ spec:
           value: ""
         - name: artifacts
           value: |
-            "$(tasks.prod-change-request-create.results.change-request-url)"
+            [{
+              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
+              "hash": "null"
+            }]
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-create-namespace
       taskRef:
@@ -800,6 +810,8 @@ spec:
         - name: issues
           value: |
             "$(tasks.prod-acceptance-tests-create-issue.results.issue-url)"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-acceptance-tests-create-doi-data
       runAfter:
@@ -1007,7 +1019,12 @@ spec:
           value: ""
         - name: artifacts
           value: |
-            "$(tasks.prod-change-request-create.results.change-request-url)"
+            [{
+              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
+              "hash": "null"
+            }]
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-notify-pipeline-end
       conditions:
