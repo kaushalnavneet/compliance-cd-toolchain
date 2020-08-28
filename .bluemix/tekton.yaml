@@ -86,15 +86,6 @@ properties:
   - name: application
     value: ${APP_NAME}
     type: text
-  - name: incident-issues-url
-    value: ${INCIDENT_ISSUES_REPO}
-    type: text
-  - name: inventory-url
-    value: ${INVENTORY_REPO_URL}
-    type: text
-  - name: evidence-locker-url
-    value: ${EVIDENCE_LOCKER_REPO}
-    type: text
   - name: emergency-label
     value: ${EMERGENCY_LABEL}
     type: text

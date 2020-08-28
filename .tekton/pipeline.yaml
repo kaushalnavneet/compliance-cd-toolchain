@@ -24,12 +24,6 @@ spec:
       description: application name
     - name: emergency-label
       description: emergency label for change request generation
-    - name: evidence-locker-url
-      description: evidence locker repo
-    - name: incident-issues-url
-      description: incident issues repo
-    - name: inventory-url
-      description: inventory repo
     - name: change-request-id
       description: optional ServiceNow Change Request ID
       default: "notAvailable"
@@ -63,16 +57,43 @@ spec:
               print("CD Pipeline was triggered!")
               print("<https://cloud.ibm.com/devops/pipelines/tekton/" + os.getenv("PIPELINE_ID") + "/runs/" + os.getenv("PIPELINE_RUN_ID") + "?env_id=ibm:yp:" + os.getenv("TOOLCHAIN_REGION") + "|See the Pipeline Logs>")
 
+    - name: prod-extract-evidence-locker-url
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: '.services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .dashboard_url'
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: prod-extract-incident-issues-url
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: '.services[] | select(.toolchain_binding.name=="incident-issues-repo") | .dashboard_url'
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: prod-extract-inventory-url
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: '.services[] | select(.toolchain_binding.name=="inventory-repo") | .dashboard_url'
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: setup
       params:
         - name: evidence-locker-url
-          value: $(params.evidence-locker-url)
+          value: $(tasks.prod-extract-evidence-locker-url.results.extracted-value)
         - name: incident-issues-url
-          value: $(params.incident-issues-url)
+          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: inventory-url
-          value: $(params.inventory-url)
+          value: $(tasks.prod-extract-inventory-url.results.extracted-value)
       taskSpec:
         params:
           - name: evidence-locker-url
@@ -744,7 +765,7 @@ spec:
         - name: repository
           value: $(tasks.prod-inventory-get-repository.results.value)
         - name: incident-issue-repo
-          value: $(params.incident-issues-url)
+          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
         - name: task-name
           value: "prod-acceptance-tests"
         - name: result-status
