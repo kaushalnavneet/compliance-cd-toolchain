@@ -574,9 +574,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
@@ -593,7 +595,12 @@ spec:
           value: ""
         - name: artifacts
           value: |
-            "$(tasks.prod-change-request-create.results.change-request-url)"
+            [{
+              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
+              "hash": "null"
+            }]
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-inventory-add-change-request
       taskRef:
@@ -638,9 +645,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
@@ -657,7 +666,12 @@ spec:
           value: ""
         - name: artifacts
           value: |
-            "$(tasks.prod-change-request-create.results.change-request-url)"
+            [{
+              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
+              "hash": "null"
+            }]
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-create-namespace
       taskRef:
@@ -776,9 +790,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
@@ -794,6 +810,8 @@ spec:
         - name: issues
           value: |
             "$(tasks.prod-acceptance-tests-create-issue.results.issue-url)"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-acceptance-tests-create-doi-data
       runAfter:
@@ -980,9 +998,11 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: namespace
           value: "cd"
         - name: evidence-name
@@ -999,7 +1019,12 @@ spec:
           value: ""
         - name: artifacts
           value: |
-            "$(tasks.prod-change-request-create.results.change-request-url)"
+            [{
+              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
+              "hash": "null"
+            }]
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-notify-pipeline-end
       conditions:
