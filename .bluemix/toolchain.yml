@@ -37,9 +37,9 @@ services:
   slack:
     service_id: slack
     parametes:
-      channel_name: '{{form.slack.parameters.channel_name}}'
-      api_token: '{{form.slack.parameters.api_token}}'
-      team_url: '{{form.slack.parameters.team_url}}'
+      channel_name: ''
+      api_token: ''
+      team_url: ''
 
   privateWorker:
     service_id: private_worker
