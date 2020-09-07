@@ -893,7 +893,10 @@ spec:
         - name: evidence-repo-path
           value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
         - name: path-list
-          value: "ci/$(tasks.prod-inventory-get-evidence-path.results.value)cd/$(tasks.setup.results.pipeline-run-id)"
+          value:
+            |
+            ci/$(tasks.prod-inventory-get-evidence-path.results.value)
+            cd/$(tasks.setup.results.pipeline-run-id)
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
         - name: pipeline-debug
