@@ -673,6 +673,54 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-change-request-change-state-to-implement
+      taskRef:
+        name: servicenow-change-state-to-implement
+      runAfter:
+        - prod-change-request-check-approval
+      params:
+        - name: servicenow-api-url
+          value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
+        - name: change-request-id
+          value: $(tasks.prod-change-request-create.results.change-request-id)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: prod-change-request-change-state-to-implement-create-evidence
+      taskRef:
+        name: evidence-add
+      retries: 2
+      workspaces:
+        - name: evidence-locker
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
+        - name: namespace
+          value: "cd"
+        - name: evidence-name
+          value: "change-request-change-state-to-implement"
+        - name: toolchain-crn
+          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+        - name: evidence-type
+          value: "com.ibm.change_request_change_state_to_implement"
+        - name: evidence-type-version
+          value: "1.0.0"
+        - name: result
+          value: $(tasks.prod-change-request-change-state-to-implement.results.status)
+        - name: issues
+          value: ""
+        - name: artifacts
+          value: |
+            [{
+              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
+              "hash": "null"
+            }]
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-create-namespace
       taskRef:
         name: iks-create-namespace
