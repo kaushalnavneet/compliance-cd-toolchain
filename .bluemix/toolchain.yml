@@ -29,7 +29,7 @@ template:
         "(" + $env.repository +
           "/tree/" + $env.branch + ")"
 toolchain:
-  name: 'tekton-cd-compliance-{{timestamp}}'
+  name: 'compliance-cd-toolchain-{{timestamp}}'
   template:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
