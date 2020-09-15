@@ -34,6 +34,19 @@ toolchain:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
 services:
+  cos-bucket:
+    service_id: customtool
+    parameters:
+      type: cos-bucket
+      lifecyclePhase: "LEARN"
+      imageUrl:
+        $ref: cos-logo.png
+        $refType: image-data-uri
+      documentationUrl: 'https://cloud.ibm.com/catalog/services/cloud-object-storage'
+      name: Cloud Object Storage
+      dashboard_url: 'https://cloud.ibm.com/catalog/services/cloud-object-storage'
+      description: The information required to connect the toolchain with your Cloud Object Storage instance.
+
   slack:
     service_id: slack
     parametes:
@@ -143,6 +156,8 @@ services:
           # Private Worker for the pipeline
           PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
           DOI_TOOLCHAIN_ID: '{{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
+          COS_BUCKET_NAME: '{{form.customtool_cos-bucket.parameters.cos-bucket-name}}'
+          COS_ENDPOINT: '{{form.customtool_cos-bucket.parameters.cos-endpoint}}'
         execute: true
 
   servicenow:
@@ -206,3 +221,10 @@ form:
       doi-toolchain-id:
     schema:
       $ref: doi-toolchain.json
+
+  customtool_cos-bucket:
+    parameters:
+      cos-bucket-name: ''
+      cos-endpoint: ''
+    schema:
+      $ref: cos.json
