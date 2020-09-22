@@ -107,4 +107,10 @@ properties:
   - name: slack-notifications
     value: "0"
     type: text
+  - name: cos-endpoint
+    value: ${COS_ENDPOINT}
+    type: text
+  - name: cos-bucket-name
+    value: ${COS_BUCKET_NAME}
+    type: text
 private_worker: ${PRIVATE_WORKER}
