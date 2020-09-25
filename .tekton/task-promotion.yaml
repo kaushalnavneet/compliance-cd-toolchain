@@ -7,6 +7,7 @@ spec:
   params:
     - name: app-name
       description: name of the app to be deployed
+      default: ""
     - name: source
       description: promotion source
     - name: target
@@ -59,7 +60,15 @@ spec:
 
           inventory_promote() {
             cd /artifacts/$INVENTORY_FOLDER
-            inventory promote "$(params.app-name)" "$(params.source)" "$(params.target)" "$(params.branch)"
+            if [ "$(params.app-name)" == "" ]; then
+              for app_name in *; do
+                if [[ "$app_name" != *.md ]]; then
+                inventory promote "$app_name" "$(params.source)" "$(params.target)" "$(params.branch)"
+                fi
+              done
+            else
+              inventory promote "$(params.app-name)" "$(params.source)" "$(params.target)" "$(params.branch)"
+            fi
           }
 
           source /scripts/retry_command.sh
