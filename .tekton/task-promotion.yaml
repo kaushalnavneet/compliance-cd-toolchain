@@ -67,12 +67,7 @@ spec:
                 fi
               done
             else
-              IFS=','
-              read -ra app_names <<< "$(params.app-name)"
-              for app_name in "${app_names[@]}"; do
-                app_name="$(echo $app_name | sed -e 's/^[[:space:]]*//')"
-                inventory promote "$app_name" "$(params.source)" "$(params.target)" "$(params.branch)"
-              done
+              inventory promote "$(params.app-name)" "$(params.source)" "$(params.target)" "$(params.branch)"
             fi
           }
 

@@ -31,11 +31,18 @@ spec:
       description: toggles debug mode for the pipeline
     - name: slack-notifications
       description: toggles slack notifications
+    - name: cos-bucket-name
+      description: Bucket name in your Cloud Object Storage instance, used as an Evidence Locker
+      default: ""
+    - name: cos-endpoint
+      description: Endpoint of your Cloud Object Storage instance, used as an Evidence Locker
+      default: ""
 
   workspaces:
     - name: artifacts
 
   tasks:
+
     - name: prod-notify-pipeline-start
       conditions:
         - conditionRef: util-is-equal
@@ -567,41 +574,6 @@ spec:
         - name: servicenow-deployment-ready
           value: $(tasks.prod-change-request-deployment-ready.results.deployment-ready)
 
-    - name: prod-change-request-create-create-evidence
-      taskRef:
-        name: evidence-add
-      retries: 2
-      workspaces:
-        - name: evidence-locker
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: evidence-repo-url
-          value: $(tasks.setup.results.evidence-locker-url)
-        - name: namespace
-          value: "cd"
-        - name: evidence-name
-          value: "create-change-request"
-        - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
-        - name: evidence-type
-          value: "com.ibm.create_change_request"
-        - name: evidence-type-version
-          value: "1.0.0"
-        - name: result
-          value: $(tasks.prod-change-request-create.results.status)
-        - name: issues
-          value: ""
-        - name: artifacts
-          value: |
-            [{
-              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
-              "hash": "null"
-            }]
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
     - name: prod-inventory-add-change-request
       taskRef:
         name: inventory-cr-add
@@ -638,41 +610,6 @@ spec:
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
 
-    - name: prod-change-request-check-approval-create-evidence
-      taskRef:
-        name: evidence-add
-      retries: 2
-      workspaces:
-        - name: evidence-locker
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: evidence-repo-url
-          value: $(tasks.setup.results.evidence-locker-url)
-        - name: namespace
-          value: "cd"
-        - name: evidence-name
-          value: "change-request-check-approval"
-        - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
-        - name: evidence-type
-          value: "com.ibm.change-request-check-approval"
-        - name: evidence-type-version
-          value: "1.0.0"
-        - name: result
-          value: $(tasks.prod-change-request-check-approval.results.status)
-        - name: issues
-          value: ""
-        - name: artifacts
-          value: |
-            [{
-              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
-              "hash": "null"
-            }]
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
     - name: prod-change-request-change-state-to-implement
       taskRef:
         name: servicenow-change-state-to-implement
@@ -683,41 +620,6 @@ spec:
           value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-change-request-change-state-to-implement-create-evidence
-      taskRef:
-        name: evidence-add
-      retries: 2
-      workspaces:
-        - name: evidence-locker
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: evidence-repo-url
-          value: $(tasks.setup.results.evidence-locker-url)
-        - name: namespace
-          value: "cd"
-        - name: evidence-name
-          value: "change-request-change-state-to-implement"
-        - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
-        - name: evidence-type
-          value: "com.ibm.change_request_change_state_to_implement"
-        - name: evidence-type-version
-          value: "1.0.0"
-        - name: result
-          value: $(tasks.prod-change-request-change-state-to-implement.results.status)
-        - name: issues
-          value: ""
-        - name: artifacts
-          value: |
-            [{
-              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
-              "hash": "null"
-            }]
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -809,58 +711,6 @@ spec:
             export APP_URL
             npm run acceptance-test
 
-    - name: prod-acceptance-tests-create-issue
-      runAfter:
-        - prod-acceptance-tests
-      taskRef:
-        name: evidence-create-incident-issue
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: secret-name
-          value: git-token
-        - name: repository
-          value: $(tasks.prod-inventory-get-repository.results.value)
-        - name: incident-issue-repo
-          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
-        - name: task-name
-          value: "prod-acceptance-tests"
-        - name: result-status
-          value: $(tasks.prod-acceptance-tests.results.status)
-        - name: commit-hash
-          value: $(tasks.prod-inventory-get-commit.results.value)
-
-    - name: prod-acceptance-tests-create-evidence
-      taskRef:
-        name: evidence-add
-      retries: 2
-      workspaces:
-        - name: evidence-locker
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: evidence-repo-url
-          value: $(tasks.setup.results.evidence-locker-url)
-        - name: namespace
-          value: "cd"
-        - name: evidence-name
-          value: "acceptance-test"
-        - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
-        - name: evidence-type
-          value: "com.ibm.acceptance_test"
-        - name: evidence-type-version
-          value: "1.0.0"
-        - name: result
-          value: $(tasks.prod-acceptance-tests.results.status)
-        - name: issues
-          value: |
-            "$(tasks.prod-acceptance-tests-create-issue.results.issue-url)"
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
     - name: prod-acceptance-tests-create-doi-data
       runAfter:
         - prod-acceptance-tests
@@ -929,11 +779,110 @@ spec:
         - name: toolchain-apikey-secret-key
           value: "ibmcloud-api-key"
 
+    - name: prod-compliance-collector
+      taskRef:
+        name: compliance-collector
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: namespace
+          value: cd
+        - name: incident-issue-repo
+          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
+        - name: commit-hash
+          value: $(tasks.prod-inventory-get-commit.results.value)
+        - name: toolchain-crn
+          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+        - name: cos-bucket-name
+          value: "$(params.cos-bucket-name)"
+        - name: cos-endpoint
+          value: "$(params.cos-endpoint)"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: toolchain-apikey-secret-key
+          value: "ibmcloud-api-key"
+        - name: data
+          value: |
+            [
+              {
+                "name": "acceptance-test",
+                "step": "",
+                "evidence_type": "com.ibm.acceptance_test",
+                "evidence_type_version": "1.0.0",
+                "expected": "success",
+                "actual": "$(tasks.prod-acceptance-tests.results.status)",
+                "artifacts": [
+                ]
+              },
+              {
+                "name": "create-change-request",
+                "step": "",
+                "evidence_type": "com.ibm.create_change_request",
+                "evidence_type_version": "1.0.0",
+                "expected": "success",
+                "actual": "$(tasks.prod-change-request-create.results.status)",
+                "artifacts": [
+                ]
+              },
+              {
+                "name": "change-request-check-approval",
+                "step": "",
+                "evidence_type": "com.ibm.change-request-check-approval",
+                "evidence_type_version": "1.0.0",
+                "expected": "success",
+                "actual": "$(tasks.prod-change-request-check-approval.results.status)",
+                "artifacts": [
+                ]
+              },
+              {
+                "name": "change-request-change-state-to-implement",
+                "step": "",
+                "evidence_type": "com.ibm.change_request_change_state_to_implement",
+                "evidence_type_version": "1.0.0",
+                "expected": "success",
+                "actual": "$(tasks.prod-change-request-change-state-to-implement.results.status)",
+                "artifacts": [
+                ]
+              }
+            ]
+
+    - name: prod-compliance-doi-reporter
+      taskRef:
+        name: compliance-doi-reporter
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: app-name
+          value: "$(params.application)"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: toolchain-id
+          value: "$(params.doi-toolchain-id)"
+        - name: ibmcloud-api-key-secret-key
+          value: "ibmcloud-api-key"
+        - name: data
+          value: |
+            [
+              {
+                "name": "prod-acceptance-tests",
+                "step": "",
+                "evidence_type": "com.ibm.acceptance_test",
+                "expected": "success",
+                "actual": "$(tasks.prod-acceptance-tests.results.status)"
+              },
+            ]
+
     - name: prod-change-request-close-get-evidence-summary
       taskRef:
         name: evidence-summarize
       runAfter:
-        - prod-acceptance-tests-create-evidence
+        - prod-compliance-collector
       workspaces:
         - name: evidence-locker
           workspace: artifacts
@@ -1042,40 +991,47 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: prod-close-change-request-create-evidence
+    - name: prod-compliance-close-cr
       taskRef:
-        name: evidence-add
-      retries: 2
+        name: compliance-collector
       workspaces:
-        - name: evidence-locker
+        - name: artifacts
           workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
+        - name: namespace
+          value: cd
+        - name: incident-issue-repo
+          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
         - name: evidence-repo-url
           value: $(tasks.setup.results.evidence-locker-url)
-        - name: namespace
-          value: "cd"
-        - name: evidence-name
-          value: "close-change-request"
+        - name: commit-hash
+          value: $(tasks.prod-inventory-get-commit.results.value)
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
-        - name: evidence-type
-          value: "com.ibm.close_change_request"
-        - name: evidence-type-version
-          value: "1.0.0"
-        - name: result
-          value: $(tasks.prod-close-change-request.results.status)
-        - name: issues
-          value: ""
-        - name: artifacts
-          value: |
-            [{
-              "url": "$(tasks.prod-change-request-create.results.change-request-url)",
-              "hash": "null"
-            }]
+        - name: cos-bucket-name
+          value: "$(params.cos-bucket-name)"
+        - name: cos-endpoint
+          value: "$(params.cos-endpoint)"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: toolchain-apikey-secret-key
+          value: "ibmcloud-api-key"
+        - name: data
+          value: |
+            [
+              {
+                "name": "close-change-request",
+                "step": "",
+                "evidence_type": "com.ibm.close_change_request",
+                "evidence_type_version": "1.0.0",
+                "expected": "success",
+                "actual": "$(tasks.prod-close-change-request.results.status)",
+                "artifacts": [
+                ]
+              }
+            ]
 
     - name: prod-notify-pipeline-end
       conditions:
