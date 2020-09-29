@@ -20,6 +20,7 @@ template:
     - artifactoryComp
     - privateWorker
     - doi-toolchain
+    - fortress
   info:
     git url: >
       "[" + $env.repository + "]" +
@@ -198,7 +199,12 @@ services:
       name: Link DOI Toolchain
       dashboard_url: 'https://cloud.ibm.com/devops/insights/overviewNew?toolchainId={{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
       description: The toolchain that contains the Devops Insights instance CD interacts with.
-
+      
+  fortress:
+    service_id: security_compliance
+    parameters:
+      evidence_repo_name: 
+      name: 
 form:
 
   github_integrated:
