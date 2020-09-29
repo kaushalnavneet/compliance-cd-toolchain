@@ -62,7 +62,7 @@
                 },
                 {
                     "title": {
-                        "$ref": "#/messages/repos.incidentIssuesRepoTitle"
+                        "$ref": "#/messages/repos.incidentIssuesRepoPlaceholder"
                     },
                     "key": "incident-issues-repo",
                     "type": "text",
@@ -76,7 +76,7 @@
                 },
                 {
                     "title": {
-                        "$ref": "#/messages/repos.evidenceLockerRepoTitle"
+                        "$ref": "#/messages/repos.evidenceLockerRepoPlaceholder"
                     },
                     "key": "evidence-locker-repo",
                     "type": "text",
@@ -90,7 +90,7 @@
                 },
                 {
                     "title": {
-                        "$ref": "#/messages/repos.inventoryRepoTitle"
+                        "$ref": "#/messages/repos.inventoryRepoPlaceholder"
                     },
                     "key": "inventory-repo",
                     "type": "text",

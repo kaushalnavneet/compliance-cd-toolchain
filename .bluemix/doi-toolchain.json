@@ -43,6 +43,8 @@
       "title": {
         "$ref": "#/messages/doiToolchain.id"
       },
+      "description": "Toolchain ID",
+      "placeholder": "Toolchain placeholder ID",
       "key": "doi-toolchain-id",
       "type": "text"
     }
