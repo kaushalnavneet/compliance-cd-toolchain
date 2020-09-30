@@ -35,6 +35,12 @@ spec:
       description: dockerconfigjson for pullsecrets
     - name: slack-notifications
       description: toggles slack notifications
+    - name: cos-bucket-name
+      description: Bucket name in your Cloud Object Storage instance, used as an Evidence Locker
+      default: ""
+    - name: cos-endpoint
+      description: Endpoint of your Cloud Object Storage instance, used as an Evidence Locker
+      default: ""
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -96,4 +102,8 @@ spec:
             value: $(params.pipeline-debug)
           - name: slack-notifications
             value: $(params.slack-notifications)
+          - name: cos-bucket-name
+            value: "$(params.cos-bucket-name)"
+          - name: cos-endpoint
+            value: "$(params.cos-endpoint)"
         serviceAccountName: sa-pullsecret
