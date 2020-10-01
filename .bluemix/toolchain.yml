@@ -205,7 +205,7 @@ services:
     parameters:
       evidence_repo_name:
       name:
-      
+
 form:
 
   github_integrated:
