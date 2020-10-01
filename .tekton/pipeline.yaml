@@ -806,6 +806,8 @@ spec:
           value: $(params.pipeline-debug)
         - name: toolchain-apikey-secret-key
           value: "ibmcloud-api-key"
+        - name: skip-pipeline-logs
+          value: "1"
         - name: data
           value: |
             [
