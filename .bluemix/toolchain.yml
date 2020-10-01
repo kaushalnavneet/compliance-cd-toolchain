@@ -52,7 +52,7 @@ services:
     service_id: customtool
     parameters:
       type: cos-bucket
-      lifecyclePhase: "LEARN"
+      lifecyclePhase: "MANAGE"
       imageUrl:
         $ref: cos-logo.png
         $refType: image-data-uri
