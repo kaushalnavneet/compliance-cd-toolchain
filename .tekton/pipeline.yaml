@@ -519,9 +519,9 @@ spec:
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
 
-    - name: prod-change-request-create
+    - name: prod-change-request-prepare
       taskRef:
-        name: servicenow-create-change-request
+        name: servicenow-prepare-change-request
       runAfter:
         - prod-get-git-credentials
         - prod-parse-image-name
@@ -535,16 +535,12 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
-        - name: application
-          value: "$(tasks.prod-get-deployment-app.results.app-name)"
         - name: repository
           value: $(tasks.prod-inventory-get-repository.results.value)
         - name: git-commit-from
           value: $(tasks.prod-inventory-changelog-from.results.value)
         - name: git-commit-to
           value: $(tasks.prod-inventory-changelog-to.results.value)
-        - name: servicenow-api-url
-          value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
         - name: servicenow-configuration-item
           value: $(params.servicenow-configuration-item)
         - name: registry-url
@@ -561,18 +557,40 @@ spec:
           value: $(params.cluster-region)
         - name: cluster-namespace
           value: $(params.cluster-namespace)
+        - name: inventory-name
+          value: $(params.application)
+        - name: inventory-target
+          value: prod_candidate
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
         - name: emergency-label
           value: $(params.emergency-label)
         - name: change-request-id
           value: $(params.change-request-id)
-        - name: change-request-url
-          value: $(tasks.prod-change-request-create-urls.results.change-request-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: formatted-summary-path
           value: $(tasks.prod-evidence-summary-format.results.formatted-summary-path)
-        - name: servicenow-deployment-ready
-          value: $(tasks.prod-change-request-deployment-ready.results.deployment-ready)
+        - name: evidence-failure-count
+          value: $(tasks.prod-evidence-summary-create.results.failure-count)
+
+    - name: prod-change-request-create
+      taskRef:
+        name: servicenow-create-change-request
+      runAfter:
+        - prod-change-request-prepare
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: cr-json-path
+          value: $(tasks.prod-change-request-prepare.results.change-request-json-path)
+        - name: change-request-url
+          value: $(tasks.prod-change-request-create-urls.results.change-request-url)
+        - name: servicenow-api-url
+          value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-inventory-add-change-request
       taskRef:
