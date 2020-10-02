@@ -1,0 +1,125 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: run-stage
+spec:
+  params:
+    - name: image
+      description: Docker image to be used to run the stage script.
+    - name: script
+      description: Location of the script that is used to run the stage.
+    - name: working-dir
+      description: Used as `workingDir` for the stage step.
+    - name: params
+      description: "Extra parameters (`key: value` pairs)."
+      default: ""
+
+  results:
+    - name: exit-code
+      description: Exit code of the stage script.
+    - name: status
+      description: Stage status, which is `success` or `failure`, depending on the stage script exit code.
+
+  workspaces:
+    - name: app
+      description: Workspace where the application is checked out.
+
+  steps:
+    - name: prepare
+      image: ibmcom/pipeline-base-image:2.7
+      volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: environment-properties
+          mountPath: /config/environment-properties
+        - name: secure-properties
+          mountPath: /config/secure-properties
+      script: |
+        #!/usr/bin/env bash
+
+        set -x
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/environment-properties' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/secure-properties' -type f)
+
+        extra_params=$(mktemp)
+        cat <<'EOF' > "$extra_params"
+        $(params.params)
+        EOF
+
+        while read -ra pair; do
+          echo -n "${pair[1]}" > "/config/${pair[0]}"
+        done < <(yq r -j "$extra_params" | jq -r 'to_entries[] | .key + " " + .value')
+
+    - name: run-stage
+      image: $(params.image)
+      workingDir: $(workspaces.app.path)/$(params.working-dir)
+      volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: environment-properties
+          mountPath: /config/environment-properties
+        - name: secure-properties
+          mountPath: /config/secure-properties
+      env:
+        - name: PIPELINE_RUN_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tekton.dev/pipelineRun']
+        - name: PIPELINE_RUN_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/tekton-pipeline']
+        - name: PIPELINE_RUN_URL
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/pipeline-run-url']
+        - name: BUILD_NUMBER
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/build-number']
+        - name: PIPELINE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/pipeline-id']
+        - name: TRIGGER_TYPE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/trigger-type']
+        - name: TRIGGER_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/trigger-name']
+        - name: TRIGGERED_BY
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/triggered-by']
+      script: |
+        #!/bin/sh
+
+        set -ex
+
+        # run the stage script
+        if $(workspaces.app.path)/$(params.script); then
+          echo -n $? > $(results.exit-code.path)
+          echo -n success > $(results.status.path)
+        else
+          echo -n $? > $(results.exit-code.path)
+          echo -n failure > $(results.status.path)
+        fi
+
+  volumes:
+    - name: config
+      emptyDir: {}
+    - name: environment-properties
+      configMap:
+        name: environment-properties
+    - name: secure-properties
+      secret:
+        secretName: secure-properties

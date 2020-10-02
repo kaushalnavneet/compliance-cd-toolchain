@@ -1,0 +1,43 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: parse-config
+spec:
+  params:
+    - name: file
+      default: .one-pipeline.yaml
+      description: Location of the config file.
+    - name: stage
+      description: Parse this section from the config file
+  results:
+    - name: image
+      description: Docker image to be used in the specified stage.
+    - name: script
+      description: Location of the script that's going to be used to run the specified stage.
+  workspaces:
+    - name: app
+      description: Workspace where the application is checked out.
+  steps:
+    - name: parse-config
+      image: ibmcom/pipeline-base-image:2.7
+      script: |
+        #!/bin/bash
+
+        set -ex
+
+        cat '$(workspaces.app.path)/$(params.file)'
+
+        config_file='$(workspaces.app.path)/$(params.file)'
+        stage='$(params.stage)'
+
+        # extract script
+        tmp_pattern="$(workspaces.app.path)/stage-$(params.stage)-XXXX"
+        script_file=$(mktemp $tmp_pattern)
+        yq r "$config_file" "${stage}.script" > "$script_file"
+        chmod +x "$script_file"
+        echo -n "$(basename $script_file)" > '$(results.script.path)'
+
+        # extract image
+        image=$(yq r "$config_file" "${stage}.image")
+        echo -n "$image" > '$(results.image.path)'

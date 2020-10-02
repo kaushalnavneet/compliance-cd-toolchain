@@ -37,6 +37,9 @@ spec:
     - name: cos-endpoint
       description: Endpoint of your Cloud Object Storage instance, used as an Evidence Locker
       default: ""
+    - name: one-pipeline-config
+      description: Configuration file to be used to customize pipeline behavior
+      default: .one-pipeline.yaml
 
   workspaces:
     - name: artifacts
@@ -179,22 +182,6 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: prod-get-deployment-app
-      taskRef:
-        name: get-deployment-app
-      runAfter:
-        - prod-clone-repo
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: app-directory
-          value: "$(tasks.prod-clone-repo.results.directory-name)"
-        - name: deployment-file
-          value: "deployment.yml"
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
     - name: prod-clone-inventory-repo
       taskRef:
         name: git-clone
@@ -243,6 +230,9 @@ spec:
       params:
         - name: image-url
           value: $(tasks.prod-inventory-get-image.results.value)
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
       taskSpec:
         params:
           - name: image-url
@@ -255,6 +245,8 @@ spec:
             description: the built docker image name
           - name: image-tag
             description: the docker image tag, containing the commit hash
+        workspaces:
+          - name: artifacts
         steps:
           - name: parse-image
             image: ibmcom/pipeline-base-image:2.6
@@ -641,93 +633,69 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: prod-create-namespace
+    - name: prod-deployment-config
       taskRef:
-        name: iks-create-namespace
-      runAfter:
-        - prod-change-request-check-approval
+        name: parse-config
       workspaces:
-        - name: artifacts
+        - name: app
           workspace: artifacts
       params:
-        - name: cluster-name
-          value: $(params.cluster)
-        - name: cluster-region
-          value: $(params.cluster-region)
-        - name: cluster-namespace
-          value: $(params.cluster-namespace)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-create-image-pull-secrets
-      taskRef:
-        name: iks-create-pull-secrets
-      runAfter:
-        - prod-create-namespace
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: cluster-name
-          value: $(params.cluster)
-        - name: cluster-region
-          value: $(params.cluster-region)
-        - name: cluster-namespace
-          value: $(params.cluster-namespace)
-        - name: registry-url
-          value: $(tasks.prod-parse-image-name.results.registry-url)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
+        - name: stage
+          value: deploy
+        - name: file
+          value: $(tasks.prod-clone-repo.results.directory-name)/$(params.one-pipeline-config)
 
     - name: prod-deployment
       taskRef:
-        name: iks-deploy
+        name: run-stage
       runAfter:
-        - prod-clone-repo
-        - prod-create-image-pull-secrets
+        - prod-change-request-change-state-to-implement
       workspaces:
-        - name: artifacts
+        - name: app
           workspace: artifacts
       params:
-        - name: cluster-name
-          value: $(params.cluster)
-        - name: cluster-region
-          value: $(params.cluster-region)
-        - name: cluster-namespace
-          value: $(params.cluster-namespace)
-        - name: allow-create-route
-          value: "false"
-        - name: app-directory
+        - name: image
+          value: $(tasks.prod-deployment-config.results.image)
+        - name: script
+          value: $(tasks.prod-deployment-config.results.script)
+        - name: working-dir
           value: $(tasks.prod-clone-repo.results.directory-name)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: registry-url
-          value: $(tasks.prod-parse-image-name.results.registry-url)
-        - name: registry-namespace
-          value: $(tasks.prod-parse-image-name.results.registry-namespace)
-        - name: image-name
-          value: $(tasks.prod-parse-image-name.results.image-name)
-        - name: image-tag
-          value: $(tasks.prod-parse-image-name.results.image-tag)
+        - name: params
+          value: |
+            image: $(tasks.prod-inventory-get-image.results.value)
+            cluster-name: $(params.cluster)
+            dev-region: $(params.cluster-region)
+            dev-cluster-namespace: $(params.cluster-namespace)
+
+    - name: prod-acceptance-tests-config
+      taskRef:
+        name: parse-config
+      runAfter:
+        - prod-deployment
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: stage
+          value: acceptance-test
+        - name: file
+          value: $(tasks.prod-clone-repo.results.directory-name)/$(params.one-pipeline-config)
 
     - name: prod-acceptance-tests
       runAfter:
         - prod-deployment
       taskRef:
-        name: util-run
+        name: run-stage
       workspaces:
-        - name: scripts
+        - name: app
           workspace: artifacts
       params:
+        - name: image
+          value: $(tasks.prod-acceptance-tests-config.results.image)
         - name: script
-          value: |
-            #!/bin/bash
-            APP_URL="$(tasks.prod-deployment.results.app-url)"
-            . /root/.nvm/nvm.sh
-            cd /scripts/"$(tasks.prod-clone-repo.results.directory-name)" || exit
-            npm ci -q
-            export APP_URL
-            npm run acceptance-test
+          value: $(tasks.prod-acceptance-tests-config.results.script)
+        - name: working-dir
+          value: $(tasks.prod-clone-repo.results.directory-name)
 
     - name: prod-acceptance-tests-create-doi-data
       runAfter:
@@ -791,7 +759,7 @@ spec:
         - name: environment
           value: "prod"
         - name: app-url
-          value: "$(tasks.prod-deployment.results.app-url)"
+          value: "http://example.com" # TODO: get app URL from deployment
         - name: pipeline-debug
           value: "$(params.pipeline-debug)"
         - name: toolchain-apikey-secret-key
