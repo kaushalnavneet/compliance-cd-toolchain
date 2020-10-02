@@ -59,7 +59,11 @@ spec:
                 set -x
               fi
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
-              echo -n "Promote '$(params.application)' from 'master' to '$(params.target)'" | tee "$(results.pull-request-title.path)"
+              if [ "$(params.application)" == "" ]; then
+                echo -n "Promote applications from 'master' to '$(params.target)'" | tee "$(results.pull-request-title.path)"
+              else
+                echo -n "Promote '$(params.application)' from 'master' to '$(params.target)'" | tee "$(results.pull-request-title.path)"
+              fi
 
     - name: get-inventory-url
       taskRef:
