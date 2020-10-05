@@ -156,7 +156,7 @@ Service Now is used to keep tack of change requests.
 
 #### Link DOI toolchain
 
-CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so that it is able to publish the deployment records to insights. For now, it should be the CI toolchain ID.
+CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so that it is able to publish the deployment records to insights.
 
 | ![DOI Toolchain ID](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/doi-toolchain.png) |
 | :--: |
