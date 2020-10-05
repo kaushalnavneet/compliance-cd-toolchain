@@ -11,7 +11,23 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: preview/servicenow
+    path: stable/task/servicenow-prepare-change-request/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/servicenow-create-change-request/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/servicenow-check-change-request-approval/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/servicenow-change-state-to-implement/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/servicenow-close-change-request/1.0.0
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
