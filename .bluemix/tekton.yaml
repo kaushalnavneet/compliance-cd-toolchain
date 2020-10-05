@@ -61,7 +61,7 @@ inputs:
     service: ${TEKTON_CATALOG_REPO}
     path: preview/compliance-checks
   - type: git
-    branch: v1
+    branch: develop
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
