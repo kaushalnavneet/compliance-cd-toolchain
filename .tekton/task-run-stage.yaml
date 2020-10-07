@@ -50,12 +50,13 @@ spec:
 
         extra_params=$(mktemp)
         cat <<'EOF' > "$extra_params"
+        ---
         $(params.params)
         EOF
 
         while read -ra pair; do
           echo -n "${pair[1]}" > "/config/${pair[0]}"
-        done < <(yq r -j "$extra_params" | jq -r 'to_entries[] | .key + " " + .value')
+        done < <(yq r -j "$extra_params" | jq -r 'select(.) | to_entries[] | .key + " " + .value')
 
     - name: run-stage
       image: $(params.image)
