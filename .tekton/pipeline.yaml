@@ -115,6 +115,8 @@ spec:
           - name: incident-issues-url
           - name: inventory-url
           - name: pipeline-run-id
+          - name: inventory-repo-owner
+          - name: inventory-repo-name
         stepTemplate:
           env:
             - name: PIPELINE_DEBUG
@@ -145,6 +147,11 @@ spec:
               echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
               echo -n "$INVENTORY_URL" | tee "$(results.inventory-url.path)"
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
+
+              IFS='/'
+              read -ra ADDR <<<"$INVENTORY_URL"
+              echo -n "${ADDR[${#ADDR[@]} - 1]}" | tee "$(results.inventory-repo-name.path)"
+              echo -n "${ADDR[${#ADDR[@]} - 2]}" | tee "$(results.inventory-repo-owner.path)"
 
     - name: prod-get-git-credentials
       runAfter:
@@ -529,6 +536,10 @@ spec:
       params:
         - name: repository
           value: $(tasks.prod-inventory-get-repository.results.value)
+        - name: inventory-repo-name
+          value: $(tasks.setup.results.inventory-repo-name)
+        - name: inventory-repo-owner
+          value: $(tasks.setup.results.inventory-repo-owner)
         - name: git-commit-from
           value: $(tasks.prod-inventory-changelog-from.results.value)
         - name: git-commit-to
