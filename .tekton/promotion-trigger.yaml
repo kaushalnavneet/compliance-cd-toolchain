@@ -19,6 +19,26 @@ spec:
       description: dockerconfigjson for pullsecrets
     - name: slack-notifications
       description: toggles slack notifications
+
+    # 'create-promotion-pull-request' parameters for the service now change request ticket
+    - name: priority
+      description: priority of the service now change request
+      default: "Critical | High | Moderate | Low | Planning"
+    - name: assignee
+      description: functional id or an email who will be assigned to the change request in service now
+      default: "_PROVIDE INFORMATION_"
+    - name: description
+      description: additional description in the change request
+      default: "_PROVIDE INFORMATION_"
+    - name: purpose
+      description: the reason of why the change request is needed
+      default: "_PROVIDE INFORMATION_"
+    - name: impact
+      description: explanation what the changes will impact
+      default: "_PROVIDE INFORMATION_"
+    - name: backout-plan
+      description: details how the change will be rolled back in case of a failure
+      default: "Revert to the previous release."
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -66,4 +86,17 @@ spec:
             value: $(params.pipeline-debug)
           - name: slack-notifications
             value: $(params.slack-notifications)
+
+          - name: priority
+            value: $(params.priority)
+          - name: assignee
+            value: $(params.assignee)
+          - name: description
+            value: $(params.description)
+          - name: purpose
+            value: $(params.purpose)
+          - name: impact
+            value: $(params.impact)
+          - name: backout-plan
+            value: $(params.backout-plan)
         serviceAccountName: sa-pullsecret

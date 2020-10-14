@@ -16,6 +16,19 @@ spec:
     - name: slack-notifications
       description: toggles slack notifications
 
+    # 'create-promotion-pull-request' parameters for the service now change request ticket
+    - name: priority
+      description: priority of the service now change request
+    - name: assignee
+      description: functional id or an email who will be assigned to the change request in service now
+    - name: description
+      description: additional description in the change request
+    - name: purpose
+      description: the reason of why the change request is needed
+    - name: impact
+      description: explanation what the changes will impact
+    - name: backout-plan
+      description: details how the change will be rolled back in case of a failure
   workspaces:
     - name: artifacts
 
@@ -187,7 +200,7 @@ spec:
             <!-- Select the priority of this change -->
             <priority>
 
-            Critical | High | Moderate | Low | Planning
+              $(params.priority)
 
             </priority>
 
@@ -197,7 +210,7 @@ spec:
             <!-- Note: This is not the approver of the Change Request -->
             <assignedto>
 
-              _PROVIDE INFORMATION_
+              $(params.assignee)
 
             </assignedto>
 
@@ -207,7 +220,7 @@ spec:
             <!-- and any PR description that was included since the last PR into this branch -->
             <description>
 
-              _PROVIDE INFORMATION_
+              $(params.description)
 
             </description>
 
@@ -215,7 +228,7 @@ spec:
             <!-- Write the reason of why the change is needed -->
             <purpose>
 
-              _PROVIDE INFORMATION_
+              $(params.purpose)
 
             </purpose>
 
@@ -223,7 +236,7 @@ spec:
             <!-- Write down what this Change Implementation will impact -->
             <impact>
 
-              _PROVIDE INFORMATION_
+              $(params.impact)
 
             </impact>
 
@@ -231,7 +244,7 @@ spec:
             <!-- Write some details how the change will be rolled back in case of a failure -->
             <backoutplan>
 
-              Revert to the previous release.
+              $(params.backout-plan)
 
             </backoutplan>
 
