@@ -40,6 +40,15 @@ If your team does not have a HashiCorp Vault set up, you can follow [this docume
 
 Note: _We advise you to use AppRole authentication method as this method can be used to read secret values._
 
+#### Key Protect
+
+Use [Key Protect](https://cloud.ibm.com/catalog/services/key-protect) to securely store and apply secrets like API keys that are part of your toolchain. Literal secret values will be stored, rotation is not yet enabled.
+
+| ![Key Protect](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/key-protect.png) |
+| :--: |
+
+Optionally, users can store their secrets in Key Protect instead of HashiCorp Vault. We advise you to use HashiCorp Vault as it supports secret rotation (storing secrets as references). The Key Protect integration is ideal to store the HashiCorp `Role ID` and `Secret ID`.
+
 #### Repositories
 
 | ![Repositories](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/repositories.png) |
