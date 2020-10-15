@@ -1,0 +1,78 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: normalize-config
+spec:
+  params:
+    - name: working-dir
+    - name: file
+    - name: pipeline-debug
+      description: Use debug mode
+      default: "0"
+  workspaces:
+    - name: app
+  stepTemplate:
+    env:
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+  steps:
+    - name: normalize-config
+      image: ibmcom/pipeline-base-image:2.7
+      script: |
+        #!/usr/bin/env bash
+
+        if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+          set -x
+          trap env EXIT
+        fi
+
+        config_file="$(workspaces.app.path)/$(params.working-dir)/$(params.file)"
+
+        if [ -f "$config_file" ]; then
+          echo "Config found: ${config_file}"
+          exit 0
+        fi
+
+        cat > "$(workspaces.app.path)/$(params.working-dir)/$(params.file)" <<EOF
+        version: '1'
+
+        setup:
+          image: ibmcom/pipeline-base-image:2.7
+          script: |
+            #!/usr/bin/env bash
+            echo "No $(params.file) found, assuming default behavior..."
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+
+            npm ci
+
+        test:
+          image: ibmcom/pipeline-base-image:2.7
+          script: |
+            #!/usr/bin/env bash
+            echo "No $(params.file) found, assuming default behavior..."
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+
+            npm test
+
+        deploy:
+          image: ibmcom/pipeline-base-image:2.6
+          script: |
+            #!/usr/bin/env bash
+            echo "No $(params.file) found, assuming default behavior..."
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+
+            source scripts/setup_deploy.sh
+            source scripts/deploy.sh
+
+        acceptance-test:
+          image: ibmcom/pipeline-base-image:2.7
+          script: |
+            #!/usr/bin/env bash
+            echo "No $(params.file) found, assuming default behavior..."
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+
+            source /root/.nvm/nvm.sh
+            export APP_URL=\$(cat ../app-url)
+            npm run acceptance-test
+        EOF

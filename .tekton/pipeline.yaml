@@ -644,7 +644,25 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-normalize-config
+      runAfter:
+        - prod-clone-repo
+      taskRef:
+        name: normalize-config
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: working-dir
+          value: $(tasks.prod-clone-repo.results.directory-name)
+        - name: file
+          value: $(params.one-pipeline-config)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-deployment-config
+      runAfter:
+        - prod-normalize-config
       taskRef:
         name: parse-config
       workspaces:
