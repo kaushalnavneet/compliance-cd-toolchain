@@ -237,7 +237,7 @@ spec:
 
     - name: notify-pipeline-end
       conditions:
-        - conditionRef: util-is-equal
+        - conditionRef: is-equal
           params:
             - name: left
               value: $(params.slack-notifications)

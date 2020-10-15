@@ -48,7 +48,7 @@ spec:
 
     - name: prod-notify-pipeline-start
       conditions:
-        - conditionRef: util-is-equal
+        - conditionRef: is-equal
           params:
             - name: left
               value: $(params.slack-notifications)
@@ -423,7 +423,7 @@ spec:
       runAfter:
         - prod-evidence-summary-create
       taskRef:
-        name: evidence-format-summary
+        name: evidence-summary-format
       workspaces:
         - name: evidence-locker
           workspace: artifacts
@@ -920,7 +920,7 @@ spec:
       runAfter:
         - prod-change-request-close-get-evidence-summary
       taskRef:
-        name: evidence-format-summary
+        name: evidence-summary-format
       workspaces:
         - name: evidence-locker
           workspace: artifacts
@@ -1052,7 +1052,7 @@ spec:
 
     - name: prod-notify-pipeline-end
       conditions:
-        - conditionRef: util-is-equal
+        - conditionRef: is-equal
           params:
             - name: left
               value: $(params.slack-notifications)

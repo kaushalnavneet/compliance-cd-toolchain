@@ -3,10 +3,6 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: preview/git
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
     path: preview/inventory
   - type: git
     branch: master
@@ -27,23 +23,11 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-close-change-request/1.0.0
+    path: stable/task/servicenow-close-change-request/1.0.1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
     path: preview/iks
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
-    path: preview/toolchain
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
-    path: preview/evidence
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
-    path: preview/util
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -59,7 +43,51 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: preview/compliance-checks
+    path: stable/task/compliance-collector/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/evidence-summarize/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/evidence-summary-format/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/evidence-summary-upload/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/pipeline-evaluate/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/git-clone/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/configmap/retry-command/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/toolchain-extract-value/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/git-get-credentials/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/compliance-doi-reporter/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/github-create-pull-request/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/condition/is-equal/1.0.0
   - type: git
     branch: develop
     service: ${TEKTON_DEFINITION_REPO}
