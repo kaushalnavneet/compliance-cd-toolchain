@@ -23,7 +23,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-close-change-request/1.0.1
+    path: stable/task/servicenow-close-change-request/1.0.2
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -47,7 +47,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/evidence-summarize/1.0.0
+    path: stable/task/evidence-summarize/1.0.1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -59,7 +59,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/pipeline-evaluate/1.0.0
+    path: stable/task/pipeline-evaluate/1.0.1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -83,7 +83,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/github-create-pull-request/1.0.0
+    path: stable/task/github-create-pull-request/1.0.1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
