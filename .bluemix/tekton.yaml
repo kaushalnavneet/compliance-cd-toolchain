@@ -85,6 +85,10 @@ inputs:
     service: ${TEKTON_CATALOG_REPO}
     path: stable/condition/is-equal/1.0.0
   - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/configmap/compliance-helper-scripts/1.0.0
+  - type: git
     branch: develop
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
