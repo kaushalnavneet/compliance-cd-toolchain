@@ -161,4 +161,7 @@ properties:
   - name: cos-bucket-name
     value: ${COS_BUCKET_NAME}
     type: text
+  - name: one-pipeline-config
+    value: .one-pipeline.yaml
+    type: text
 private_worker: ${PRIVATE_WORKER}

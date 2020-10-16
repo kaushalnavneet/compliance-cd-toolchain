@@ -41,6 +41,9 @@ spec:
     - name: cos-endpoint
       description: Endpoint of your Cloud Object Storage instance, used as an Evidence Locker
       default: ""
+    - name: one-pipeline-config
+      description: Configuration file to be used to customize pipeline behavior
+      default: .one-pipeline.yaml
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -106,4 +109,6 @@ spec:
             value: "$(params.cos-bucket-name)"
           - name: cos-endpoint
             value: "$(params.cos-endpoint)"
+          - name: one-pipeline-config
+            value: $(params.one-pipeline-config)
         serviceAccountName: sa-pullsecret
