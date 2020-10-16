@@ -14,6 +14,39 @@ spec:
     - name: params
       description: "Extra parameters (`key: value` pairs)."
       default: ""
+    - name: configmap-0
+      description: "Name of a `ConfigMap` that's going to be mounted."
+      default: 'not-provided-configmap-0'
+    - name: configmap-1
+      description: "Name of a `ConfigMap` that's going to be mounted."
+      default: 'not-provided-configmap-1'
+    - name: configmap-2
+      description: "Name of a `ConfigMap` that's going to be mounted."
+      default: 'not-provided-configmap-2'
+    - name: configmap-3
+      description: "Name of a `ConfigMap` that's going to be mounted."
+      default: 'not-provided-configmap-3'
+    - name: configmap-4
+      description: "Name of a `ConfigMap` that's going to be mounted."
+      default: 'not-provided-configmap-4'
+    - name: secret-0
+      description: "Name of a `Secret` that's goint to be mounted."
+      default: 'not-provided-secret-0'
+    - name: secret-1
+      description: "Name of a `Secret` that's goint to be mounted."
+      default: 'not-provided-secret-1'
+    - name: secret-2
+      description: "Name of a `Secret` that's goint to be mounted."
+      default: 'not-provided-secret-2'
+    - name: secret-3
+      description: "Name of a `Secret` that's goint to be mounted."
+      default: 'not-provided-secret-3'
+    - name: secret-4
+      description: "Name of a `Secret` that's goint to be mounted."
+      default: 'not-provided-secret-4'
+    - name: pipeline-debug
+      description: Use debug mode
+      default: "0"
 
   results:
     - name: exit-code
@@ -25,6 +58,11 @@ spec:
     - name: app
       description: Workspace where the application is checked out.
 
+  stepTemplate:
+    env:
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+
   steps:
     - name: prepare
       image: ibmcom/pipeline-base-image:2.7
@@ -35,10 +73,35 @@ spec:
           mountPath: /config/environment-properties
         - name: secure-properties
           mountPath: /config/secure-properties
+        - name: configmap-0
+          mountPath: /config/$(params.configmap-0)
+        - name: configmap-1
+          mountPath: /config/$(params.configmap-1)
+        - name: configmap-2
+          mountPath: /config/$(params.configmap-2)
+        - name: configmap-3
+          mountPath: /config/$(params.configmap-3)
+        - name: configmap-4
+          mountPath: /config/$(params.configmap-4)
+        - name: secret-0
+          mountPath: /config/$(params.secret-0)
+        - name: secret-1
+          mountPath: /config/$(params.secret-1)
+        - name: secret-2
+          mountPath: /config/$(params.secret-2)
+        - name: secret-3
+          mountPath: /config/$(params.secret-3)
+        - name: secret-4
+          mountPath: /config/$(params.secret-4)
       script: |
         #!/usr/bin/env bash
 
-        set -x
+        set -e
+
+        if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+          set -x
+          trap env EXIT
+        fi
 
         while read file; do
           ln -snf "$file" "/config/$(basename "$file")"
@@ -47,6 +110,46 @@ spec:
         while read file; do
           ln -snf "$file" "/config/$(basename "$file")"
         done < <(find '/config/secure-properties' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.configmap-0)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.configmap-1)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.configmap-2)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.configmap-3)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.configmap-4)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.secret-0)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.secret-1)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.secret-2)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.secret-3)' -type f)
+
+        while read file; do
+          ln -snf "$file" "/config/$(basename "$file")"
+        done < <(find '/config/$(params.secret-4)' -type f)
 
         extra_params=$(mktemp)
         cat <<'EOF' > "$extra_params"
@@ -68,6 +171,26 @@ spec:
           mountPath: /config/environment-properties
         - name: secure-properties
           mountPath: /config/secure-properties
+        - name: configmap-0
+          mountPath: /config/$(params.configmap-0)
+        - name: configmap-1
+          mountPath: /config/$(params.configmap-1)
+        - name: configmap-2
+          mountPath: /config/$(params.configmap-2)
+        - name: configmap-3
+          mountPath: /config/$(params.configmap-3)
+        - name: configmap-4
+          mountPath: /config/$(params.configmap-4)
+        - name: secret-0
+          mountPath: /config/$(params.secret-0)
+        - name: secret-1
+          mountPath: /config/$(params.secret-1)
+        - name: secret-2
+          mountPath: /config/$(params.secret-2)
+        - name: secret-3
+          mountPath: /config/$(params.secret-3)
+        - name: secret-4
+          mountPath: /config/$(params.secret-4)
       env:
         - name: PIPELINE_RUN_NAME
           valueFrom:
@@ -104,8 +227,6 @@ spec:
       script: |
         #!/bin/sh
 
-        set -ex
-
         # run the stage script
         if $(workspaces.app.path)/$(params.script); then
           echo -n $? > $(results.exit-code.path)
@@ -124,3 +245,43 @@ spec:
     - name: secure-properties
       secret:
         secretName: secure-properties
+    - name: configmap-0
+      configMap:
+        name: $(params.configmap-0)
+        optional: true
+    - name: configmap-1
+      configMap:
+        name: $(params.configmap-1)
+        optional: true
+    - name: configmap-2
+      configMap:
+        name: $(params.configmap-2)
+        optional: true
+    - name: configmap-3
+      configMap:
+        name: $(params.configmap-3)
+        optional: true
+    - name: configmap-4
+      configMap:
+        name: $(params.configmap-4)
+        optional: true
+    - name: secret-0
+      secret:
+        secretName: $(params.secret-0)
+        optional: true
+    - name: secret-1
+      secret:
+        secretName: $(params.secret-1)
+        optional: true
+    - name: secret-2
+      secret:
+        secretName: $(params.secret-2)
+        optional: true
+    - name: secret-3
+      secret:
+        secretName: $(params.secret-3)
+        optional: true
+    - name: secret-4
+      secret:
+        secretName: $(params.secret-4)
+        optional: true

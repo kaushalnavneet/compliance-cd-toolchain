@@ -689,6 +689,28 @@ spec:
           value: $(tasks.prod-deployment-config.results.script)
         - name: working-dir
           value: $(tasks.prod-clone-repo.results.directory-name)
+        - name: configmap-0
+          value: $(tasks.prod-deployment-config.results.configmap-0)
+        - name: configmap-1
+          value: $(tasks.prod-deployment-config.results.configmap-1)
+        - name: configmap-2
+          value: $(tasks.prod-deployment-config.results.configmap-2)
+        - name: configmap-3
+          value: $(tasks.prod-deployment-config.results.configmap-3)
+        - name: configmap-4
+          value: $(tasks.prod-deployment-config.results.configmap-4)
+        - name: secret-0
+          value: $(tasks.prod-deployment-config.results.secret-0)
+        - name: secret-1
+          value: $(tasks.prod-deployment-config.results.secret-1)
+        - name: secret-2
+          value: $(tasks.prod-deployment-config.results.secret-2)
+        - name: secret-3
+          value: $(tasks.prod-deployment-config.results.secret-3)
+        - name: secret-4
+          value: $(tasks.prod-deployment-config.results.secret-4)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
         - name: params
           value: |
             image: $(tasks.prod-inventory-get-image.results.value)
@@ -725,6 +747,28 @@ spec:
           value: $(tasks.prod-acceptance-tests-config.results.script)
         - name: working-dir
           value: $(tasks.prod-clone-repo.results.directory-name)
+        - name: configmap-0
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-0)
+        - name: configmap-1
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-1)
+        - name: configmap-2
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-2)
+        - name: configmap-3
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-3)
+        - name: configmap-4
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-4)
+        - name: secret-0
+          value: $(tasks.prod-acceptance-tests-config.results.secret-0)
+        - name: secret-1
+          value: $(tasks.prod-acceptance-tests-config.results.secret-1)
+        - name: secret-2
+          value: $(tasks.prod-acceptance-tests-config.results.secret-2)
+        - name: secret-3
+          value: $(tasks.prod-acceptance-tests-config.results.secret-3)
+        - name: secret-4
+          value: $(tasks.prod-acceptance-tests-config.results.secret-4)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-acceptance-tests-create-doi-data
       runAfter:

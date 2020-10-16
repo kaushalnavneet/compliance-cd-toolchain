@@ -73,6 +73,7 @@ spec:
             echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
 
             source /root/.nvm/nvm.sh
+            npm ci
             export APP_URL=\$(cat ../app-url)
             npm run acceptance-test
         EOF
