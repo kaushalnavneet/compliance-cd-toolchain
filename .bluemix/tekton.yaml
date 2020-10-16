@@ -39,10 +39,6 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: preview/github
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
     path: stable/task/compliance-collector/1.0.0
   - type: git
     branch: master
