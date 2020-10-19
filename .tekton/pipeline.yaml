@@ -1116,3 +1116,39 @@ spec:
               import os
               print("CD Pipeline finished!")
               print("<https://cloud.ibm.com/devops/pipelines/tekton/" + os.getenv("PIPELINE_ID") + "/runs/" + os.getenv("PIPELINE_RUN_ID") + "?env_id=ibm:yp:" + os.getenv("TOOLCHAIN_REGION") + "|See the Pipeline Logs>")
+
+    - name: prod-pipeline-evaluator
+      runAfter:
+        - prod-compliance-close-cr
+      taskRef:
+        name: pipeline-evaluate
+      params:
+        - name: results
+          value: |
+            [
+              {
+                "name": "prod-close-change-request",
+                "expected": "success",
+                "actual": "$(tasks.prod-close-change-request.results.status)"
+              },
+              {
+                "name": "prod-acceptance-tests",
+                "expected": "success",
+                "actual": "$(tasks.prod-acceptance-tests.results.status)"
+              },
+              {
+                "name": "prod-change-request-create",
+                "expected": "success",
+                "actual": "$(tasks.prod-change-request-create.results.status)"
+              },
+              {
+                "name": "prod-change-request-check-approval",
+                "expected": "success",
+                "actual": "$(tasks.prod-change-request-check-approval.results.status)"
+              },
+              {
+                "name": "prod-change-request-change-state-to-implement",
+                "expected": "success",
+                "actual": "$(tasks.prod-change-request-change-state-to-implement.results.status)"
+              }
+            ]
