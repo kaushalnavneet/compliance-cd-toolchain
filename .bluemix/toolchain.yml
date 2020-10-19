@@ -215,8 +215,10 @@ services:
   fortress:
     service_id: security_compliance
     parameters:
-      evidence_repo_name:
-      name:
+      name: compliance
+      evidence_repo_name: '{{form.github_integrated.parameters.evidence-locker-repo}}'
+      trigger_scan: disabled
+      profile: "IBM Cloud Best Practices Controls 1.0"
 
 form:
 
