@@ -5,9 +5,6 @@ metadata:
   name: cd-pipeline
 spec:
   params:
-    - name: revision
-      description: the git repo
-      default: master
     - name: servicenow-api-base-url
       description: The ServiceNow API Base URL you wish to use (test or live)
     - name: servicenow-configuration-item
