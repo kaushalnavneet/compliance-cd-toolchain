@@ -54,7 +54,7 @@ Use [Key Protect](https://cloud.ibm.com/catalog/services/key-protect) to securel
 | ![Key Protect](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/key-protect.png) |
 | :--: |
 
-Optionally, users can store their secrets in Key Protect instead of HashiCorp Vault. We advise you to use HashiCorp Vault as it supports secret rotation (storing secrets as references). The Key Protect integration is ideal to store the HashiCorp `Role ID` and `Secret ID`.
+A Key Protect tool integration is included in this template to securely manage the HashiCorp `Role ID` and `Secret ID` in accordance with the [best practices for vault](https://pages.github.ibm.com/vault-as-a-service/vault/usage/best-practices.html) recommended  by SOS. Ideally these two HashiCorp secrets should be stored in Key Protect as a prerequisite for users creating toolchains. Doing so will protect access to HashiCorp Vault, which is the default secrets repository for most consumers.
 
 #### Repositories
 
