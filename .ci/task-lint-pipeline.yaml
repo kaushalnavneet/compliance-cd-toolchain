@@ -1,0 +1,37 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: lint-pipeline
+spec:
+  workspaces:
+    - name: artifacts
+  params:
+    - name: pipeline-debug
+      default: "0"
+  results:
+    - name: exit-code
+    - name: status
+  steps:
+    - name: lint-pipeline
+      image: ibmcom/pipeline-base-image:2.9
+      env:
+        - name: PIPELINE_DEBUG
+          value: $(params.pipeline-debug)
+      script: |
+        #!/usr/bin/env bash
+
+        npm i -g tekton-lint
+        set -x
+        export COMMON_TEKTON_TASKS_DIR="$(workspaces.artifacts.path)/common-tekton-tasks"
+        export COMPLIANCE_CD_TOOLCHAIN_DIR="$(workspaces.artifacts.path)/compliance-cd-toolchain"
+
+        cd "$COMPLIANCE_CD_TOOLCHAIN_DIR"
+
+        if scripts/check.sh; then
+          echo -n $? > "$(results.exit-code.path)"
+          echo -n success > "$(results.status.path)"
+        else
+          echo -n $? > "$(results.exit-code.path)"
+          echo -n failure > "$(results.status.path)"
+        fi
