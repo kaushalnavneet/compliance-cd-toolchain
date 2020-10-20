@@ -5,8 +5,6 @@ metadata:
   name: cd-template
 spec:
   params:
-    - name: revision
-      description: the branch for the git repo
     - name: cluster
       description: The IBM Cloud Kubernetes cluster name
     - name: cluster-region
@@ -81,8 +79,6 @@ spec:
             persistentVolumeClaim:
               claimName: pipelinerun-$(uid)-pvc
         params:
-          - name: revision
-            value: $(params.revision)
           - name: servicenow-api-base-url
             value: $(params.servicenow-api-base-url)
           - name: servicenow-configuration-item
