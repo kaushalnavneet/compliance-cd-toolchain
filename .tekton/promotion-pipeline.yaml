@@ -249,13 +249,10 @@ spec:
             </backoutplan>
 
     - name: notify-pipeline-end
-      conditions:
-        - conditionRef: is-equal
-          params:
-            - name: left
-              value: $(params.slack-notifications)
-            - name: right
-              value: "1"
+      when:
+        - input: $(params.slack-notifications)
+          operator: in
+          values: ["1"]
       taskRef:
         name: slack-post-message
       runAfter:
