@@ -209,8 +209,6 @@ spec:
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
@@ -222,8 +220,8 @@ spec:
           value: artifact
         - name: target
           value: prod_candidate
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.prod-clone-inventory-repo.results.git-url)
 
     - name: prod-parse-image-name
       runAfter:
@@ -279,8 +277,6 @@ spec:
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
@@ -292,8 +288,8 @@ spec:
           value: repository_url
         - name: target
           value: prod_candidate
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.prod-clone-inventory-repo.results.git-url)
 
     - name: prod-inventory-get-commit
       taskRef:
@@ -301,8 +297,6 @@ spec:
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
@@ -314,8 +308,8 @@ spec:
           value: commit_sha
         - name: target
           value: prod_candidate
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.prod-clone-inventory-repo.results.git-url)
 
     - name: prod-clone-repo
       taskRef:
@@ -359,8 +353,6 @@ spec:
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
@@ -370,8 +362,8 @@ spec:
           value: "pipeline_run_id"
         - name: target
           value: "prod_candidate"
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.prod-clone-inventory-repo.results.git-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -381,8 +373,6 @@ spec:
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
@@ -392,8 +382,8 @@ spec:
           value: "build_number"
         - name: target
           value: "prod_candidate"
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.prod-clone-inventory-repo.results.git-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -470,8 +460,6 @@ spec:
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
@@ -483,8 +471,8 @@ spec:
           value: commit_sha
         - name: target
           value: prod
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.prod-clone-inventory-repo.results.git-url)
         - name: allow-default-value
           value: "true"
         - name: default-value
@@ -496,8 +484,6 @@ spec:
       runAfter:
         - prod-clone-inventory-repo
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
@@ -509,8 +495,8 @@ spec:
           value: commit_sha
         - name: target
           value: prod_candidate
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.prod-clone-inventory-repo.results.git-url)
 
     - name: prod-change-request-prepare
       taskRef:
