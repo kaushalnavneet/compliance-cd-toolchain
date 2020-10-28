@@ -562,12 +562,8 @@ spec:
           value: $(params.cluster-region)
         - name: cluster-namespace
           value: $(params.cluster-namespace)
-        - name: inventory-name
-          value: $(params.application)
-        - name: inventory-target
-          value: prod_candidate
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: deployment-bom-path
+          value: $(tasks.prod-inventory-deployment-bom.results.deployment-bom-path)
         - name: emergency-label
           value: $(params.emergency-label)
         - name: change-request-id
