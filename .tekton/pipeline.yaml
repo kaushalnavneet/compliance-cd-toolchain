@@ -983,6 +983,12 @@ spec:
         - name: evidence-locker
           workspace: artifacts
       params:
+        - name: cos-bucket-name
+          value: "$(params.cos-bucket-name)"
+        - name: cos-endpoint
+          value: "$(params.cos-endpoint)"
+        - name: toolchain-apikey-secret-key
+          value: "ibmcloud-api-key"
         - name: evidence-repo-path
           value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
         - name: evidence-summary-path

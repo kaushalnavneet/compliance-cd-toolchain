@@ -47,7 +47,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/evidence-summary-upload/1.0.0
+    path: stable/task/evidence-summary-upload/2.0.0
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
