@@ -566,6 +566,8 @@ spec:
         - name: artifacts
           workspace: artifacts
       params:
+        - name: change-request-id
+          value: $(params.change-request-id)
         - name: cr-json-path
           value: $(tasks.prod-change-request-prepare.results.change-request-json-path)
         - name: change-request-url
