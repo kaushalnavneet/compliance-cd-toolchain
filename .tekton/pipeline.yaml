@@ -163,6 +163,28 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-inventory-deployment-bom
+      runAfter:
+        - prod-get-git-credentials
+      taskRef:
+        name: inventory-deployment-bom
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: application-name
+          value: $(params.application)
+        - name: target-environment
+          value: prod_candidate
+        - name: inventory-repo-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-clone-evidence-repo
       taskRef:
         name: git-clone
