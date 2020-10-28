@@ -3,10 +3,6 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: preview/inventory
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
     path: stable/task/servicenow-prepare-change-request/2.0.2
   - type: git
     branch: master
@@ -84,6 +80,18 @@ inputs:
     branch: master
     service: ${TEKTON_CATALOG_REPO}
     path: stable/configmap/compliance-helper-scripts/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/inventory-get/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/inventory-cr-add/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/inventory-apply/1.0.0
   - type: git
     branch: develop
     service: ${TEKTON_DEFINITION_REPO}
