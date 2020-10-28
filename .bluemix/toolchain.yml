@@ -162,7 +162,6 @@ services:
           SERVICENOW_TOKEN: '{{form.customtool_servicenow.parameters.api-token}}'
           SERVICENOW_BASE_URL: '{{form.customtool_servicenow.parameters.api-url}}'
           SERVICENOW_CONFIGURATION_ITEM: '{{form.customtool_servicenow.parameters.configuration-item}}'
-          CHANGEREQUEST_ID: '{{form.customtool_servicenow.parameters.changerequest-id}}'
           INVENTORY_REPO: inventory-repo
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
@@ -230,7 +229,6 @@ form:
   customtool_servicenow:
     parameters:
       api-url: https://watsontest.service-now.com
-      changerequest-id: notAvailable
       api-token:
       configuration-item:
     schema:

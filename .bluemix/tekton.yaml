@@ -142,7 +142,7 @@ properties:
     value: ${EMERGENCY_LABEL}
     type: text
   - name: change-request-id
-    value: ${CHANGEREQUEST_ID}
+    value: notAvailable
     type: text
   - name: artifactory-dockerconfigjson
     value: ${ARTIFACTORY_DOCKER_CONFIG_JSON}

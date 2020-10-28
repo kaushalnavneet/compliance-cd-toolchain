@@ -28,13 +28,6 @@
       "type": "string",
       "pattern": "\\S"
     },
-    "changerequest-id": {
-      "description": {
-        "$ref": "#/messages/servicenow.initialCrDescription"
-      },
-      "type": "string",
-      "pattern": "\\S"
-    },
     "configuration-item": {
       "description": {
         "$ref": "#/messages/servicenow.configurationItemDescription"
@@ -45,7 +38,6 @@
   },
   "required": [
     "api-token",
-    "changerequest-id",
     "configuration-item"
   ],
   "form": [
@@ -88,27 +80,6 @@
         "$ref": "#/messages/servicenow.configurationItemTitle"
       },
       "key": "configuration-item",
-      "type": "text",
-      "readonly": false
-    },
-    {
-      "type": "table",
-      "columnCount": 1,
-      "widths": ["100%"],
-      "items": [
-        {
-          "type": "label",
-          "title": {
-            "$ref": "#/messages/servicenow.initialCrHelp"
-          }
-        }
-      ]
-    },
-    {
-      "title": {
-        "$ref": "#/messages/servicenow.initialCrTitle"
-      },
-      "key": "changerequest-id",
       "type": "text",
       "readonly": false
     },
