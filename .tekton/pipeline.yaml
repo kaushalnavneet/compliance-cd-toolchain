@@ -853,6 +853,8 @@ spec:
           value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
         - name: evidence-repo-url
           value: $(tasks.setup.results.evidence-locker-url)
+        - name: application-repo-url
+          value: $(tasks.prod-inventory-get-repository.results.value)
         - name: commit-hash
           value: $(tasks.prod-inventory-get-commit.results.value)
         - name: toolchain-crn
@@ -865,8 +867,6 @@ spec:
           value: $(params.pipeline-debug)
         - name: toolchain-apikey-secret-key
           value: "ibmcloud-api-key"
-        - name: skip-pipeline-logs
-          value: "1"
         - name: data
           value: |
             [
@@ -1058,48 +1058,6 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: prod-compliance-close-cr
-      taskRef:
-        name: compliance-collector
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: namespace
-          value: cd
-        - name: incident-issue-repo
-          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
-        - name: evidence-repo-url
-          value: $(tasks.setup.results.evidence-locker-url)
-        - name: commit-hash
-          value: $(tasks.prod-inventory-get-commit.results.value)
-        - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
-        - name: cos-bucket-name
-          value: "$(params.cos-bucket-name)"
-        - name: cos-endpoint
-          value: "$(params.cos-endpoint)"
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: toolchain-apikey-secret-key
-          value: "ibmcloud-api-key"
-        - name: data
-          value: |
-            [
-              {
-                "name": "close-change-request",
-                "step": "",
-                "evidence_type": "com.ibm.close_change_request",
-                "evidence_type_version": "1.0.0",
-                "expected": "success",
-                "actual": "$(tasks.prod-close-change-request.results.status)",
-                "artifacts": [
-                ]
-              }
-            ]
-
     - name: prod-notify-pipeline-end
       when:
         - input: "$(params.slack-notifications)"
@@ -1122,7 +1080,7 @@ spec:
 
     - name: prod-pipeline-evaluator
       runAfter:
-        - prod-compliance-close-cr
+        - prod-close-change-request
       taskRef:
         name: pipeline-evaluate
       params:
