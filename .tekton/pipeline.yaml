@@ -463,6 +463,8 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: evidence-repo-path
           value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
@@ -470,6 +472,8 @@ spec:
           value: ci/$(tasks.prod-inventory-get-evidence-path.results.value)
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.prod-extract-evidence-locker-url.results.extracted-value)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -1025,6 +1029,8 @@ spec:
       workspaces:
         - name: evidence-locker
           workspace: artifacts
+        - name: secrets
+          workspace: artifacts
       params:
         - name: evidence-repo-path
           value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
@@ -1035,6 +1041,8 @@ spec:
             cd/$(tasks.setup.results.pipeline-run-id)
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+        - name: evidence-repo-url
+          value: $(tasks.prod-extract-evidence-locker-url.results.extracted-value)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
