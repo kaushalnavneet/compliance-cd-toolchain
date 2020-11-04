@@ -7,12 +7,12 @@ spec:
   params:
     - name: application
       description: name of the deployed app or service
-    - name: source
+    - name: source-environment
       description: promotion source, this can be overridden (defaults to master)
       default: "master"
-    - name: target
-      description: promotion target, this can be overridden (defaults to prod_candidate)
-      default: "prod_candidate"
+    - name: target-environment
+      description: promotion target, this can be overridden (defaults to prod)
+      default: "prod"
     - name: pipeline-debug
       description: toggles debug mode for the pipeline
     - name: artifactory-dockerconfigjson
@@ -78,10 +78,10 @@ spec:
         params:
           - name: application
             value: $(params.application)
-          - name: source
-            value: $(params.source)
-          - name: target
-            value: $(params.target)
+          - name: source-environment
+            value: $(params.source-environment)
+          - name: target-environment
+            value: $(params.target-environment)
           - name: pipeline-debug
             value: $(params.pipeline-debug)
           - name: slack-notifications

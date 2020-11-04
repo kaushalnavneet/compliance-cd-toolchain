@@ -58,12 +58,14 @@ spec:
             export PATH="$(pwd)/inventory-script:$PATH"
           }
 
+          TARGET=$(params.target)_candidate
+
           inventory_promote() {
             cd /artifacts/$INVENTORY_FOLDER
             if [ "$(params.app-name)" == "" ]; then
               for app_name in *; do
                 if [[ "$app_name" != *.md ]]; then
-                inventory promote "$app_name" "$(params.source)" "$(params.target)" "$(params.branch)"
+                inventory promote "$app_name" "$(params.source)" "$TARGET" "$(params.branch)"
                 fi
               done
             else
@@ -71,7 +73,7 @@ spec:
               read -ra app_names <<< "$(params.app-name)"
               for app_name in "${app_names[@]}"; do
                 app_name="$(echo $app_name | sed -e 's/^[[:space:]]*//')"
-                inventory promote "$app_name" "$(params.source)" "$(params.target)" "$(params.branch)"
+                inventory promote "$app_name" "$(params.source)" "$TARGET" "$(params.branch)"
               done
             fi
           }

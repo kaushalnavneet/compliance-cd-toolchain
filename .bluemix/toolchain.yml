@@ -165,6 +165,8 @@ services:
           INVENTORY_REPO: inventory-repo
           # GH Label used on issues and PRs to indicate an emergency change
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
+          SOURCE_ENVIRONMENT: '{{form.pipeline.parameters.source-environment}}'
+          TARGET_ENVIRONMENT: '{{form.pipeline.parameters.target-environment}}'
           ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
           # Private Worker for the pipeline
           PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
@@ -223,6 +225,8 @@ form:
       prod-cluster-namespace: default
       build-cluster-namespace: staging
       emergency-label: EMERGENCY
+      source-environment: master
+      target-environment: prod
     schema:
       $ref: deploy.json
 

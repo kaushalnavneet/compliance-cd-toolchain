@@ -83,6 +83,20 @@
         "type":"string",
         "pattern":"\\S"
      },
+     "source-environment":{
+        "description":{
+           "$ref":"#/messages/deploy.sourceEnvironmentDescription"
+        },
+        "type":"string",
+        "pattern":"\\S"
+     },
+     "target-environment":{
+        "description":{
+           "$ref":"#/messages/deploy.targetEnvironmentDescription"
+        },
+        "type":"string",
+        "pattern":"\\S"
+     },
      "emergency-label":{
         "description":{
            "$ref":"#/messages/deploy.emergencyLabel"
@@ -98,7 +112,9 @@
      "prod-resource-group",
      "prod-cluster-name",
      "prod-cluster-namespace",
-     "emergency-label"
+     "emergency-label",
+     "source-environment",
+     "target-environment"
   ],
   "form":[
      {
@@ -202,6 +218,24 @@
               "readonly":false
            }
         ]
+     },
+     {
+        "title":{
+           "$ref":"#/messages/deploy.sourceEnvironment"
+        },
+        "key":"source-environment",
+        "type":"text",
+        "readonly":false,
+        "value":"master"
+     },
+     {
+        "title":{
+           "$ref":"#/messages/deploy.targetEnvironment"
+        },
+        "key":"target-environment",
+        "type":"text",
+        "readonly":false,
+        "value":"prod"
      },
      {
         "title":{

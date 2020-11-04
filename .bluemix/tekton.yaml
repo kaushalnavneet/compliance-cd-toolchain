@@ -75,7 +75,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/github-create-pull-request/1.0.1
+    path: stable/task/github-create-pull-request/2.0.0
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -91,7 +91,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-apply/1.0.0
+    path: stable/task/inventory-apply/2.0.0
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -104,7 +104,7 @@ triggers:
   - type: git
     name: Git CD Trigger
     service: ${INVENTORY_REPO}
-    branch: prod_candidate
+    pattern: "*_candidate"
     events:
       push: true
     eventListener: cd-listener
@@ -144,6 +144,12 @@ properties:
     type: text
   - name: emergency-label
     value: ${EMERGENCY_LABEL}
+    type: text
+  - name: source-environment
+    value: ${SOURCE_ENVIRONMENT}
+    type: text
+  - name: target-environment
+    value: ${TARGET_ENVIRONMENT}
     type: text
   - name: change-request-id
     value: notAvailable

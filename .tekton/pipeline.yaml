@@ -37,6 +37,8 @@ spec:
     - name: one-pipeline-config
       description: Configuration file to be used to customize pipeline behavior
       default: .one-pipeline.yaml
+    - name: target-environment
+      description: target environment
 
   workspaces:
     - name: artifacts
@@ -98,12 +100,15 @@ spec:
           value: $(params.pipeline-debug)
         - name: inventory-url
           value: $(tasks.prod-extract-inventory-url.results.extracted-value)
+        - name: target-environment
+          value: $(params.target-environment)
       taskSpec:
         params:
           - name: evidence-locker-url
           - name: incident-issues-url
           - name: inventory-url
           - name: pipeline-debug
+          - name: target-environment
         results:
           - name: evidence-locker-url
           - name: incident-issues-url
@@ -111,6 +116,7 @@ spec:
           - name: pipeline-run-id
           - name: inventory-repo-owner
           - name: inventory-repo-name
+          - name: target-environment
         stepTemplate:
           env:
             - name: PIPELINE_DEBUG
@@ -137,10 +143,13 @@ spec:
               EVIDENCE_URL=$(echo -n "$(params.evidence-locker-url)" | sed 's:/*$::')
               INCIDENT_ISSUES_URL=$(echo -n "$(params.incident-issues-url)" | sed 's:/*$::')
               INVENTORY_URL=$(echo -n "$(params.inventory-url)" | sed 's:/*$::')
+              TARGET=$(echo -n "$(params.target-environment)" | sed 's:.*/::' )
+
               echo -n "$EVIDENCE_URL" | tee "$(results.evidence-locker-url.path)"
               echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
               echo -n "$INVENTORY_URL" | tee "$(results.inventory-url.path)"
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
+              echo -n "$TARGET" | tee "$(results.target-environment.path)"
 
               IFS='/'
               read -ra ADDR <<<"$INVENTORY_URL"
@@ -177,7 +186,7 @@ spec:
         - name: application-name
           value: $(params.application)
         - name: target-environment
-          value: prod_candidate
+          value: $(tasks.setup.results.target-environment)
         - name: inventory-repo-url
           value: $(tasks.setup.results.inventory-url)
         - name: evidence-repo-url
@@ -1013,6 +1022,8 @@ spec:
           value: $(params.pipeline-debug)
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: target-environment
+          value: $(tasks.setup.results.target-environment)
 
     - name: prod-close-change-request
       taskRef:

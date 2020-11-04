@@ -7,9 +7,9 @@ spec:
   params:
     - name: application
       description: the name of the application that's going to be promoted (defaults to the application name)
-    - name: source
+    - name: source-environment
       description: promotion source
-    - name: target
+    - name: target-environment
       description: promotion target
     - name: pipeline-debug
       description: toggles debug mode for the pipeline
@@ -38,14 +38,17 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: target
-          value: $(params.target)
+          value: $(params.target-environment)
         - name: application
           value: $(params.application)
+        - name: source
+          value: $(params.source-environment)
       taskSpec:
         params:
           - name: pipeline-debug
           - name: target
           - name: application
+          - name: source
         results:
           - name: inventory-owner
           - name: inventory-name
@@ -72,10 +75,11 @@ spec:
                 set -x
               fi
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
+              TARGET=$(params.target)_candidate
               if [ "$(params.application)" == "" ]; then
-                echo -n "Promote applications from 'master' to '$(params.target)'" | tee "$(results.pull-request-title.path)"
+                echo -n "Promote applications from '$(params.source)' to '$TARGET'" | tee "$(results.pull-request-title.path)"
               else
-                echo -n "Promote '$(params.application)' from 'master' to '$(params.target)'" | tee "$(results.pull-request-title.path)"
+                echo -n "Promote '$(params.application)' from '$(params.source)' to '$TARGET'" | tee "$(results.pull-request-title.path)"
               fi
 
     - name: get-inventory-url
@@ -164,9 +168,9 @@ spec:
         - name: app-name
           value: $(params.application)
         - name: source
-          value: $(params.source)
+          value: $(params.source-environment)
         - name: target
-          value: $(params.target)
+          value: $(params.target-environment)
         - name: branch
           value: $(tasks.setup-variables.results.pipeline-run-id)
         - name: pipeline-debug
@@ -189,7 +193,7 @@ spec:
         - name: head
           value: $(tasks.setup-variables.results.pipeline-run-id)
         - name: base
-          value: $(params.target)
+          value: $(params.target-environment)
         - name: title
           value: $(tasks.setup-variables.results.pull-request-title)
         - name: body
