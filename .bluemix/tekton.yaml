@@ -139,9 +139,6 @@ properties:
   - name: servicenow-configuration-item
     value: ${SERVICENOW_CONFIGURATION_ITEM}
     type: text
-  - name: application
-    value: ${APP_NAME}
-    type: text
   - name: emergency-label
     value: ${EMERGENCY_LABEL}
     type: text

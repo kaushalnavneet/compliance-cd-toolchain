@@ -17,8 +17,6 @@ spec:
       description: iks cluster namespace
     - name: doi-toolchain-id
       description: toolchain ID
-    - name: application
-      description: application name
     - name: emergency-label
       description: emergency label for change request generation
     - name: change-request-id

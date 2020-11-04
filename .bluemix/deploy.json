@@ -76,13 +76,6 @@
         "type":"string",
         "pattern":"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
      },
-     "app-name":{
-        "description":{
-           "$ref":"#/messages/deploy.appDescription"
-        },
-        "type":"string",
-        "pattern":"\\S"
-     },
      "source-environment":{
         "description":{
            "$ref":"#/messages/deploy.sourceEnvironmentDescription"
@@ -106,7 +99,6 @@
      }
   },
   "required":[
-     "app-name",
      "api-key",
      "prod-region",
      "prod-resource-group",
@@ -120,14 +112,6 @@
      {
         "type":"validator",
         "url":"/devops/validator/validator-v1.html"
-     },
-     {
-        "type":"text",
-        "readonly":false,
-        "title":{
-           "$ref":"#/messages/deploy.appName"
-        },
-        "key":"app-name"
      },
      {
         "type":"password",

@@ -157,7 +157,6 @@ services:
         content:
           $text: tekton.yaml
         env:
-          APP_NAME: '{{form.pipeline.parameters.app-name}}'
           # repo for Tekton definitions and catalog
           TEKTON_DEFINITION_REPO: tekton-definition-repo
           TEKTON_CATALOG_REPO: tekton-catalog-repo
@@ -232,7 +231,6 @@ form:
 
   pipeline:
     parameters:
-      app-name: hello-compliance-app
       prod-cluster-namespace: default
       build-cluster-namespace: staging
       emergency-label: EMERGENCY
