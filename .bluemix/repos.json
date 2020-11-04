@@ -34,12 +34,20 @@
             },
             "type": "string",
             "pattern": "\\S"
+        },
+        "one-pipeline-repo": {
+            "description": {
+                "$ref": "#/messages/repos.onePipelineRepoDescription"
+            },
+            "type": "string",
+            "pattern": "\\S"
         }
     },
     "required": [
         "incident-issues-repo",
         "evidence-locker-repo",
-        "inventory-repo"
+        "inventory-repo",
+        "one-pipeline-repo"
     ],
     "form": [
         {
@@ -50,8 +58,8 @@
             "type": "table",
             "columnCount": 2,
             "widths": [
-                "22%",
-                "78%"
+                "30%",
+                "70%"
             ],
             "items": [
                 {
@@ -93,6 +101,20 @@
                         "$ref": "#/messages/repos.inventoryRepoPlaceholder"
                     },
                     "key": "inventory-repo",
+                    "type": "text",
+                    "readonly": false
+                },
+                {
+                    "type": "label",
+                    "title": {
+                        "$ref": "#/messages/repos.onePipelineRepoTitle"
+                    }
+                },
+                {
+                    "title": {
+                        "$ref": "#/messages/repos.onePipelineRepoPlaceholder"
+                    },
+                    "key": "one-pipeline-repo",
                     "type": "text",
                     "readonly": false
                 }

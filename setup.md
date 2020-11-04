@@ -79,15 +79,9 @@ A Key Protect tool integration is included in this template to securely manage t
     If you used the <https://github.ibm.com/one-pipeline/compliance-ci-toolchain> template to set up your CI process, check out your CI toolchain and copy the names of the repositories used there.
     If you set up your CI toolchain from scratch, you will still need to add these repositories there, and use the same ones here.
 
-    - **Application repo URL:** The application to be deployed.
-        Default: `""`
-        E.g.: <https://github.ibm.com/myorg/my-compliance-app>
-
     - **Incident issues repo URL:** Issues about incidents that happen during the build and deployment process are stored here.
         Default: `""`
         E.g.: <https://github.ibm.com/myorg/my-compliance-ci-issues>
-
-        Note: This is WIP, cd pipeline currently does not use this repo yet.
 
     - **Evidence locker repo URL:** All raw compliance evidence that belongs to the application is collected here.
         Default: `""`
@@ -96,6 +90,8 @@ A Key Protect tool integration is included in this template to securely manage t
     - **Inventory repo URL:** Change management is tracked in this repository. CD pipeline creates a new branch named as the created CR number, and merges it to master after deplyment is concluded.
         Default: `""`
         E.g.: <https://github.ibm.com/myorg/my-compliance-ci-inventory>
+
+    - **One-Pipeline Configuration repo URL:** The custom scripts used in the CD Pipeline (`.one-pipeline.yaml`) should come from this repository.
 
 
 #### Delivery Pipeline

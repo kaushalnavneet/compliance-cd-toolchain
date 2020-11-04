@@ -90,6 +90,15 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-extract-one-pipeline-config-url
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: '.services[] | select(.toolchain_binding.name=="one-pipeline-repo") | .dashboard_url'
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: setup
       params:
         - name: evidence-locker-url
@@ -102,17 +111,21 @@ spec:
           value: $(tasks.prod-extract-inventory-url.results.extracted-value)
         - name: target-environment
           value: $(params.target-environment)
+        - name: one-pipeline-config-url
+          value: $(tasks.prod-extract-one-pipeline-config-url.results.extracted-value)
       taskSpec:
         params:
           - name: evidence-locker-url
           - name: incident-issues-url
           - name: inventory-url
+          - name: one-pipeline-config-url
           - name: pipeline-debug
           - name: target-environment
         results:
           - name: evidence-locker-url
           - name: incident-issues-url
           - name: inventory-url
+          - name: one-pipeline-config-url
           - name: pipeline-run-id
           - name: inventory-repo-owner
           - name: inventory-repo-name
@@ -144,10 +157,12 @@ spec:
               INCIDENT_ISSUES_URL=$(echo -n "$(params.incident-issues-url)" | sed 's:/*$::')
               INVENTORY_URL=$(echo -n "$(params.inventory-url)" | sed 's:/*$::')
               TARGET=$(echo -n "$(params.target-environment)" | sed 's:.*/::' )
+              ONE_PIPELINE_CONFIG_URL=$(echo -n "$(params.one-pipeline-config-url)" | sed 's:/*$::')
 
               echo -n "$EVIDENCE_URL" | tee "$(results.evidence-locker-url.path)"
               echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
               echo -n "$INVENTORY_URL" | tee "$(results.inventory-url.path)"
+              echo -n "$ONE_PIPELINE_CONFIG_URL" | tee "$(results.one-pipeline-config-url.path)"
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
               echo -n "$TARGET" | tee "$(results.target-environment.path)"
 
@@ -229,6 +244,28 @@ spec:
           value: $(tasks.setup.results.inventory-url)
         - name: branch
           value: "master"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: git-user
+          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
+
+    - name: prod-clone-one-pipeline-config-repo
+      taskRef:
+        name: git-clone
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: repository
+          value: $(tasks.setup.results.one-pipeline-config-url)
+        - name: branch
+          value: "master"
+        - name: directory-name
+          value: "one-pipeline-config-repo"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: git-user
@@ -341,24 +378,6 @@ spec:
           value: prod_candidate
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
-
-    - name: prod-clone-repo
-      taskRef:
-        name: git-clone
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: repository
-          value: $(tasks.prod-inventory-get-repository.results.value)
-        - name: revision
-          value: $(tasks.prod-inventory-get-commit.results.value)
-        - name: git-user
-          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
 
     - name: prod-get-evidence-locker-path
       taskRef:
@@ -655,7 +674,7 @@ spec:
 
     - name: prod-normalize-config
       runAfter:
-        - prod-clone-repo
+        - prod-clone-one-pipeline-config-repo
       taskRef:
         name: normalize-config
       workspaces:
@@ -663,7 +682,7 @@ spec:
           workspace: artifacts
       params:
         - name: working-dir
-          value: $(tasks.prod-clone-repo.results.directory-name)
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
         - name: file
           value: $(params.one-pipeline-config)
         - name: pipeline-debug
@@ -681,7 +700,7 @@ spec:
         - name: stage
           value: deploy
         - name: file
-          value: $(tasks.prod-clone-repo.results.directory-name)/$(params.one-pipeline-config)
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)/$(params.one-pipeline-config)
 
     - name: prod-deployment
       taskRef:
@@ -697,7 +716,7 @@ spec:
         - name: script
           value: $(tasks.prod-deployment-config.results.script)
         - name: working-dir
-          value: $(tasks.prod-clone-repo.results.directory-name)
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
         - name: configmap-0
           value: $(tasks.prod-deployment-config.results.configmap-0)
         - name: configmap-1
@@ -739,7 +758,7 @@ spec:
         - name: stage
           value: acceptance-test
         - name: file
-          value: $(tasks.prod-clone-repo.results.directory-name)/$(params.one-pipeline-config)
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)/$(params.one-pipeline-config)
 
     - name: prod-acceptance-tests
       runAfter:
@@ -755,7 +774,7 @@ spec:
         - name: script
           value: $(tasks.prod-acceptance-tests-config.results.script)
         - name: working-dir
-          value: $(tasks.prod-clone-repo.results.directory-name)
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
         - name: configmap-0
           value: $(tasks.prod-acceptance-tests-config.results.configmap-0)
         - name: configmap-1

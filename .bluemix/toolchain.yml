@@ -16,6 +16,7 @@ template:
     - incident-issues-repo
     - evidence-locker-repo
     - inventory-repo
+    - one-pipeline-repo
     - servicenow
     - artifactoryComp
     - privateWorker
@@ -129,6 +130,15 @@ services:
       enable_traceability: false
       legal: true
 
+  one-pipeline-repo:
+    service_id: github_integrated
+    parameters:
+      repo_url: '{{form.github_integrated.parameters.one-pipeline-repo}}'
+      type: link
+      has_issues: false
+      enable_traceability: false
+      legal: true
+
   build:
     service_id: pipeline
     parameters:
@@ -216,6 +226,7 @@ form:
       incident-issues-repo:
       evidence-locker-repo:
       inventory-repo:
+      one-pipeline-repo:
     schema:
       $ref: repos.json
 
