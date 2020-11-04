@@ -1,0 +1,105 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: get-deployment-delta
+spec:
+  params:
+    - name: target-environment
+    - name: inventory-folder
+      description: directory name where the inventory located
+    - name: git-api-token-key
+      default: "git-token"
+    - name: pipeline-debug
+      default: "0"
+
+  workspaces:
+    - name: artifacts
+      mountPath: /artifacts
+    - name: secrets
+      mountPath: /secrets
+
+  results:
+    - name: deployment-delta-list-path
+    - name: inventory-entries-list-path
+
+  stepTemplate:
+    env:
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+
+  steps:
+    - name: calculate
+      image: ibmcom/pipeline-base-image:2.9
+      workingDir: $(workspaces.artifacts.path)
+      script: |
+        #!/bin/bash
+
+        if [ $PIPELINE_DEBUG = 1 ]; then
+          pwd
+          env
+          trap env EXIT
+          set -x
+        fi
+
+        list_entries () {
+          git checkout $1 > /dev/null
+          for app_name in *; do
+            if [[ "$app_name" != *.md ]]; then
+              echo "$app_name"
+            fi
+          done
+        }
+
+        GIT_TOKEN=$(cat "/secrets/$(params.git-api-token-key)")
+
+        git config --global user.email "tekton@example.com"
+        git config --global user.name "Tekton"
+
+        git clone https://"$GIT_TOKEN"@github.ibm.com/cocoa/inventory-script.git
+        export PATH="$(pwd)/inventory-script:$PATH"
+
+        cd /artifacts/"$(params.inventory-folder)"
+
+        TARGET_ENVIRONMENT="$(params.target-environment)"
+        TARGET_CANDIDATE="${TARGET_ENVIRONMENT}_candidate"
+
+        DELTA="$(inventory diff $TARGET_ENVIRONMENT $TARGET_CANDIDATE)"
+        ENTRIES=$(list_entries $TARGET_CANDIDATE)
+
+        cd $(workspaces.artifacts.path)
+
+        echo "Inventory entries: "
+        echo ""
+        echo $ENTRIES
+
+        echo ""
+
+        echo "Changed entries in inventory since last deployment:"
+        echo ""
+        echo $DELTA
+
+        delta_json="[]"
+        IFS=' ' read -ra delta_entries <<< "$DELTA"
+        for i in "${delta_entries[@]}"
+        do
+          delta_json=$(echo "$delta_json" | jq -c --arg element "$i" '. + [$element]')
+        done
+
+        echo -n "$delta_json" > "./deployment-delta-list.json"
+
+        cat ./deployment-delta-list.json
+
+        entries_json="[]"
+        IFS=' ' read -ra inventory_entries <<< "$ENTRIES"
+        for i in "${inventory_entries[@]}"
+        do
+          entries_json=$(echo "$entries_json" | jq -c --arg element "$i" '. + [$element]')
+        done
+
+        echo -n "$entries_json" > "./inventory-entries-list.json"
+
+        cat ./inventory-entries-list.json
+
+        echo -n "deployment-delta-list.json" > $(results.deployment-delta-list-path.path)
+        echo -n "inventory-entries-list.json" > $(results.inventory-entries-list-path.path)

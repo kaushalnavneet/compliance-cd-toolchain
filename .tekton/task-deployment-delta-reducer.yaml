@@ -1,0 +1,41 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deployment-delta-reducer
+spec:
+  workspaces:
+    - name: artifacts
+      mountPath: /artifacts
+
+  params:
+    - name: deployment-delta-path
+
+  results:
+    - name: application-name
+
+  steps:
+    - name: reduce
+      image: ibmcom/pipeline-base-image:2.9
+      workingDir: $(workspaces.artifacts.path)
+      script: |
+        #!/bin/bash
+
+        #
+        # THIS TASK IS TO MAKE SURE OUR SETUP WITH
+        # A SINGLE INVENTORY ENTRY STILL KEEPS WORKING
+        #
+        # CAN BE REMOVED, WHEN WE ITERATE OVER
+        # THE CHANGED INVENTORY ENTRIES
+        # INSTEAD OF EXPECTING A SINGLE ENTRY
+        #
+
+        set -e -o pipefail
+
+        ls -la
+
+        deployment_delta_json="$(cat $(params.deployment-delta-path))"
+
+        app=$(echo $deployment_delta_json | jq -r '.[0]')
+
+        echo -n "${app}" | tee $(results.application-name.path)

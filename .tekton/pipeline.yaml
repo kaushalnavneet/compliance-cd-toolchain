@@ -39,6 +39,9 @@ spec:
       default: .one-pipeline.yaml
     - name: target-environment
       description: target environment
+    - name: target-environment-ref
+      description: target environment branch name from git trigger
+      default: ""
 
   workspaces:
     - name: artifacts
@@ -109,10 +112,12 @@ spec:
           value: $(params.pipeline-debug)
         - name: inventory-url
           value: $(tasks.prod-extract-inventory-url.results.extracted-value)
-        - name: target-environment
-          value: $(params.target-environment)
         - name: one-pipeline-config-url
           value: $(tasks.prod-extract-one-pipeline-config-url.results.extracted-value)
+        - name: target-environment
+          value: $(params.target-environment)
+        - name: target-environment-ref
+          value: $(params.target-environment-ref)
       taskSpec:
         params:
           - name: evidence-locker-url
@@ -121,6 +126,7 @@ spec:
           - name: one-pipeline-config-url
           - name: pipeline-debug
           - name: target-environment
+          - name: target-environment-ref
         results:
           - name: evidence-locker-url
           - name: incident-issues-url
@@ -130,6 +136,7 @@ spec:
           - name: inventory-repo-owner
           - name: inventory-repo-name
           - name: target-environment
+          - name: target-environment-candidate
         stepTemplate:
           env:
             - name: PIPELINE_DEBUG
@@ -156,8 +163,14 @@ spec:
               EVIDENCE_URL=$(echo -n "$(params.evidence-locker-url)" | sed 's:/*$::')
               INCIDENT_ISSUES_URL=$(echo -n "$(params.incident-issues-url)" | sed 's:/*$::')
               INVENTORY_URL=$(echo -n "$(params.inventory-url)" | sed 's:/*$::')
-              TARGET=$(echo -n "$(params.target-environment)" | sed 's:.*/::' )
               ONE_PIPELINE_CONFIG_URL=$(echo -n "$(params.one-pipeline-config-url)" | sed 's:/*$::')
+              TARGET=$(params.target-environment)
+
+              if [ -n "$(params.target-environment-ref)" ]; then
+                TARGET=$(echo -n "$(params.target-environment-ref)" | sed 's:.*/::' | sed 's/_.*//')
+              fi
+
+              CANDIDATE="${TARGET}_candidate"
 
               echo -n "$EVIDENCE_URL" | tee "$(results.evidence-locker-url.path)"
               echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
@@ -165,6 +178,7 @@ spec:
               echo -n "$ONE_PIPELINE_CONFIG_URL" | tee "$(results.one-pipeline-config-url.path)"
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
               echo -n "$TARGET" | tee "$(results.target-environment.path)"
+              echo -n "$CANDIDATE" | tee "$(results.target-environment-candidate.path)"
 
               IFS='/'
               read -ra ADDR <<<"$INVENTORY_URL"
@@ -184,28 +198,6 @@ spec:
       params:
         - name: repository
           value: $(tasks.setup.results.inventory-url)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-inventory-deployment-bom
-      runAfter:
-        - prod-get-git-credentials
-      taskRef:
-        name: inventory-deployment-bom
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: application-name
-          value: $(params.application)
-        - name: target-environment
-          value: $(tasks.setup.results.target-environment)
-        - name: inventory-repo-url
-          value: $(tasks.setup.results.inventory-url)
-        - name: evidence-repo-url
-          value: $(tasks.setup.results.evidence-locker-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -271,23 +263,51 @@ spec:
         - name: git-user
           value: $(tasks.prod-get-git-credentials.results.git-auth-user)
 
+    - name: prod-get-deployment-delta
+      taskRef:
+        name: get-deployment-delta
+      runAfter:
+        - prod-clone-inventory-repo
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: target-environment
+          value: $(tasks.setup.results.target-environment)
+        - name: inventory-folder
+          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: deployment-delta-reducer
+      taskRef:
+        name: deployment-delta-reducer
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: deployment-delta-path
+          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+
     - name: prod-inventory-get-image
       taskRef:
         name: inventory-get
       runAfter:
-        - prod-clone-inventory-repo
+        - prod-get-deployment-delta
       workspaces:
         - name: secrets
           workspace: artifacts
       params:
         - name: name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: property
           value: artifact
         - name: target
-          value: prod_candidate
+          value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
 
@@ -343,19 +363,19 @@ spec:
       taskRef:
         name: inventory-get
       runAfter:
-        - prod-clone-inventory-repo
+        - prod-get-deployment-delta
       workspaces:
         - name: secrets
           workspace: artifacts
       params:
         - name: name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: property
           value: repository_url
         - name: target
-          value: prod_candidate
+          value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
 
@@ -363,19 +383,19 @@ spec:
       taskRef:
         name: inventory-get
       runAfter:
-        - prod-clone-inventory-repo
+        - prod-get-deployment-delta
       workspaces:
         - name: secrets
           workspace: artifacts
       params:
         - name: name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: property
           value: commit_sha
         - name: target
-          value: prod_candidate
+          value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
 
@@ -401,17 +421,17 @@ spec:
       taskRef:
         name: inventory-get
       runAfter:
-        - prod-clone-inventory-repo
+        - prod-get-deployment-delta
       workspaces:
         - name: secrets
           workspace: artifacts
       params:
         - name: name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: property
           value: "pipeline_run_id"
         - name: target
-          value: "prod_candidate"
+          value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
         - name: pipeline-debug
@@ -421,17 +441,17 @@ spec:
       taskRef:
         name: inventory-get
       runAfter:
-        - prod-clone-inventory-repo
+        - prod-get-deployment-delta
       workspaces:
         - name: secrets
           workspace: artifacts
       params:
         - name: name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: property
           value: "build_number"
         - name: target
-          value: "prod_candidate"
+          value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
         - name: pipeline-debug
@@ -514,13 +534,13 @@ spec:
           workspace: artifacts
       params:
         - name: name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: property
           value: commit_sha
         - name: target
-          value: prod
+          value: $(tasks.setup.results.target-environment)
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
         - name: allow-default-value
@@ -538,15 +558,37 @@ spec:
           workspace: artifacts
       params:
         - name: name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: property
           value: commit_sha
         - name: target
-          value: prod_candidate
+          value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-url
           value: $(tasks.prod-clone-inventory-repo.results.git-url)
+
+    - name: prod-inventory-deployment-bom
+      runAfter:
+        - prod-get-git-credentials
+      taskRef:
+        name: inventory-deployment-bom
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: application-name
+          value: $(tasks.deployment-delta-reducer.results.application-name)
+        - name: target-environment
+          value: "$(tasks.setup.results.target-environment-candidate)"
+        - name: inventory-repo-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-change-request-prepare
       taskRef:
@@ -639,7 +681,7 @@ spec:
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
         - name: application
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
 
@@ -832,7 +874,7 @@ spec:
           workspace: artifacts
       params:
         - name: app-name
-          value: $(params.application)
+          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: file-locations
           value: $(tasks.prod-acceptance-tests-create-doi-data.results.file-locations)
         - name: test-types
@@ -852,13 +894,13 @@ spec:
         - prod-inventory-get-build-number
       params:
         - name: app-name
-          value: "$(params.application)"
+          value: "$(tasks.deployment-delta-reducer.results.application-name)"
         - name: toolchain-id
           value: "$(params.doi-toolchain-id)"
         - name: build-number
           value: "$(tasks.prod-inventory-get-build-number.results.value)"
         - name: environment
-          value: "prod"
+          value: "$(tasks.setup.results.target-environment)"
         - name: app-url
           value: "http://example.com" # TODO: get app URL from deployment
         - name: pipeline-debug
@@ -948,7 +990,7 @@ spec:
           workspace: artifacts
       params:
         - name: app-name
-          value: "$(params.application)"
+          value: "$(tasks.deployment-delta-reducer.results.application-name)"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: toolchain-id

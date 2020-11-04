@@ -42,9 +42,12 @@ spec:
     - name: one-pipeline-config
       description: Configuration file to be used to customize pipeline behavior
       default: .one-pipeline.yaml
-    - name: cd-target-environment
+    - name: target-environment
       description: target environment, this can be overridden (defaults to prod)
       default: "prod"
+    - name: target-environment-ref
+      description: target environment branch from git trigger binding
+      default: ""
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -94,8 +97,6 @@ spec:
             value: $(params.cluster-namespace)
           - name: doi-toolchain-id
             value: $(params.doi-toolchain-id)
-          - name: application
-            value: $(params.application)
           - name: emergency-label
             value: $(params.emergency-label)
           - name: change-request-id
@@ -111,5 +112,7 @@ spec:
           - name: one-pipeline-config
             value: $(params.one-pipeline-config)
           - name: target-environment
-            value: $(params.cd-target-environment)
+            value: $(params.target-environment)
+          - name: target-environment-ref
+            value: $(params.target-environment-ref)
         serviceAccountName: sa-pullsecret
