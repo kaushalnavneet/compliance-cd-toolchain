@@ -783,10 +783,12 @@ spec:
           value: $(params.pipeline-debug)
         - name: params
           value: |
-            image: $(tasks.prod-inventory-get-image.results.value)
+            environment: $(tasks.setup.results.target-environment)
             cluster-name: $(params.cluster)
             dev-region: $(params.cluster-region)
             dev-cluster-namespace: $(params.cluster-namespace)
+            deployment-delta-path: "../$(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)"
+            inventory-path: "../$(tasks.prod-clone-inventory-repo.results.directory-name)"
 
     - name: prod-acceptance-tests-config
       taskRef:
