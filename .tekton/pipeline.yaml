@@ -288,6 +288,8 @@ spec:
       params:
         - name: deployment-delta-path
           value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+        - name: inventory-entries-list-path
+          value: $(tasks.prod-get-deployment-delta.results.inventory-entries-list-path)
 
     - name: prod-inventory-get-image
       taskRef:

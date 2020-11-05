@@ -10,6 +10,7 @@ spec:
 
   params:
     - name: deployment-delta-path
+    - name: inventory-entries-list-path
 
   results:
     - name: application-name
@@ -32,10 +33,18 @@ spec:
 
         set -e -o pipefail
 
-        ls -la
-
         deployment_delta_json="$(cat $(params.deployment-delta-path))"
 
-        app=$(echo $deployment_delta_json | jq -r '.[0]')
+        app=$(echo $deployment_delta_json | jq -r '.[0] // ""')
+
+        if [ -z $app ]; then
+          inventory_entries_json="$(cat $(params.inventory-entries-list-path))"
+          app=$(echo $inventory_entries_json | jq -r '.[0] // ""')
+        fi
+
+        if [ -z $app ]; then
+          echo "ERROR: no entries found in inventory, check your promotion targets"
+          exit 1
+        fi
 
         echo -n "${app}" | tee $(results.application-name.path)
