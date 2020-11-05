@@ -100,12 +100,6 @@ The Tekton CD Toolchain with Compliance comes with an integrated Tekton pipeline
 | ![Delivery Pipeline](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/pipeline.png) |
 | :--: |
 
-- **Application name for Kubernetes deployment:**
-The name of the application. CD pipeline will look for running pods on the target cluster labelled with the application name, to calculate changes from the previously deployed version.
-This should be the same as in the `deployment.yaml` file in the application repo.
-
-    Default: `hello-compliance-app`
-
 - **IBM Cloud API Key:**
 The API key is used to interact with the ibmcloud CLI tool in several tasks.
 
@@ -248,12 +242,12 @@ After creating your toolchain, you can toggle sending notifications with the `sl
 
 ### 5. Run the CD Pipeline
 
-- The CD Pipeline can be triggered manually or automatically by committing to the `prod_candidate` branch of the inventory repository.
 - Make sure the PR & CI Pipeline ran successfully before running the `Promotion Pipeline`.
-- The Promotion Pipeline creates a `Pull Request` with the content of the inventory on the `master` branch targeting the `prod_candidate` branch. If this `Pull Request` gets merged, it triggers the CD Pipeline.
+- The Promotion Pipeline creates a `Pull Request` with the content of the inventory on the Inventory Source Environment (eg: `master`) branch targeting the Inventory Target Environment branch (eg: `staging`). An intermediary candidate branch is created (eg: `staging_candidate`), where the PR will be targeted. If this `Pull Request` gets merged, it triggers the `CD Pipeline`.
 - First, use the `Manual Promotion Trigger` to start the `Promotion Pipeline`.
 - _Optional_: To recieve Slack notifications from this pipeline, turn the `slack-notifications` environment variable to `1`.
 - If the `Promotion Pipeline` ran successfully, the `create-promotion-pull-request` Task should provide you a link to the aforementioned `Pull Request`.
+- Complete the fields in the `PR`, to generate the `Change Request` for ServiceNow in the `CD Pipeline` run.
 - Merge the `Pull Request` from the Github UI. Merging will trigger the run of `CD Pipeline`.
 
-Note: You can also trigger the `CD Pipeline` manually, just make sure the `PR` & `CI` pipelines were successful and the `prod_candidate` branch in the Inventory Repository has the contents of the `master` branch.
+Note: You can also trigger the `CD Pipeline` manually, just make sure the `PR` & `CI` pipelines were successful and the intermediary candidate branch (eg: `staging_candidate`) in the Inventory Repository has the contents of the `master` branch.
