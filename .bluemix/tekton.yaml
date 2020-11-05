@@ -104,7 +104,7 @@ triggers:
   - type: git
     name: Git CD Trigger
     service: ${INVENTORY_REPO}
-    pattern: "*_candidate"
+    branch: ${CANDIDATE_BRANCH}
     events:
       push: true
     eventListener: cd-listener

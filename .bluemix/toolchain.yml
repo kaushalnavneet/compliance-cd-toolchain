@@ -176,6 +176,7 @@ services:
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
           SOURCE_ENVIRONMENT: '{{form.pipeline.parameters.source-environment}}'
           TARGET_ENVIRONMENT: '{{form.pipeline.parameters.target-environment}}'
+          CANDIDATE_BRANCH: '{{form.pipeline.parameters.target-environment}}_candidate'
           ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
           # Private Worker for the pipeline
           PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
