@@ -579,8 +579,8 @@ spec:
         - name: secrets
           workspace: artifacts
       params:
-        - name: application-name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
+        - name: deployment-delta-list-path
+          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
         - name: target-environment
           value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-repo-url
