@@ -64,35 +64,45 @@ spec:
         TARGET_ENVIRONMENT="$(params.target-environment)"
         TARGET_CANDIDATE="${TARGET_ENVIRONMENT}_candidate"
 
-        DELTA="$(inventory diff $TARGET_ENVIRONMENT $TARGET_CANDIDATE)"
+        DELTA="$(inventory diff $TARGET_CANDIDATE $TARGET_ENVIRONMENT)"
         ENTRIES=$(list_entries $TARGET_CANDIDATE)
+
+        if [[ $DELTA == $ENTRIES && $DELTA == "*" ]]; then
+          echo "Error: Inventory target and source are both empty. Please make sure to merge the promotion PR in the Inventory before running this pipeline."
+          exit 1
+        fi
 
         cd $(workspaces.artifacts.path)
 
+        #
+        # write all inventory entry names that are actually being deployed in this run to a JSON array
+        #
+
         delta_json="[]"
-        IFS=' ' read -ra delta_entries <<< "$DELTA"
-        for i in "${delta_entries[@]}"
-        do
-          delta_json=$(echo "$delta_json" | jq -c --arg element "$i" '. + [$element]')
-        done
+
+        while IFS= read -r line; do
+          delta_json=$(echo "$delta_json" | jq -c --arg element "$line" '. + [$element]')
+        done <<< "$DELTA"
 
         echo -n "$delta_json" > "./deployment-delta-list.json"
 
         echo "Changed entries in inventory since last deployment:"
-        echo ""
         cat ./deployment-delta-list.json | jq '.'
 
+        #
+        # write all inventory entry names in a JSON array
+        #
+
         entries_json="[]"
-        IFS=' ' read -ra inventory_entries <<< "$ENTRIES"
-        for i in "${inventory_entries[@]}"
-        do
-          entries_json=$(echo "$entries_json" | jq -c --arg element "$i" '. + [$element]')
-        done
+
+        while IFS= read -r line; do
+        entries_json=$(echo "$entries_json" | jq -c --arg element "$line" '. + [$element]')
+        done <<< "$ENTRIES"
 
         echo -n "$entries_json" > "./inventory-entries-list.json"
 
-        echo "Inventory entries: "
         echo ""
+        echo "Inventory entries: "
         cat ./inventory-entries-list.json | jq '.'
 
         echo -n "deployment-delta-list.json" > $(results.deployment-delta-list-path.path)

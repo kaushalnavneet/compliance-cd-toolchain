@@ -223,7 +223,7 @@ spec:
       taskRef:
         name: git-clone
       runAfter:
-        - prod-clone-evidence-repo
+        - prod-get-git-credentials
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -243,7 +243,7 @@ spec:
       taskRef:
         name: git-clone
       runAfter:
-        - prod-clone-inventory-repo
+        - prod-get-git-credentials
       workspaces:
         - name: artifacts
           workspace: artifacts
