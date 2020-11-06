@@ -75,6 +75,10 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/devops-insights-publish-deploy/1
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
     path: stable/task/github-create-pull-request/2
   - type: git
     branch: master
