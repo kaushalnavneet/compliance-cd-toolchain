@@ -682,10 +682,12 @@ spec:
           value: $(params.pipeline-debug)
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
-        - name: application
-          value: $(tasks.deployment-delta-reducer.results.application-name)
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: target-environment
+          value: "$(tasks.setup.results.target-environment)"
+        - name: deployment-delta-list-path
+          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
 
     - name: prod-change-request-check-approval
       taskRef:
