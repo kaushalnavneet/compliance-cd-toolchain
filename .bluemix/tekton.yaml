@@ -3,7 +3,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-prepare-change-request/3.0.1
+    path: stable/task/servicenow-prepare-change-request/4.0.0
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}

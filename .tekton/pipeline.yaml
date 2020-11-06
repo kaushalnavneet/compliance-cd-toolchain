@@ -644,6 +644,8 @@ spec:
           value: $(tasks.prod-evidence-summary-format.results.formatted-summary-path)
         - name: evidence-failure-count
           value: $(tasks.prod-evidence-summary-create.results.failure-count)
+        - name: target-environment
+          value: "$(tasks.setup.results.target-environment)"
 
     - name: prod-change-request-create
       taskRef:
