@@ -67,6 +67,10 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/devops-insights-publish-test/1.0.0
+  - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
     path: stable/task/compliance-doi-reporter/1
   - type: git
     branch: master

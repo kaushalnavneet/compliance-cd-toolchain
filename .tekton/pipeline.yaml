@@ -640,7 +640,7 @@ spec:
       runAfter:
         - prod-acceptance-tests-create-doi-data
       taskRef:
-        name: doi-publish-testrecord
+        name: devops-insights-publish-test
       retries: 2
       workspaces:
         - name: artifacts
