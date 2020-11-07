@@ -636,6 +636,8 @@ spec:
           value: $(tasks.prod-inventory-deployment-bom.results.deployment-bom-path)
         - name: emergency-label
           value: $(params.emergency-label)
+        - name: omit-release-window
+          value: "true"
         - name: change-request-id
           value: $(params.change-request-id)
         - name: pipeline-debug
