@@ -81,7 +81,9 @@ spec:
         delta_json="[]"
 
         while IFS= read -r line; do
-          delta_json=$(echo "$delta_json" | jq -c --arg element "$line" '. + [$element]')
+          if [ -n "$line" ]; then
+            delta_json=$(echo "$delta_json" | jq -c --arg element $line '. + [$element]')
+          fi
         done <<< "$DELTA"
 
         echo -n "$delta_json" > "./deployment-delta-list.json"
@@ -96,7 +98,9 @@ spec:
         entries_json="[]"
 
         while IFS= read -r line; do
-        entries_json=$(echo "$entries_json" | jq -c --arg element "$line" '. + [$element]')
+          if [ -n "$line" ]; then
+            entries_json=$(echo "$entries_json" | jq -c --arg element "$line" '. + [$element]')
+          fi
         done <<< "$ENTRIES"
 
         echo -n "$entries_json" > "./inventory-entries-list.json"
