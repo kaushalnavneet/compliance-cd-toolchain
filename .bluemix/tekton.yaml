@@ -3,23 +3,23 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-prepare-change-request/4.0.0
+    path: stable/task/servicenow-prepare-change-request/5
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-create-change-request/2.0.0
+    path: stable/task/servicenow-create-change-request/2
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-check-change-request-approval/1.0.0
+    path: stable/task/servicenow-check-change-request-approval/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-change-state-to-implement/1.0.0
+    path: stable/task/servicenow-change-state-to-implement/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-close-change-request/1.0.2
+    path: stable/task/servicenow-close-change-request/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -35,27 +35,23 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/compliance-collector/2.0.0
+    path: stable/task/compliance-collector/2
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/evidence-summarize/2.0.0
+    path: stable/task/evidence-summarize/3
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/evidence-summary-format/1.0.1
+    path: stable/task/evidence-summary-upload/2
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/evidence-summary-upload/2.0.0
+    path: stable/task/pipeline-evaluate/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/pipeline-evaluate/1.0.1
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/git-clone/1.0.0
+    path: stable/task/git-clone/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -63,19 +59,19 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/toolchain-extract-value/1.0.0
+    path: stable/task/toolchain-extract-value/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/git-get-credentials/1.1.0
+    path: stable/task/git-get-credentials/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/compliance-doi-reporter/1.0.1
+    path: stable/task/compliance-doi-reporter/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/github-create-pull-request/2.0.0
+    path: stable/task/github-create-pull-request/2
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -83,19 +79,19 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-get/1.0.0
+    path: stable/task/inventory-get/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-cr-add/3.0.0
+    path: stable/task/inventory-cr-add/3
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-apply/2.0.1
+    path: stable/task/inventory-apply/2
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-deployment-bom/2.0.0
+    path: stable/task/inventory-deployment-bom/2
   - type: git
     branch: develop
     service: ${TEKTON_DEFINITION_REPO}
@@ -156,8 +152,10 @@ properties:
     value: ${ARTIFACTORY_DOCKER_CONFIG_JSON}
     type: SECURE
   - name: pipeline-debug
-    value: "0"
-    type: text
+    type: single_select
+    value:
+      "0": true
+      "1": false
   - name: version
     value: "v1"
     type: text

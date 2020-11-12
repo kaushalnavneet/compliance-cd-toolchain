@@ -17,8 +17,6 @@ spec:
       description: toolchain ID
     - name: emergency-label
       description: the name of the emergency label
-    - name: application
-      description: name of the deployed app or service
     - name: servicenow-api-base-url
       description: Base API URL for ServiceNow to handle Change Requests
       default: "https://watsontest.service-now.com"

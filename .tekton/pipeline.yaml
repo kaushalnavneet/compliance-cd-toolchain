@@ -116,6 +116,8 @@ spec:
           value: $(params.target-environment)
         - name: target-environment-ref
           value: $(params.target-environment-ref)
+        - name: servicenow-api-base-url
+          value: $(params.servicenow-api-base-url)
       taskSpec:
         params:
           - name: evidence-locker-url
@@ -125,6 +127,7 @@ spec:
           - name: pipeline-debug
           - name: target-environment
           - name: target-environment-ref
+          - name: servicenow-api-base-url
         results:
           - name: evidence-locker-url
           - name: incident-issues-url
@@ -135,6 +138,8 @@ spec:
           - name: inventory-repo-name
           - name: target-environment
           - name: target-environment-candidate
+          - name: change-request-url
+          - name: servicenow-api-url
         stepTemplate:
           env:
             - name: PIPELINE_DEBUG
@@ -143,6 +148,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.annotations['devops.cloud.ibm.com/tekton-pipeline']
+            - name: CHANGE_API_PATH
+              value: "api/ibmwc/change"
+            - name: CHANGE_REQUEST_URL_PATH
+              value: "nav_to.do?uri=change_request.do?sys_id="
+            - name: SERVICENOW_BASE_URL
+              value: $(params.servicenow-api-base-url)
         steps:
           - name: setup
             image: ibmcom/pipeline-base-image:2.6
@@ -182,6 +193,27 @@ spec:
               read -ra ADDR <<<"$INVENTORY_URL"
               echo -n "${ADDR[${#ADDR[@]} - 1]}" | tee "$(results.inventory-repo-name.path)"
               echo -n "${ADDR[${#ADDR[@]} - 2]}" | tee "$(results.inventory-repo-owner.path)"
+
+              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
+              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
+
+    - name: prod-get-evidence-locker-path
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: .services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .parameters.repo_name
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: prod-get-toolchain-crn
+      taskRef:
+        name: toolchain-extract-value
+      params:
+        - name: expression
+          value: .crn
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
 
     - name: prod-get-git-credentials
       runAfter:
@@ -291,287 +323,6 @@ spec:
         - name: inventory-entries-list-path
           value: $(tasks.prod-get-deployment-delta.results.inventory-entries-list-path)
 
-    - name: prod-inventory-get-image
-      taskRef:
-        name: inventory-get
-      runAfter:
-        - prod-get-deployment-delta
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: property
-          value: artifact
-        - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
-        - name: inventory-url
-          value: $(tasks.prod-clone-inventory-repo.results.git-url)
-
-    - name: prod-parse-image-name
-      runAfter:
-        - prod-inventory-get-image
-      params:
-        - name: image-url
-          value: $(tasks.prod-inventory-get-image.results.value)
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      taskSpec:
-        params:
-          - name: image-url
-        results:
-          - name: registry-url
-            description: the image registry url
-          - name: registry-namespace
-            description: the image registry namespace
-          - name: image-name
-            description: the built docker image name
-          - name: image-tag
-            description: the docker image tag, containing the commit hash
-        workspaces:
-          - name: artifacts
-        steps:
-          - name: parse-image
-            image: ibmcom/pipeline-base-image:2.6
-            script: |
-              #!/bin/bash
-
-              set -e -o pipefail;
-
-              if [ "$PIPELINE_DEBUG" = 1 ]; then
-                env
-                cat /cd-config/toolchain.json
-                trap env EXIT
-                set -x
-              fi
-
-              REGISTRY_URL=$(echo "$(params.image-url)" | cut -f1 -d/)
-              REGISTRY_NAMESPACE=$(echo "$(params.image-url)" | cut -f2 -d/)
-              IMAGE_NAME=$(echo "$(params.image-url)" | cut -f1 -d: | cut -f3 -d/)
-              IMAGE_TAG=$(echo "$(params.image-url)" | cut -f2 -d:)
-
-              echo -n "$REGISTRY_URL" > $(results.registry-url.path)
-              echo -n "$REGISTRY_NAMESPACE" > $(results.registry-namespace.path)
-              echo -n "$IMAGE_NAME" > $(results.image-name.path)
-              echo -n "$IMAGE_TAG" > $(results.image-tag.path)
-
-    - name: prod-inventory-get-repository
-      taskRef:
-        name: inventory-get
-      runAfter:
-        - prod-get-deployment-delta
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: property
-          value: repository_url
-        - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
-        - name: inventory-url
-          value: $(tasks.prod-clone-inventory-repo.results.git-url)
-
-    - name: prod-inventory-get-commit
-      taskRef:
-        name: inventory-get
-      runAfter:
-        - prod-get-deployment-delta
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: property
-          value: commit_sha
-        - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
-        - name: inventory-url
-          value: $(tasks.prod-clone-inventory-repo.results.git-url)
-
-    - name: prod-get-evidence-locker-path
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: .services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .parameters.repo_name
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-get-toolchain-crn
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: .crn
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-inventory-get-evidence-path
-      taskRef:
-        name: inventory-get
-      runAfter:
-        - prod-get-deployment-delta
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: property
-          value: "pipeline_run_id"
-        - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
-        - name: inventory-url
-          value: $(tasks.prod-clone-inventory-repo.results.git-url)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-inventory-get-build-number
-      taskRef:
-        name: inventory-get
-      runAfter:
-        - prod-get-deployment-delta
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: property
-          value: "build_number"
-        - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
-        - name: inventory-url
-          value: $(tasks.prod-clone-inventory-repo.results.git-url)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-evidence-summary-create
-      taskRef:
-        name: evidence-summarize
-      workspaces:
-        - name: evidence-locker
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
-        - name: path-list
-          value: ci/$(tasks.prod-inventory-get-evidence-path.results.value)
-        - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
-        - name: evidence-repo-url
-          value: $(tasks.prod-extract-evidence-locker-url.results.extracted-value)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-evidence-summary-format
-      runAfter:
-        - prod-evidence-summary-create
-      taskRef:
-        name: evidence-summary-format
-      workspaces:
-        - name: evidence-locker
-          workspace: artifacts
-      params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: summary-path
-          value: $(tasks.prod-evidence-summary-create.results.summary-path)
-
-    - name: prod-change-request-deployment-ready
-      runAfter:
-        - prod-evidence-summary-create
-      taskRef:
-        name: summary-to-deployment-ready
-      params:
-        - name: failure-count
-          value: $(tasks.prod-evidence-summary-create.results.failure-count)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-change-request-create-urls
-      params:
-        - name: servicenow-api-base-url
-          value: $(params.servicenow-api-base-url)
-      taskSpec:
-        params:
-          - name: servicenow-api-base-url
-        results:
-          - name: change-request-url
-          - name: servicenow-api-url
-        steps:
-          - name: create-change-request-urls
-            image: ibmcom/pipeline-base-image:2.6
-            env:
-              - name: CHANGE_API_PATH
-                value: "api/ibmwc/change"
-              - name: CHANGE_REQUEST_URL_PATH
-                value: "nav_to.do?uri=change_request.do?sys_id="
-              - name: SERVICENOW_BASE_URL
-                value: $(params.servicenow-api-base-url)
-            script: |
-              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
-              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
-
-    - name: prod-inventory-changelog-from
-      taskRef:
-        name: inventory-get
-      runAfter:
-        - prod-clone-inventory-repo
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: property
-          value: commit_sha
-        - name: target
-          value: $(tasks.setup.results.target-environment)
-        - name: inventory-url
-          value: $(tasks.prod-clone-inventory-repo.results.git-url)
-        - name: allow-default-value
-          value: "true"
-        - name: default-value
-          value: ""
-
-    - name: prod-inventory-changelog-to
-      taskRef:
-        name: inventory-get
-      runAfter:
-        - prod-clone-inventory-repo
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: property
-          value: commit_sha
-        - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
-        - name: inventory-url
-          value: $(tasks.prod-clone-inventory-repo.results.git-url)
-
     - name: prod-inventory-deployment-bom
       runAfter:
         - prod-get-git-credentials
@@ -594,42 +345,51 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-evidence-summary-create
+      taskRef:
+        name: evidence-summarize
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: deployment-delta-list-path
+          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+        - name: target
+          value: "$(tasks.setup.results.target-environment-candidate)"
+        - name: toolchain-crn
+          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: inventory-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: evidence-repo-url
+          value: $(tasks.setup.results.evidence-locker-url)
+
     - name: prod-change-request-prepare
       taskRef:
         name: servicenow-prepare-change-request
       runAfter:
         - prod-get-git-credentials
-        - prod-parse-image-name
-        - prod-change-request-create-urls
-        - prod-change-request-deployment-ready
-        - prod-inventory-changelog-to
-        - prod-inventory-changelog-from
       workspaces:
         - name: dynamic-secrets
           workspace: artifacts
         - name: artifacts
           workspace: artifacts
       params:
-        - name: repository
-          value: $(tasks.prod-inventory-get-repository.results.value)
-        - name: inventory-repo-name
-          value: $(tasks.setup.results.inventory-repo-name)
-        - name: inventory-repo-owner
-          value: $(tasks.setup.results.inventory-repo-owner)
-        - name: git-commit-from
-          value: $(tasks.prod-inventory-changelog-from.results.value)
-        - name: git-commit-to
-          value: $(tasks.prod-inventory-changelog-to.results.value)
+        - name: deployment-delta-list-path
+          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+        - name: inventory-repo-url
+          value: $(tasks.setup.results.inventory-url)
         - name: servicenow-configuration-item
           value: $(params.servicenow-configuration-item)
-        - name: registry-url
-          value: $(tasks.prod-parse-image-name.results.registry-url)
-        - name: registry-namespace
-          value: $(tasks.prod-parse-image-name.results.registry-namespace)
-        - name: image-name
-          value: $(tasks.prod-parse-image-name.results.image-name)
-        - name: image-tag
-          value: $(tasks.prod-parse-image-name.results.image-tag)
+        - name: deployment-ready
+          value: $(tasks.prod-evidence-summary-create.results.deployment-ready)
+        - name: formatted-summary-path
+          value: $(tasks.prod-evidence-summary-create.results.formatted-summary-path)
+        - name: omit-release-window
+          value: "true"
         - name: cluster
           value: $(params.cluster)
         - name: cluster-region
@@ -640,16 +400,10 @@ spec:
           value: $(tasks.prod-inventory-deployment-bom.results.deployment-bom-path)
         - name: emergency-label
           value: $(params.emergency-label)
-        - name: omit-release-window
-          value: "true"
         - name: change-request-id
           value: $(params.change-request-id)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: formatted-summary-path
-          value: $(tasks.prod-evidence-summary-format.results.formatted-summary-path)
-        - name: evidence-failure-count
-          value: $(tasks.prod-evidence-summary-create.results.failure-count)
         - name: target-environment
           value: "$(tasks.setup.results.target-environment)"
 
@@ -667,9 +421,9 @@ spec:
         - name: cr-json-path
           value: $(tasks.prod-change-request-prepare.results.change-request-json-path)
         - name: change-request-url
-          value: $(tasks.prod-change-request-create-urls.results.change-request-url)
+          value: $(tasks.setup.results.change-request-url)
         - name: servicenow-api-url
-          value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
+          value: $(tasks.setup.results.servicenow-api-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -705,7 +459,7 @@ spec:
           workspace: artifacts
       params:
         - name: servicenow-api-url
-          value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
+          value: $(tasks.setup.results.servicenow-api-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: change-request-id
@@ -718,7 +472,7 @@ spec:
         - prod-change-request-check-approval
       params:
         - name: servicenow-api-url
-          value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
+          value: $(tasks.setup.results.servicenow-api-url)
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
         - name: pipeline-debug
@@ -902,27 +656,30 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: prod-publish-deployrecord
-      taskRef:
-        name: doi-publish-deployrecord
-      runAfter:
-        - prod-deployment
-        - prod-inventory-get-build-number
-      params:
-        - name: app-name
-          value: "$(tasks.deployment-delta-reducer.results.application-name)"
-        - name: toolchain-id
-          value: "$(params.doi-toolchain-id)"
-        - name: build-number
-          value: "$(tasks.prod-inventory-get-build-number.results.value)"
-        - name: environment
-          value: "$(tasks.setup.results.target-environment)"
-        - name: app-url
-          value: "http://example.com" # TODO: get app URL from deployment
-        - name: pipeline-debug
-          value: "$(params.pipeline-debug)"
-        - name: toolchain-apikey-secret-key
-          value: "ibmcloud-api-key"
+    # "BUILD NUMBER" is ambiguous, multiple inventory items,
+    # multiple artifatcs from multiple CI builds, which one should we use?
+    #
+    # - name: prod-publish-deployrecord
+    #   taskRef:
+    #     name: doi-publish-deployrecord
+    #   runAfter:
+    #     - prod-deployment
+    #     - prod-inventory-get-build-number
+    #   params:
+    #     - name: app-name
+    #       value: "$(tasks.deployment-delta-reducer.results.application-name)"
+    #     - name: toolchain-id
+    #       value: "$(params.doi-toolchain-id)"
+    #     - name: build-number
+    #       value: "$(tasks.prod-inventory-get-build-number.results.value)"
+    #     - name: environment
+    #       value: "$(tasks.setup.results.target-environment)"
+    #     - name: app-url
+    #       value: "http://example.com" # TODO: get app URL from deployment
+    #     - name: pipeline-debug
+    #       value: "$(params.pipeline-debug)"
+    #     - name: toolchain-apikey-secret-key
+    #       value: "ibmcloud-api-key"
 
     - name: prod-compliance-collector
       taskRef:
@@ -939,10 +696,6 @@ spec:
           value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
         - name: evidence-repo-url
           value: $(tasks.setup.results.evidence-locker-url)
-        - name: application-repo-url
-          value: $(tasks.prod-inventory-get-repository.results.value)
-        - name: commit-hash
-          value: $(tasks.prod-inventory-get-commit.results.value)
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
         - name: cos-bucket-name
@@ -1031,40 +784,25 @@ spec:
       runAfter:
         - prod-compliance-collector
       workspaces:
-        - name: evidence-locker
+        - name: artifacts
           workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
-        - name: path-list
-          value:
-            |
-            ci/$(tasks.prod-inventory-get-evidence-path.results.value)
-            cd/$(tasks.setup.results.pipeline-run-id)
+        - name: deployment-delta-list-path
+          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+        - name: target
+          value: "$(tasks.setup.results.target-environment-candidate)"
+        - name: include-cd-evidence
+          value: "1"
+        - name: inventory-url
+          value: $(tasks.setup.results.inventory-url)
         - name: toolchain-crn
           value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
         - name: evidence-repo-url
           value: $(tasks.prod-extract-evidence-locker-url.results.extracted-value)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-
-    - name: prod-change-request-close-format-summary
-      runAfter:
-        - prod-change-request-close-get-evidence-summary
-      taskRef:
-        name: evidence-summary-format
-      workspaces:
-        - name: evidence-locker
-          workspace: artifacts
-      params:
-        - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: summary-path
-          value: $(tasks.prod-change-request-close-get-evidence-summary.results.summary-path)
 
     - name: prod-evidence-summary-upload
       taskRef:
@@ -1109,8 +847,8 @@ spec:
     - name: prod-close-change-request
       taskRef:
         name: servicenow-close-change-request
-      runAfter:
-        - prod-inventory-merge-change-request-branch
+#      runAfter:
+#        - prod-inventory-merge-change-request-branch
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -1123,7 +861,7 @@ spec:
             #!/bin/bash
             CLOSE_CATEGORY="successful"
 
-            if [ "$(tasks.prod-change-request-close-get-evidence-summary.results.failure-count)" -gt 0 ]; then
+            if [ "$(tasks.prod-change-request-close-get-evidence-summary.results.deployment-ready)" == "no" ]; then
               CLOSE_CATEGORY="successful_issues"
             fi
 
@@ -1135,16 +873,16 @@ spec:
             #!/bin/bash
 
             CLOSE_ISSUES=""
-            if [ "$(tasks.prod-change-request-close-get-evidence-summary.results.failure-count)" -gt 0 ]; then
+            if [ "$(tasks.prod-change-request-close-get-evidence-summary.results.deployment-ready)" == "no" ]; then
               CLOSE_ISSUES="but some checks failed during build or deployment. See summary for more details!"
             fi
 
-            SUMMARY="$(cat ./$(tasks.prod-change-request-close-format-summary.results.formatted-summary-path))"
+            SUMMARY="$(cat ./$(tasks.prod-change-request-close-get-evidence-summary.results.formatted-summary-path))"
 
             printf "Deployed successful %s\n\nUPDATED EVIDENCE SUMMARY: \n\n%s" "$CLOSE_ISSUES" "$SUMMARY"
 
         - name: servicenow-api-url
-          value: $(tasks.prod-change-request-create-urls.results.servicenow-api-url)
+          value: $(tasks.setup.results.servicenow-api-url)
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
         - name: pipeline-debug
