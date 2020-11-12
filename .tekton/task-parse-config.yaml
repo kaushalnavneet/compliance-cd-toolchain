@@ -38,6 +38,8 @@ spec:
       description: "Name of the `Secret` that's going to be mounted in `run-stage`"
     - name: secret-4
       description: "Name of the `Secret` that's going to be mounted in `run-stage`"
+    - name: abort-on-failure
+      description: "Whether abort the pipeline in case of a failure or not"
   workspaces:
     - name: app
       description: Workspace where the application is checked out.
@@ -80,6 +82,7 @@ spec:
         if [[ "$(parse '')" == "null" ]]; then
           echo "Stage '${stage}' is not defined in '${config_file}'"
           echo -n "registry.access.redhat.com/ubi8/ubi-minimal" > '$(results.image.path)'
+          echo -n "true" > "$(results.abort-on-failure.path)"
           cat > "$script_file" <<EOF
         #!/bin/sh
         echo "Skipping stage..."
@@ -98,6 +101,12 @@ spec:
             exit 1
           else
             parse .script > "$script_file"
+          fi
+
+          if [[ "$(parse .abort_on_failure)" != "null" ]]; then
+            parse .abort_on_failure > "$(results.abort-on-failure.path)"
+          else
+            echo -n "true" > "$(results.abort-on-failure.path)"
           fi
 
         fi

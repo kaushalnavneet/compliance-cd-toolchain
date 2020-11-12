@@ -44,6 +44,8 @@ spec:
     - name: secret-4
       description: "Name of a `Secret` that's goint to be mounted."
       default: 'not-provided-secret-4'
+    - name: abort-on-failure
+      description: "Whether abort the pipeline in case of a failure or not"
     - name: pipeline-debug
       description: Use debug mode
       default: "0"
@@ -234,6 +236,9 @@ spec:
         else
           echo -n $? > $(results.exit-code.path)
           echo -n failure > $(results.status.path)
+          if [ "$(params.abort-on-failure)" = "true" ]; then
+            exit 1
+          fi
         fi
 
   volumes:

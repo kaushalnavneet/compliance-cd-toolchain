@@ -789,6 +789,8 @@ spec:
           value: $(tasks.prod-deployment-config.results.secret-3)
         - name: secret-4
           value: $(tasks.prod-deployment-config.results.secret-4)
+        - name: abort-on-failure
+          value: $(tasks.prod-deployment-config.results.abort-on-failure)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: params
@@ -849,6 +851,8 @@ spec:
           value: $(tasks.prod-acceptance-tests-config.results.secret-3)
         - name: secret-4
           value: $(tasks.prod-acceptance-tests-config.results.secret-4)
+        - name: abort-on-failure
+          value: $(tasks.prod-acceptance-tests-config.results.abort-on-failure)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
