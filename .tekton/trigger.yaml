@@ -40,6 +40,9 @@ spec:
     - name: one-pipeline-config
       description: Configuration file to be used to customize pipeline behavior
       default: .one-pipeline.yaml
+    - name: one-pipeline-config-branch
+      description: The branch where the configuration file is kept
+      default: master
     - name: target-environment
       description: target environment, this can be overridden (defaults to prod)
       default: "prod"
@@ -109,6 +112,8 @@ spec:
             value: "$(params.cos-endpoint)"
           - name: one-pipeline-config
             value: $(params.one-pipeline-config)
+          - name: one-pipeline-config-branch
+            value: $(params.one-pipeline-config-branch)
           - name: target-environment
             value: $(params.target-environment)
           - name: target-environment-ref
