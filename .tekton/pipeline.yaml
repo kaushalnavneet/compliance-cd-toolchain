@@ -445,8 +445,8 @@ spec:
           value: $(params.pipeline-debug)
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: inventory-url
+          value: $(tasks.setup.results.inventory-url)
         - name: target-environment
           value: "$(tasks.setup.results.target-environment)"
         - name: deployment-delta-list-path

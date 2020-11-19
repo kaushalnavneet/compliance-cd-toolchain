@@ -34,7 +34,7 @@ spec:
 
   steps:
     - name: inventory-promote
-      image: ibmcom/pipeline-base-image:2.6
+      image: wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/ibm-compliance-automation:1.1.7@sha256:0d672453433c67d9146d2e9bc52575797c81eaff0654b4da4bf2a46dd8701a0b
       script: |
           #!/bin/bash
           set -e -o pipefail;
@@ -46,26 +46,21 @@ spec:
             set -x
           fi
 
-          export GIT_TOKEN=$(cat "/secrets/$(params.git-api-token-key)")
-          export INVENTORY_FOLDER=$(jq -r '.services[] | select(.toolchain_binding.name=="inventory-repo")
-          | .parameters.repo_name' /cd-config/toolchain.json)
+          export GHE_TOKEN=$(cat "/secrets/$(params.git-api-token-key)")
+          export INVENTORY_URL=$(jq -r '.services[] | select(.toolchain_binding.name=="inventory-repo")
+          | .parameters.repo_url' /cd-config/toolchain.json)
 
-          git config --global user.email "tekton@example.com"
-          git config --global user.name "Tekton"
-
-          clone_inventory_script() {
-            git clone "https://$GIT_TOKEN@github.ibm.com/cocoa/inventory-script.git"
-            export PATH="$(pwd)/inventory-script:$PATH"
-          }
+          export GHE_REPO=$(echo "$INVENTORY_URL" | cut -f5 -d/ | cut -f1 -d.)
+          export GHE_ORG=$(echo "$INVENTORY_URL" | cut -f4 -d/)
 
           TARGET=$(params.target)_candidate
 
           inventory_promote() {
-            cd /artifacts/$INVENTORY_FOLDER
+            cd /artifacts/$GHE_REPO
             if [ "$(params.app-name)" == "" ]; then
               for app_name in *; do
                 if [[ "$app_name" != *.md ]]; then
-                inventory promote "$app_name" "$(params.source)" "$TARGET" "$(params.branch)"
+                  cocoa inventory promote --name="$app_name" --source="$(params.source)" --target="$TARGET" --branch="$(params.branch)"
                 fi
               done
             else
@@ -73,18 +68,12 @@ spec:
               read -ra app_names <<< "$(params.app-name)"
               for app_name in "${app_names[@]}"; do
                 app_name="$(echo $app_name | sed -e 's/^[[:space:]]*//')"
-                inventory promote "$app_name" "$(params.source)" "$TARGET" "$(params.branch)"
+                cocoa inventory promote --name="$app_name" --source="$(params.source)" --target="$TARGET" --branch="$(params.branch)"
               done
             fi
           }
 
           source /scripts/retry_command.sh
-
-          retry $(params.retry-count) $(params.retry-delay) clone_inventory_script
-          if [  $? -ne 0 ]; then
-            echo "Error getting the pipeline run id from the given version. There might be a github downtime, you can check it here: https://ibmtoolbox.statuspage.io"
-            exit 1
-          fi
 
           retry $(params.retry-count) $(params.retry-delay) inventory_promote
           if [  $? -ne 0 ]; then
