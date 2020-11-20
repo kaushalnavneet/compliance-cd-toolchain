@@ -83,7 +83,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-cr-add/3
+    path: stable/task/inventory-cr-add/4
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
