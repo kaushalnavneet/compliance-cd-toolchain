@@ -27,10 +27,6 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: preview/devops-insights
-  - type: git
-    branch: master
-    service: ${TEKTON_CATALOG_REPO}
     path: preview/slack
   - type: git
     branch: master
