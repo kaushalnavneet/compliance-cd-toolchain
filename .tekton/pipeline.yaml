@@ -659,31 +659,6 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    # "BUILD NUMBER" is ambiguous, multiple inventory items,
-    # multiple artifatcs from multiple CI builds, which one should we use?
-    #
-    # - name: prod-publish-deployrecord
-    #   taskRef:
-    #     name: doi-publish-deployrecord
-    #   runAfter:
-    #     - prod-deployment
-    #     - prod-inventory-get-build-number
-    #   params:
-    #     - name: app-name
-    #       value: "$(tasks.deployment-delta-reducer.results.application-name)"
-    #     - name: toolchain-id
-    #       value: "$(params.doi-toolchain-id)"
-    #     - name: build-number
-    #       value: "$(tasks.prod-inventory-get-build-number.results.value)"
-    #     - name: environment
-    #       value: "$(tasks.setup.results.target-environment)"
-    #     - name: app-url
-    #       value: "http://example.com" # TODO: get app URL from deployment
-    #     - name: pipeline-debug
-    #       value: "$(params.pipeline-debug)"
-    #     - name: toolchain-apikey-secret-key
-    #       value: "ibmcloud-api-key"
-
     - name: prod-compliance-collector
       taskRef:
         name: compliance-collector
@@ -850,8 +825,6 @@ spec:
     - name: prod-close-change-request
       taskRef:
         name: servicenow-close-change-request
-#      runAfter:
-#        - prod-inventory-merge-change-request-branch
       workspaces:
         - name: artifacts
           workspace: artifacts
