@@ -67,54 +67,10 @@ spec:
               print("CD Pipeline was triggered!")
               print("<https://cloud.ibm.com/devops/pipelines/tekton/" + os.getenv("PIPELINE_ID") + "/runs/" + os.getenv("PIPELINE_RUN_ID") + "?env_id=ibm:yp:" + os.getenv("TOOLCHAIN_REGION") + " | See the Pipeline Logs>")
 
-    - name: prod-extract-evidence-locker-url
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: '.services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .dashboard_url'
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-extract-incident-issues-url
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: '.services[] | select(.toolchain_binding.name=="incident-issues-repo") | .dashboard_url'
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-extract-inventory-url
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: '.services[] | select(.toolchain_binding.name=="inventory-repo") | .dashboard_url'
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-extract-one-pipeline-config-url
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: '.services[] | select(.toolchain_binding.name=="one-pipeline-repo") | .dashboard_url'
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
     - name: setup
       params:
-        - name: evidence-locker-url
-          value: $(tasks.prod-extract-evidence-locker-url.results.extracted-value)
-        - name: incident-issues-url
-          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: inventory-url
-          value: $(tasks.prod-extract-inventory-url.results.extracted-value)
-        - name: one-pipeline-config-url
-          value: $(tasks.prod-extract-one-pipeline-config-url.results.extracted-value)
         - name: target-environment
           value: $(params.target-environment)
         - name: target-environment-ref
@@ -123,16 +79,13 @@ spec:
           value: $(params.servicenow-api-base-url)
       taskSpec:
         params:
-          - name: evidence-locker-url
-          - name: incident-issues-url
-          - name: inventory-url
-          - name: one-pipeline-config-url
           - name: pipeline-debug
           - name: target-environment
           - name: target-environment-ref
           - name: servicenow-api-base-url
         results:
           - name: evidence-locker-url
+          - name: evidence-locker-folder
           - name: incident-issues-url
           - name: inventory-url
           - name: one-pipeline-config-url
@@ -140,9 +93,13 @@ spec:
           - name: inventory-repo-owner
           - name: inventory-repo-name
           - name: target-environment
-          - name: target-environment-candidate
           - name: change-request-url
           - name: servicenow-api-url
+          - name: toolchain-crn
+        volumes:
+          - name: cd-config-volume
+            configMap:
+              name: toolchain
         stepTemplate:
           env:
             - name: PIPELINE_DEBUG
@@ -159,7 +116,10 @@ spec:
               value: $(params.servicenow-api-base-url)
         steps:
           - name: setup
-            image: ibmcom/pipeline-base-image:2.6
+            image: ibmcom/pipeline-base-image:2.9@sha256:2976e1374e87f5cddabcf80179d9708868d52dbf656fdde60f803553be633db2
+            volumeMounts:
+              - mountPath: /cd-config
+                name: cd-config-volume
             script: |
               #!/bin/bash
 
@@ -172,25 +132,37 @@ spec:
                 set -x
               fi
 
-              EVIDENCE_URL=$(echo -n "$(params.evidence-locker-url)" | sed 's:/*$::')
-              INCIDENT_ISSUES_URL=$(echo -n "$(params.incident-issues-url)" | sed 's:/*$::')
-              INVENTORY_URL=$(echo -n "$(params.inventory-url)" | sed 's:/*$::')
-              ONE_PIPELINE_CONFIG_URL=$(echo -n "$(params.one-pipeline-config-url)" | sed 's:/*$::')
+              _toolchain_read () {
+                echo $(jq -r "$1" /cd-config/toolchain.json | tr -d '\n')
+              }
+
+              EVIDENCE_LOCKER_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .dashboard_url')
+              INCIDENT_ISSUES_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="incident-issues-repo") | .dashboard_url')
+              INVENTORY_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="inventory-repo") | .dashboard_url')
+              ONE_PIPELINE_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="one-pipeline-repo") | .dashboard_url')
+
+              EVIDENCE_LOCKER_FOLDER=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .parameters.repo_name')
+              TOOLCHAIN_CRN=$(_toolchain_read '.crn')
+
+              EVIDENCE_LOCKER_URL=$(echo -n "${EVIDENCE_LOCKER_URL}" | sed 's:/*$::')
+              INCIDENT_ISSUES_URL=$(echo -n "${INCIDENT_URL}" | sed 's:/*$::')
+              INVENTORY_URL=$(echo -n "${INVENTORY_URL}" | sed 's:/*$::')
+              ONE_PIPELINE_URL=$(echo -n "${ONE_PIPELINE_URL}" | sed 's:/*$::')
               TARGET=$(params.target-environment)
 
               if [ -n "$(params.target-environment-ref)" ]; then
                 TARGET=$(echo -n "$(params.target-environment-ref)" | sed 's:.*/::' | sed 's/_.*//')
               fi
 
-              CANDIDATE="${TARGET}_candidate"
-
-              echo -n "$EVIDENCE_URL" | tee "$(results.evidence-locker-url.path)"
+              echo -n "$EVIDENCE_LOCKER_URL" | tee "$(results.evidence-locker-url.path)"
               echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
               echo -n "$INVENTORY_URL" | tee "$(results.inventory-url.path)"
-              echo -n "$ONE_PIPELINE_CONFIG_URL" | tee "$(results.one-pipeline-config-url.path)"
+              echo -n "$ONE_PIPELINE_URL" | tee "$(results.one-pipeline-config-url.path)"
               echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
               echo -n "$TARGET" | tee "$(results.target-environment.path)"
-              echo -n "$CANDIDATE" | tee "$(results.target-environment-candidate.path)"
+
+              echo -n "$TOOLCHAIN_CRN" | tee "$(results.toolchain-crn.path)"
+              echo -n "$EVIDENCE_LOCKER_FOLDER" | tee "$(results.evidence-locker-folder.path)"
 
               IFS='/'
               read -ra ADDR <<<"$INVENTORY_URL"
@@ -199,24 +171,6 @@ spec:
 
               echo -n "${SERVICENOW_BASE_URL}/${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
               echo -n "${SERVICENOW_BASE_URL}/${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
-
-    - name: prod-get-evidence-locker-path
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: .services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .parameters.repo_name
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-get-toolchain-crn
-      taskRef:
-        name: toolchain-extract-value
-      params:
-        - name: expression
-          value: .crn
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
 
     - name: prod-get-git-credentials
       runAfter:
@@ -233,6 +187,22 @@ spec:
           value: $(tasks.setup.results.inventory-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+
+    - name: tag-inventory
+      taskRef:
+        name: tag-inventory
+      runAfter:
+        - prod-get-git-credentials
+      params:
+        - name: inventory-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: target-environment
+          value: $(tasks.setup.results.target-environment)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+      workspaces:
+        - name: secrets
+          workspace: artifacts
 
     - name: prod-clone-evidence-repo
       taskRef:
@@ -259,6 +229,7 @@ spec:
         name: git-clone
       runAfter:
         - prod-get-git-credentials
+        - tag-inventory
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -268,7 +239,9 @@ spec:
         - name: repository
           value: $(tasks.setup.results.inventory-url)
         - name: branch
-          value: "master"
+          value: "$(tasks.setup.results.target-environment)"
+        - name: revision
+          value: "tags/$(tasks.setup.results.pipeline-run-id)"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: git-user
@@ -301,6 +274,7 @@ spec:
         name: get-deployment-delta
       runAfter:
         - prod-clone-inventory-repo
+        - tag-inventory
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -309,6 +283,8 @@ spec:
       params:
         - name: target-environment
           value: $(tasks.setup.results.target-environment)
+        - name: inventory-url
+          value: $(tasks.setup.results.inventory-url)
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
         - name: pipeline-debug
@@ -329,6 +305,7 @@ spec:
     - name: prod-inventory-deployment-bom
       runAfter:
         - prod-get-git-credentials
+        - tag-inventory
       taskRef:
         name: inventory-deployment-bom
       workspaces:
@@ -339,8 +316,6 @@ spec:
       params:
         - name: deployment-delta-list-path
           value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
-        - name: target-environment
-          value: "$(tasks.setup.results.target-environment-candidate)"
         - name: inventory-repo-url
           value: $(tasks.setup.results.inventory-url)
         - name: evidence-repo-url
@@ -360,9 +335,9 @@ spec:
         - name: deployment-delta-list-path
           value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
         - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
+          value: "$(tasks.setup.results.target-environment)"
         - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+          value: $(tasks.setup.results.toolchain-crn)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
         - name: inventory-url
@@ -447,10 +422,6 @@ spec:
           value: $(tasks.prod-change-request-create.results.change-request-id)
         - name: inventory-url
           value: $(tasks.setup.results.inventory-url)
-        - name: target-environment
-          value: "$(tasks.setup.results.target-environment)"
-        - name: deployment-delta-list-path
-          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
 
     - name: prod-change-request-check-approval
       taskRef:
@@ -467,6 +438,8 @@ spec:
           value: $(params.pipeline-debug)
         - name: change-request-id
           value: $(tasks.prod-change-request-create.results.change-request-id)
+        - name: retry-delay
+          value: "15"
 
     - name: prod-change-request-change-state-to-implement
       taskRef:
@@ -671,11 +644,11 @@ spec:
         - name: namespace
           value: cd
         - name: incident-issue-repo
-          value: $(tasks.prod-extract-incident-issues-url.results.extracted-value)
+          value: $(tasks.setup.results.incident-issues-url)
         - name: evidence-repo-url
           value: $(tasks.setup.results.evidence-locker-url)
         - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+          value: $(tasks.setup.results.toolchain-crn)
         - name: cos-bucket-name
           value: "$(params.cos-bucket-name)"
         - name: cos-endpoint
@@ -770,15 +743,15 @@ spec:
         - name: deployment-delta-list-path
           value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
         - name: target
-          value: "$(tasks.setup.results.target-environment-candidate)"
+          value: "$(tasks.setup.results.target-environment)"
         - name: include-cd-evidence
           value: "1"
         - name: inventory-url
           value: $(tasks.setup.results.inventory-url)
         - name: toolchain-crn
-          value: $(tasks.prod-get-toolchain-crn.results.extracted-value)
+          value: $(tasks.setup.results.toolchain-crn)
         - name: evidence-repo-url
-          value: $(tasks.prod-extract-evidence-locker-url.results.extracted-value)
+          value: $(tasks.setup.results.evidence-locker-url)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -796,31 +769,27 @@ spec:
         - name: toolchain-apikey-secret-key
           value: "ibmcloud-api-key"
         - name: evidence-repo-path
-          value: $(tasks.prod-get-evidence-locker-path.results.extracted-value)
+          value: $(tasks.setup.results.evidence-locker-folder)
         - name: evidence-summary-path
           value: "$(tasks.prod-change-request-close-get-evidence-summary.results.summary-path)"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: prod-inventory-merge-change-request-branch
+    - name: prod-inventory-conclude
       taskRef:
-        name: inventory-apply
+        name: inventory-conclude
       runAfter:
         - prod-deployment
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
-        - name: change-request-id
-          value: $(tasks.prod-change-request-create.results.change-request-id)
+        - name: inventory-repo-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: target-environment
+          value: "$(tasks.setup.results.target-environment)"
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: inventory-folder
-          value: $(tasks.prod-clone-inventory-repo.results.directory-name)
-        - name: target-environment
-          value: $(tasks.setup.results.target-environment)
 
     - name: prod-close-change-request
       taskRef:

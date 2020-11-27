@@ -134,123 +134,33 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: clone-inventory-repo
-      taskRef:
-        name: git-clone
-      runAfter:
-        - get-git-credentials
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: repository
-          value: $(tasks.get-inventory-variables.results.inventory-url)
-        - name: branch
-          value: "master"
-        - name: git-user
-          value: $(tasks.get-git-credentials.results.git-auth-user)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
     - name: inventory-promote
       taskRef:
         name: inventory-promote
       runAfter:
-        - clone-inventory-repo
+        - get-git-credentials
       workspaces:
-        - name: artifacts
-          workspace: artifacts
         - name: secrets
           workspace: artifacts
       params:
-        - name: app-name
-          value: $(params.application)
         - name: source
           value: $(params.source-environment)
         - name: target
           value: $(params.target-environment)
-        - name: branch
-          value: $(tasks.setup-variables.results.pipeline-run-id)
+        - name: priority
+          value: $(params.priority)
+        - name: assignee
+          value: $(params.assignee)
+        - name: description
+          value: $(params.description)
+        - name: purpose
+          value: $(params.purpose)
+        - name: impact
+          value: $(params.impact)
+        - name: backout-plan
+          value: $(params.backout-plan)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-
-    - name: create-promotion-pull-request
-      taskRef:
-        name: github-create-pull-request
-      runAfter:
-        - inventory-promote
-        - get-inventory-variables
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: owner
-          value: $(tasks.get-inventory-variables.results.inventory-owner)
-        - name: repository
-          value: $(tasks.get-inventory-variables.results.inventory-name)
-        - name: head
-          value: $(tasks.setup-variables.results.pipeline-run-id)
-        - name: base
-          value: $(params.target-environment)
-        - name: title
-          value: $(tasks.setup-variables.results.pull-request-title)
-        - name: body
-          value: |
-            This Pull Request was created by an automated build promotion. Pipeline Run ID: $(tasks.setup-variables.results.pipeline-run-id)
-
-            # Priority
-            <!-- Select the priority of this change -->
-            <priority>
-
-              $(params.priority)
-
-            </priority>
-
-            # Change Request assignee
-            <!-- The functional ID or the person's email who will be assigned to the Change Request in ServiceNow -->
-            <!-- Both of them need access to the ServiceNow -->
-            <!-- Note: This is not the approver of the Change Request -->
-            <assignedto>
-
-              $(params.assignee)
-
-            </assignedto>
-
-            # Additional Description
-            <!-- Some description of the change, implementation steps -->
-            <!-- This field will be appended with the commit messages of the content of the PR, -->
-            <!-- and any PR description that was included since the last PR into this branch -->
-            <description>
-
-              $(params.description)
-
-            </description>
-
-            # Purpose/Goal
-            <!-- Write the reason of why the change is needed -->
-            <purpose>
-
-              $(params.purpose)
-
-            </purpose>
-
-            # Explanation of Impact
-            <!-- Write down what this Change Implementation will impact -->
-            <impact>
-
-              $(params.impact)
-
-            </impact>
-
-            # Backout Plan
-            <!-- Write some details how the change will be rolled back in case of a failure -->
-            <backoutplan>
-
-              $(params.backout-plan)
-
-            </backoutplan>
 
     - name: notify-pipeline-end
       when:
@@ -260,7 +170,7 @@ spec:
       taskRef:
         name: slack-post-message
       runAfter:
-        - create-promotion-pull-request
+        - inventory-promote
       workspaces:
         - name: workspace
           workspace: artifacts
@@ -271,4 +181,4 @@ spec:
               import os
               print("Promotion Pipeline finished!")
               print("<https://cloud.ibm.com/devops/pipelines/tekton/" + os.getenv("PIPELINE_ID") + "/runs/" + os.getenv("PIPELINE_RUN_ID") + "?env_id=ibm:yp:" + os.getenv("TOOLCHAIN_REGION") + " | See the Pipeline Logs>")
-              print("<$(tasks.create-promotion-pull-request.results.pull-request-url)|See the Promotion Pull Request>")
+              print("<$(tasks.inventory-promote.results.promotion-pr-url)|See the Promotion Pull Request>")

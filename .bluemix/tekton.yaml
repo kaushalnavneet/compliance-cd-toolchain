@@ -3,7 +3,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/servicenow-prepare-change-request/5
+    path: stable/task/servicenow-prepare-change-request/6
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -35,7 +35,7 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/evidence-summarize/3
+    path: stable/task/evidence-summarize/4
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
@@ -87,15 +87,15 @@ inputs:
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-cr-add/4
+    path: stable/task/inventory-cr-add/5
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-apply/2
+    path: stable/task/inventory-conclude/1
   - type: git
     branch: master
     service: ${TEKTON_CATALOG_REPO}
-    path: stable/task/inventory-deployment-bom/2
+    path: stable/task/inventory-deployment-bom/3
   - type: git
     branch: develop
     service: ${TEKTON_DEFINITION_REPO}
@@ -104,7 +104,7 @@ triggers:
   - type: git
     name: Git CD Trigger
     service: ${INVENTORY_REPO}
-    pattern: '*_candidate'
+    branch: ${TARGET_ENVIRONMENT}
     disabled: true
     events:
       push: true
