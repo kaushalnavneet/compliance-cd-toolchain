@@ -53,7 +53,7 @@ spec:
             fieldPath: metadata.annotations['devops.cloud.ibm.com/tekton-pipeline']
   steps:
     - name: inventory-promote
-      image: wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/ibm-compliance-automation:1.1.8@sha256:de2d767a5295334959955b39a681cb78e103addd09c3d6c311fa53ad724fcaea
+      image: wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/ibm-compliance-automation:1.2.0@sha256:91cd436d40b871e4c89ab7c8308652628e1a4eef6135c6e8166a87899226eed4
       volumeMounts:
         - mountPath: /cd-config
           name: cd-config-volume
