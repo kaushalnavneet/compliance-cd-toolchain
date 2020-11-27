@@ -97,7 +97,7 @@ inputs:
     service: ${TEKTON_CATALOG_REPO}
     path: stable/task/inventory-deployment-bom/3
   - type: git
-    branch: develop
+    branch: v6
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
