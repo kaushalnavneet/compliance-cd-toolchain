@@ -193,6 +193,8 @@ spec:
           mountPath: /config/$(params.secret-3)
         - name: secret-4
           mountPath: /config/$(params.secret-4)
+        - name: toolchain
+          mountPath: /toolchain
       env:
         - name: PIPELINE_RUN_NAME
           valueFrom:
@@ -290,3 +292,6 @@ spec:
       secret:
         secretName: $(params.secret-4)
         optional: true
+    - name: toolchain
+      configMap:
+        name: toolchain
