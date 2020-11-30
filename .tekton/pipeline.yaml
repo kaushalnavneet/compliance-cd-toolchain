@@ -585,6 +585,11 @@ spec:
           value: $(tasks.prod-acceptance-tests-config.results.abort-on-failure)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: params
+          value: |
+            environment: $(tasks.setup.results.target-environment)
+            deployment-delta-path: "../$(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)"
+            inventory-path: "../$(tasks.prod-clone-inventory-repo.results.directory-name)"
 
     - name: prod-acceptance-tests-create-doi-data
       runAfter:
