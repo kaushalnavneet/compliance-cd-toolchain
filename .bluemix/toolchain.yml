@@ -226,7 +226,7 @@ form:
       incident-issues-repo:
       evidence-locker-repo:
       inventory-repo:
-      one-pipeline-repo:
+      one-pipeline-repo: 'https://github.ibm.com/one-pipeline/hello-compliance-deployment'
     schema:
       $ref: repos.json
 
