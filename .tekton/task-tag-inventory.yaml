@@ -32,8 +32,6 @@ spec:
       script: |
         #!/bin/bash
 
-        set -e -o pipefail
-
         if [ $PIPELINE_DEBUG == 1 ]; then
           pwd
           env
@@ -51,3 +49,8 @@ spec:
           --repo="${GHE_REPO}" \
           --environment="${TARGET_ENV}" \
           "${PIPELINE_RUN_ID}"
+
+        if [ $? -ne 0 ]; then
+          echo "The target branch cannot be found, please run the promotion pipeline first!"
+          exit 1
+        fi

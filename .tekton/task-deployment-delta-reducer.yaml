@@ -43,7 +43,8 @@ spec:
         fi
 
         if [ -z $app ]; then
-          echo "ERROR: no entries found in inventory, check your promotion targets"
+          echo "ERROR: no entries found in inventory"
+          echo "Please make sure the promotion pull request is merged to the target environment"
           exit 1
         fi
 
