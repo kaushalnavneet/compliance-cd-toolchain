@@ -231,6 +231,9 @@ spec:
       script: |
         #!/bin/sh
 
+        export WORKSPACE="$(workspaces.app.path)"
+        export CONFIG_DIR="$(workspaces.app.path)/$(params.working-dir)"
+
         # run the stage script
         if $(workspaces.app.path)/$(params.script); then
           echo -n $? > $(results.exit-code.path)
