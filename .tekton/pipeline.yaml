@@ -668,7 +668,7 @@ spec:
               {
                 "name": "acceptance-test",
                 "step": "",
-                "evidence_type": "com.ibm.acceptance_test",
+                "evidence_type": "com.ibm.acceptance_tests",
                 "evidence_type_version": "1.0.0",
                 "expected": "success",
                 "actual": "$(tasks.prod-acceptance-tests.results.status)",
@@ -728,7 +728,7 @@ spec:
               {
                 "name": "prod-acceptance-tests",
                 "step": "",
-                "evidence_type": "com.ibm.acceptance_test",
+                "evidence_type": "com.ibm.acceptance_tests",
                 "expected": "success",
                 "actual": "$(tasks.prod-acceptance-tests.results.status)"
               },
