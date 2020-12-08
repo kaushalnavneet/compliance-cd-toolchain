@@ -334,6 +334,10 @@ spec:
       params:
         - name: deployment-delta-list-path
           value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+        - name: inventory-entries-list-path
+          value: $(tasks.prod-get-deployment-delta.results.inventory-entries-list-path)
+        - name: use-delta-as-base
+          value: "1"
         - name: target
           value: "$(tasks.setup.results.target-environment)"
         - name: toolchain-crn
@@ -747,6 +751,10 @@ spec:
       params:
         - name: deployment-delta-list-path
           value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+        - name: inventory-entries-list-path
+          value: $(tasks.prod-get-deployment-delta.results.inventory-entries-list-path)
+        - name: use-delta-as-base
+          value: "0"
         - name: target
           value: "$(tasks.setup.results.target-environment)"
         - name: include-cd-evidence
