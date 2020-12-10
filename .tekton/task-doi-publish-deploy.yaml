@@ -1,0 +1,200 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: devops-insights-publish-deploy
+spec:
+  description: |
+    This task publishes a deploy record to DevOps Insights for every given application
+  params:
+    - name: deployment-delta-list-path
+      description: Path to JSON list of application names in inventory
+    - name: toolchain-id
+      description: Toolchain service instance id - Default to the toolchain containing the CD Tekton PipelineRun currently executed
+      default: ""
+    - name: environment
+      description: The environment where the pipeline job deployed the app.
+    - name: deploy-status
+      description: The deployment status (can be either pass | fail)
+      default: "pass"
+    - name: job-url
+      description: The url to the job's deployment logs. Default to the CD Tekton PipelineRun currently executed
+      default: ""
+    - name: ibmcloud-api
+      description: the ibmcloud api
+      default: https://cloud.ibm.com
+    - name: continuous-delivery-context-secret
+      description: name of the configmap containing the continuous delivery pipeline context secrets
+      default: "secure-properties"
+    - name: toolchain-apikey-secret-key
+      description: field in the secret that contains the api key used to access toolchain and DOI instance
+      default: "toolchain-apikey"
+    - name: inventory-repo-url
+      description: The inventory repository
+      default: ""
+    - name: git-api-token-key
+      description: The name of the secret in the workspace
+      default: "git-token"
+    - name: break-glass-name
+      description: Name of the `ConfigMap` that holds Break-Glass mode settings
+      default: environment-properties
+    - name: break-glass-key
+      description: Key in the `break-glass-name` `ConfigMap` that holds the Break-Glass mode settings
+      default: break_glass
+    - name: pipeline-debug
+      description: Pipeline debug mode
+      default: "0"
+
+  workspaces:
+    - name: secrets
+      mountPath: /secrets
+    - name: artifacts
+      mountPath: /artifacts
+
+  stepTemplate:
+    env:
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+      - name: INVENTORY_REPO
+        value: $(params.inventory-repo-url)
+      - name: PIPELINE_RUN_ID
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/tekton-pipeline']
+  steps:
+    - name: get-build-numbers
+      image: wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/ibm-compliance-automation:1.2.4@sha256:dc98cc52c0caede42149c08727147520e30e81fee543b8dd5939b45d06baa142
+      workingDir: $(workspaces.artifacts.path)
+      script: |
+        #!/bin/bash
+        set -e -o pipefail;
+        if [ "$PIPELINE_DEBUG" == 1 ]; then
+          env
+          trap env EXIT
+          set -x
+        fi
+
+        GHE_REPO=${INVENTORY_REPO##*/}
+        export GHE_REPO=${GHE_REPO%.git}
+        GHE_ORG=${INVENTORY_REPO%/*}
+        export GHE_ORG=${GHE_ORG##*/}
+        GHE_TOKEN=$(cat "/secrets/$(params.git-api-token-key)")
+        export GHE_TOKEN
+        APPS="$(cat "$(params.deployment-delta-list-path)")"
+
+        for array_raw_item in $(echo "${APPS}" | jq -c '.[]'); do
+          export APP_NAME=$(echo "${array_raw_item}" | jq -r '.')
+
+          build_number=$(cocoa inventory get \
+            --org="$GHE_ORG" \
+            --repo="$GHE_REPO" \
+            --entry="$APP_NAME" \
+            --label="${PIPELINE_RUN_ID}" \
+            --property="build_number")
+
+          echo $build_number >> build_numbers.txt
+        done
+
+    - name: publish-deployrecord
+      image: ibmcom/pipeline-base-image:2.9@sha256:2976e1374e87f5cddabcf80179d9708868d52dbf656fdde60f803553be633db2
+      env:
+        - name: IBM_CLOUD_API
+          value: $(params.ibmcloud-api)
+        - name: IBM_CLOUD_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: $(params.continuous-delivery-context-secret)
+              key: $(params.toolchain-apikey-secret-key)
+              optional: true
+        - name: BREAK_GLASS
+          valueFrom:
+            configMapKeyRef:
+              name: $(params.break-glass-name)
+              key: $(params.break-glass-key)
+              optional: true
+        - name: TOOLCHAIN_ID
+          value: $(params.toolchain-id)
+        - name: DEPLOY_STATUS
+          value: $(params.deploy-status)
+        - name: ENVIRONMENT
+          value: $(params.environment)
+        - name: JOB_URL
+          value: $(params.job-url)
+        - name: PIPELINE_RUN_URL
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['devops.cloud.ibm.com/pipeline-run-url']
+      workingDir: $(workspaces.artifacts.path)
+      script: |
+        #!/bin/bash
+        set -e -o pipefail
+
+        if [ $PIPELINE_DEBUG == 1 ]; then
+          env
+          cat /cd-config/toolchain.json
+          trap env EXIT
+          set -x
+        fi
+
+        if [[ -n "$BREAK_GLASS" ]]; then
+          echo "Break-Glass mode is on, skipping the rest of the task..."
+          exit 0
+        fi
+
+        if [[ "$IBM_CLOUD_API" == *test* ]]; then
+          export IBM_CLOUD_DEVOPS_ENV=dev
+        fi
+
+        CURRENT_TOOLCHAIN_ID=$(jq -r '.toolchain_guid' /cd-config/toolchain.json)
+        DOI_IN_TOOLCHAIN=$(jq -e '[.services[] | select(.service_id=="draservicebroker")] | length' /cd-config/toolchain.json)
+
+        if [ "$DOI_IN_TOOLCHAIN" == 0 ]; then
+          if [ -z "$TOOLCHAIN_ID" ] || [ "$CURRENT_TOOLCHAIN_ID" == "$TOOLCHAIN_ID" ]; then
+            echo "No Devops Insights integration found in toolchain. Skipping ..."
+            exit 0
+          fi
+        fi
+
+        # Default Toolchain ID if needed
+        if [ -z "$TOOLCHAIN_ID" ]; then
+          TOOLCHAIN_ID=$CURRENT_TOOLCHAIN_ID
+        fi
+
+        # Default Job URL if needed
+        if [ -z "$JOB_URL" ]; then
+          JOB_URL="$PIPELINE_RUN_URL"
+        fi
+
+        APPS="$(cat "$(workspaces.artifacts.path)/$(params.deployment-delta-list-path)")"
+
+        export TOOLCHAIN_ID=${TOOLCHAIN_ID} # for doi plugin
+        ibmcloud login --apikey ${IBM_CLOUD_API_KEY} -a ${IBM_CLOUD_API} --no-region
+
+        BUILD_NUMBERS=()
+        if [ -f "build_numbers.txt" ]; then
+          mapfile -t BUILD_NUMBERS < build_numbers.txt
+        fi
+
+        i=0
+        for array_raw_item in $(echo "${APPS}" | jq -c '.[]'); do
+          APP_NAME=$(echo "${array_raw_item}" | jq -r '.' | sed -e 's/\//--/g')
+          BUILD_NUMBER=$(echo "${BUILD_NUMBERS[i]}")
+          ibmcloud doi publishdeployrecord \
+            --env "${ENVIRONMENT}" \
+            --status=${DEPLOY_STATUS} \
+            --joburl="${JOB_URL}" \
+            --buildnumber="${BUILD_NUMBER}" \
+            --logicalappname="${APP_NAME}"
+          ((i+=1))
+        done
+      volumeMounts:
+        - mountPath: /cd-config
+          name: cd-config-volume
+
+  volumes:
+    - name: cd-config-volume
+      configMap:
+        name: toolchain
+        items:
+          - key: toolchain.json
+            path: toolchain.json

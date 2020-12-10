@@ -641,6 +641,30 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: prod-publish-deployrecord
+      taskRef:
+        name: devops-insights-publish-deploy
+      runAfter:
+        - prod-get-deployment-delta
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: deployment-delta-list-path
+          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
+        - name: inventory-repo-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: toolchain-id
+          value: "$(params.doi-toolchain-id)"
+        - name: environment
+          value: "$(tasks.setup.results.target-environment)"
+        - name: pipeline-debug
+          value: "$(params.pipeline-debug)"
+        - name: toolchain-apikey-secret-key
+          value: "ibmcloud-api-key"
+
     - name: prod-compliance-collector
       taskRef:
         name: compliance-collector
