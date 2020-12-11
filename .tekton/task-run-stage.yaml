@@ -242,7 +242,7 @@ spec:
         . ../environment-variables
 
         export WORKSPACE="$(workspaces.app.path)"
-        export CONFIG_DIR="$(workspaces.app.path)/$(params.working-dir)"
+        export CONFIG_DIR="/config"
 
         # run the stage script
         if $(workspaces.app.path)/$(params.script); then
