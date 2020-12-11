@@ -536,6 +536,15 @@ spec:
             deployment-delta-path: "../$(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)"
             inventory-path: "../$(tasks.prod-clone-inventory-repo.results.directory-name)"
 
+    - name: security-compliance
+      runAfter:
+        - prod-deployment
+      taskRef:
+        name: security-compliance-scan
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: prod-acceptance-tests-config
       taskRef:
         name: parse-config

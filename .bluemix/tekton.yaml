@@ -85,6 +85,10 @@ inputs:
     service: ${TEKTON_CATALOG_REPO}
     path: stable/task/inventory-deployment-bom/3
   - type: git
+    branch: master
+    service: ${TEKTON_CATALOG_REPO}
+    path: stable/task/security-compliance-scan/1
+  - type: git
     branch: develop
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
