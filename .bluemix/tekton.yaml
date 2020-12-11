@@ -89,7 +89,7 @@ inputs:
     service: ${TEKTON_CATALOG_REPO}
     path: stable/task/security-compliance-scan/1
   - type: git
-    branch: develop
+    branch: v7
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
