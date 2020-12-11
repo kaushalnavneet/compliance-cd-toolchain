@@ -17,3 +17,9 @@ spec:
       value: $(event.pull_request.base.ref)
     - name: revision
       value: $(event.pull_request.head.sha)
+    - name: base-commit
+      value: $(event.pull_request.base.sha)
+    - name: target-branch
+      value: $(event.pull_request.base.ref)
+    - name: pr-number
+      value: $(event.pull_request.number)

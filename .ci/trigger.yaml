@@ -24,6 +24,11 @@ spec:
       default: "0"
     - name: artifactory-dockerconfigjson
       description: dockerconfigjson for pullsecrets
+    - name: target-branch
+      description: target branch
+    - name: pr-number
+      description: the PR number
+    - name: base-commit
 
   resourcetemplates:
     - apiVersion: v1
@@ -77,4 +82,10 @@ spec:
             value: $(params.revision)
           - name: statuses-repo-url
             value: $(params.statuses-repo-url)
+          - name: pr-number
+            value: $(params.pr-number)
+          - name: target-branch
+            value: $(params.target-branch)
+          - name: base-commit
+            value: $(params.base-commit)
         serviceAccountName: sa-pullsecret

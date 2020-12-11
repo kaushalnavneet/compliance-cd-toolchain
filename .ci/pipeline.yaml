@@ -20,6 +20,11 @@ spec:
     - name: pipeline-debug
       description: Pipeline debug ("verbose") mode
       default: "0"
+    - name: pr-number
+      description: the number of the pull request
+    - name: target-branch
+      description: target branch
+    - name: base-commit
 
   workspaces:
     - name: artifacts
@@ -206,6 +211,82 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: check-pr-github-status-pending
+      runAfter:
+        - git-get-credentials
+      taskRef:
+        name: github-set-status
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: secret-name
+          value: git-token
+        - name: repo-url
+          value: $(params.statuses-repo-url)
+        - name: commit-sha
+          value: $(params.revision)
+        - name: state
+          value: "pending"
+        - name: context
+          value: tekton/check-pr
+        - name: description
+          value: PR Checker Script started.
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: pr-check
+      runAfter:
+        - tekton-lint
+      taskRef:
+        name: check-pull-request
+      params:
+        - name: branch
+          value: $(params.branch)
+        - name: target-branch
+          value: $(params.target-branch)
+        - name: pr-number
+          value: $(params.pr-number)
+        - name: github-user
+          value: $(tasks.git-get-credentials.results.git-auth-user)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: directory-name
+          value: $(tasks.clone-repo.results.directory-name)
+        - name: to-commit
+          value: $(params.revision)
+        - name: from-commit
+          value: $(params.base-commit)
+        - name: repo-url
+          value: $(tasks.clone-repo.results.git-url)
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+
+    - name: pr-checks-github-status-result
+      taskRef:
+        name: github-set-status
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: secret-name
+          value: git-token
+        - name: repo-url
+          value: $(params.statuses-repo-url)
+        - name: commit-sha
+          value: $(params.revision)
+        - name: state
+          value: $(tasks.pr-check.results.status)
+        - name: context
+          value: tekton/check-pr
+        - name: description
+          value: PR Checker Script finished.
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
     - name: code-pipeline-evaluator
       runAfter:
         - tekton-lint
@@ -224,5 +305,10 @@ spec:
                 "name": "tekton-lint",
                 "expected": "success",
                 "actual": "$(tasks.tekton-lint.results.status)"
+              },
+              {
+                "name": "pr-check",
+                "expected": "success",
+                "actual": "$(tasks.pr-check.results.status)"
               }
             ]
