@@ -244,7 +244,7 @@ To integrate the toolchain with the Security and Compliance Service (Project For
 
 ### Link DOI toolchain
 
-CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so that it is able to publish the deployment records to insights.
+CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so that it is able to publish the deployment records to insights. You can use your CI toolchain since that has DOI integrated.
 
 | ![DOI Toolchain ID](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/doi-toolchain.png) |
 | :--: |
