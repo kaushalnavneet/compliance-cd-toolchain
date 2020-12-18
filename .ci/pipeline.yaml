@@ -60,15 +60,31 @@ spec:
         - name: repository
           value: $(params.repository)
         - name: branch
-          value: $(params.branch)
-        - name: origin
-          value: $(params.origin)
-        - name: revision
-          value: $(params.revision)
+          value: $(params.target-branch)
         - name: directory-name
           value: "compliance-cd-toolchain"
         - name: git-user
           value: $(tasks.git-get-credentials.results.git-auth-user)
+
+    - name: setup-repo
+      runAfter:
+        - clone-repo
+      taskRef:
+        name: util-run
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: script
+          value:
+            |
+            cd /scripts/compliance-cd-toolchain;
+            git config --global user.email "tekton@example.com"
+            git config --global user.name "Tekton"
+            git merge origin/$(params.branch) --no-ff
+
+      workspaces:
+        - name: scripts
+          workspace: artifacts
 
     - name: clone-common-tasks
       taskRef:
@@ -119,7 +135,7 @@ spec:
         name: yaml-lint
       runAfter:
         - clone-common-tasks
-        - clone-repo
+        - setup-repo
       workspaces:
         - name: artifacts
           workspace: artifacts
