@@ -14,6 +14,9 @@ spec:
       default: ""
     - name: environment
       description: The environment where the pipeline job deployed the app.
+    - name: doi-environment
+      description: The environment where the pipeline job deployed the app.
+      default: ""
     - name: deploy-status
       description: The deployment status (can be either pass | fail)
       default: "pass"
@@ -117,7 +120,7 @@ spec:
         - name: DEPLOY_STATUS
           value: $(params.deploy-status)
         - name: ENVIRONMENT
-          value: $(params.environment)
+          value: $(params.doi-environment)
         - name: JOB_URL
           value: $(params.job-url)
         - name: PIPELINE_RUN_URL
@@ -153,6 +156,10 @@ spec:
             echo "No Devops Insights integration found in toolchain. Skipping ..."
             exit 0
           fi
+        fi
+
+        if [ -z "$ENVIRONMENT" ]; then
+          ENVIRONMENT=$(params.environment)
         fi
 
         # Default Toolchain ID if needed

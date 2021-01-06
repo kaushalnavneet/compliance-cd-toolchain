@@ -40,6 +40,9 @@ spec:
       default: master
     - name: target-environment
       description: target environment
+    - name: doi-environment
+      description: doi target environment
+      default: ""
     - name: target-environment-ref
       description: target environment branch name from git trigger
       default: ""
@@ -647,6 +650,8 @@ spec:
           value: "ibmcloud-api-key"
         - name: toolchain-id
           value: $(params.doi-toolchain-id)
+        - name: doi-environment
+          value: $(params.doi-environment)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
@@ -669,6 +674,8 @@ spec:
           value: "$(params.doi-toolchain-id)"
         - name: environment
           value: "$(tasks.setup.results.target-environment)"
+        - name: doi-environment
+          value: "$(params.doi-environment)"
         - name: pipeline-debug
           value: "$(params.pipeline-debug)"
         - name: toolchain-apikey-secret-key
