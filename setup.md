@@ -257,6 +257,9 @@ For example, if the URL is: `https://cloud.ibm.com/devops/toolchains/aaaaaaa-bbb
 Note: Make sure to only include the ID here, not the full URL.
 
 
+You can also set a target environment for the DOI interactions, this parameter is optional. If you provide this parameter, it will be used instead of the target environment from the inventory.
+
+
 
 ### Cloud Object Storage (Not Required)
 

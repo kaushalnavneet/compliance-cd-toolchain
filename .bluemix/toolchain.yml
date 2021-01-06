@@ -181,6 +181,7 @@ services:
           # Private Worker for the pipeline
           PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
           DOI_TOOLCHAIN_ID: '{{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
+          DOI_ENVIRONMENT: '{{form.customtool_doi-toolchain.parameters.doi-environment}}'
           COS_BUCKET_NAME: '{{form.customtool_cos-bucket.parameters.cos-bucket-name}}'
           COS_ENDPOINT: '{{form.customtool_cos-bucket.parameters.cos-endpoint}}'
         execute: true
@@ -251,6 +252,7 @@ form:
   customtool_doi-toolchain:
     parameters:
       doi-toolchain-id:
+      doi-environment:
     schema:
       $ref: doi-toolchain.json
 

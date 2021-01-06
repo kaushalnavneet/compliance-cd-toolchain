@@ -141,6 +141,9 @@ properties:
   - name: target-environment
     value: ${TARGET_ENVIRONMENT}
     type: text
+  - name: doi-environment
+    value: ${DOI_ENVIRONMENT}
+    type: text
   - name: change-request-id
     value: notAvailable
     type: text
