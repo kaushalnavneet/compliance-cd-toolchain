@@ -150,9 +150,6 @@ properties:
   - name: artifactory-dockerconfigjson
     value: ${ARTIFACTORY_DOCKER_CONFIG_JSON}
     type: SECURE
-  - name: onepipeline-dockerconfigjson
-    value: ${ONEPIPELINE_DOCKER_CONFIG_JSON}
-    type: SECURE
   - name: pipeline-debug
     type: single_select
     value:
