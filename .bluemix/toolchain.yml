@@ -19,7 +19,6 @@ template:
     - one-pipeline-repo
     - servicenow
     - artifactoryComp
-    - privateWorker
     - doi-toolchain
     - fortress
   info:
