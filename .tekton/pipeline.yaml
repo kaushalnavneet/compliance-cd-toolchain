@@ -859,7 +859,7 @@ spec:
                 "evidence_type": "com.ibm.acceptance_tests",
                 "expected": "success",
                 "actual": "$(tasks.prod-acceptance-tests.results.status)"
-              },
+              }
             ]
 
     - name: prod-evidence-summary-upload
