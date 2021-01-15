@@ -38,13 +38,13 @@ spec:
         version: '1'
 
         setup:
-          image: ibmcom/pipeline-base-image:2.7
+          image: ibmcom/pipeline-base-image:2.6
           script: |
             #!/usr/bin/env bash
             echo "No $(params.file) found, assuming default behavior..."
             echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
 
-            npm ci
+            source scripts/setup.sh
 
         test:
           image: ibmcom/pipeline-base-image:2.7

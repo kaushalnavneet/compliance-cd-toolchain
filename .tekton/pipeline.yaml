@@ -477,9 +477,71 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: prod-deployment-config
+    - name: prod-cd-setup-config
       runAfter:
         - prod-normalize-config
+      taskRef:
+        name: parse-config
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: stage
+          value: setup
+        - name: file
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)/$(params.one-pipeline-config)
+
+    - name: prod-cd-setup
+      taskRef:
+        name: run-stage
+      runAfter:
+        - prod-cd-setup-config
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: image
+          value: $(tasks.prod-cd-setup-config.results.image)
+        - name: script
+          value: $(tasks.prod-cd-setup-config.results.script)
+        - name: working-dir
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
+        - name: configmap-0
+          value: $(tasks.prod-cd-setup-config.results.configmap-0)
+        - name: configmap-1
+          value: $(tasks.prod-cd-setup-config.results.configmap-1)
+        - name: configmap-2
+          value: $(tasks.prod-cd-setup-config.results.configmap-2)
+        - name: configmap-3
+          value: $(tasks.prod-cd-setup-config.results.configmap-3)
+        - name: configmap-4
+          value: $(tasks.prod-cd-setup-config.results.configmap-4)
+        - name: secret-0
+          value: $(tasks.prod-cd-setup-config.results.secret-0)
+        - name: secret-1
+          value: $(tasks.prod-cd-setup-config.results.secret-1)
+        - name: secret-2
+          value: $(tasks.prod-cd-setup-config.results.secret-2)
+        - name: secret-3
+          value: $(tasks.prod-cd-setup-config.results.secret-3)
+        - name: secret-4
+          value: $(tasks.prod-cd-setup-config.results.secret-4)
+        - name: abort-on-failure
+          value: $(tasks.prod-cd-setup-config.results.abort-on-failure)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: params
+          value: |
+            environment: $(tasks.setup.results.target-environment)
+            cluster-name: $(params.cluster)
+            dev-region: $(params.cluster-region)
+            dev-cluster-namespace: $(params.cluster-namespace)
+            deployment-delta-path: "../$(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)"
+            inventory-path: "../$(tasks.prod-clone-inventory-repo.results.directory-name)"
+
+    - name: prod-deployment-config
+      runAfter:
+        - prod-cd-setup
       taskRef:
         name: parse-config
       workspaces:
@@ -495,7 +557,7 @@ spec:
       taskRef:
         name: run-stage
       runAfter:
-        - prod-change-request-change-state-to-implement
+        - prod-cd-setup
       workspaces:
         - name: app
           workspace: artifacts
