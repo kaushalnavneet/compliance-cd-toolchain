@@ -117,6 +117,11 @@ spec:
           fi
         done <<< "$DELTA"
 
+        if [ "$delta_json" = "[]" ]; then
+          echo "There is no code change detected, therefore no Change Request can be made.\nTo run the CD successfully, please provide an existing Change Request ID."
+          exit 1
+        fi
+
         echo -n "$delta_json" > "./deployment-delta-list.json"
 
         echo "Changed entries in inventory since last deployment:"
