@@ -11,6 +11,7 @@ spec:
       description: directory name where the inventory located
     - name: git-api-token-key
       default: "git-token"
+    - name: change-request-id
     - name: pipeline-debug
       default: "0"
 
@@ -117,7 +118,7 @@ spec:
           fi
         done <<< "$DELTA"
 
-        if [ "$delta_json" = "[]" ]; then
+        if [ "$delta_json" = "[]" ] && [[ "$(params.change-request-id)" = "notAvailable"  || -z "$(params.change-request-id)" ]]; then
           echo -e "There is no code change detected, therefore no Change Request can be made.\nTo run the CD successfully, please make sure the promotion pull request is merged or provide an existing Change Request ID."
           exit 1
         fi

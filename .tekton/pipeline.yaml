@@ -290,6 +290,8 @@ spec:
           value: $(tasks.setup.results.inventory-url)
         - name: inventory-folder
           value: $(tasks.prod-clone-inventory-repo.results.directory-name)
+        - name: change-request-id
+          value: $(params.change-request-id)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
