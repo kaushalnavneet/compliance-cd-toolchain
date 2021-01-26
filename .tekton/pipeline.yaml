@@ -779,6 +779,8 @@ spec:
     - name: prod-close-change-request
       taskRef:
         name: servicenow-close-change-request
+      runAfter:
+        - prod-change-request-close-get-evidence-summary
       workspaces:
         - name: artifacts
           workspace: artifacts
