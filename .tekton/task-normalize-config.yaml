@@ -42,7 +42,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             echo "No $(params.file) found, assuming default behavior..."
-            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts for more details"
 
             source scripts/setup.sh
 
@@ -51,7 +51,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             echo "No $(params.file) found, assuming default behavior..."
-            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts for more details"
 
             npm test
 
@@ -60,7 +60,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             echo "No $(params.file) found, assuming default behavior..."
-            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts for more details"
 
             source scripts/setup_deploy.sh
             source scripts/deploy.sh
@@ -70,7 +70,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             echo "No $(params.file) found, assuming default behavior..."
-            echo "See https://pages.github.ibm.com/one-pipeline/docs/custom-scripts for more details"
+            echo "See https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts for more details"
 
             source /root/.nvm/nvm.sh
             npm ci
