@@ -295,18 +295,6 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
-    - name: deployment-delta-reducer
-      taskRef:
-        name: deployment-delta-reducer
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: deployment-delta-path
-          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
-        - name: inventory-entries-list-path
-          value: $(tasks.prod-get-deployment-delta.results.inventory-entries-list-path)
-
     - name: prod-inventory-deployment-bom
       runAfter:
         - prod-get-git-credentials
@@ -695,57 +683,6 @@ spec:
         - name: ibmcloud-api-key-secret-key
           value: "ibmcloud-api-key"
 
-    - name: prod-acceptance-tests-results-to-doi
-      runAfter:
-        - prod-acceptance-tests-create-doi-data
-      taskRef:
-        name: devops-insights-publish-test
-      retries: 2
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: app-name
-          value: $(tasks.deployment-delta-reducer.results.application-name)
-        - name: file-locations
-          value: $(tasks.prod-acceptance-tests-create-doi-data.results.file-locations)
-        - name: test-types
-          value: $(tasks.prod-acceptance-tests-create-doi-data.results.test-types)
-        - name: toolchain-apikey-secret-key
-          value: "ibmcloud-api-key"
-        - name: toolchain-id
-          value: $(params.doi-toolchain-id)
-        - name: doi-environment
-          value: $(params.doi-environment)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: prod-publish-deployrecord
-      taskRef:
-        name: devops-insights-publish-deploy
-      runAfter:
-        - prod-get-deployment-delta
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: deployment-delta-list-path
-          value: $(tasks.prod-get-deployment-delta.results.deployment-delta-list-path)
-        - name: inventory-repo-url
-          value: $(tasks.setup.results.inventory-url)
-        - name: toolchain-id
-          value: "$(params.doi-toolchain-id)"
-        - name: environment
-          value: "$(tasks.setup.results.target-environment)"
-        - name: doi-environment
-          value: "$(params.doi-environment)"
-        - name: pipeline-debug
-          value: "$(params.pipeline-debug)"
-        - name: toolchain-apikey-secret-key
-          value: "ibmcloud-api-key"
-
     - name: prod-change-request-close-get-evidence-summary
       taskRef:
         name: evidence-summarize
@@ -899,33 +836,6 @@ spec:
                 "actual": "$(tasks.prod-close-change-request.results.status)",
                 "artifacts": [
                 ]
-              }
-            ]
-
-    - name: prod-compliance-doi-reporter
-      taskRef:
-        name: compliance-doi-reporter
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      params:
-        - name: app-name
-          value: "$(tasks.deployment-delta-reducer.results.application-name)"
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-        - name: toolchain-id
-          value: "$(params.doi-toolchain-id)"
-        - name: ibmcloud-api-key-secret-key
-          value: "ibmcloud-api-key"
-        - name: data
-          value: |
-            [
-              {
-                "name": "prod-acceptance-tests",
-                "step": "",
-                "evidence_type": "com.ibm.acceptance_tests",
-                "expected": "success",
-                "actual": "$(tasks.prod-acceptance-tests.results.status)"
               }
             ]
 
