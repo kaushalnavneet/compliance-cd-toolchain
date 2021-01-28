@@ -119,7 +119,7 @@ spec:
               value: $(params.servicenow-api-base-url)
         steps:
           - name: setup
-            image: ibmcom/pipeline-base-image:2.9@sha256:2976e1374e87f5cddabcf80179d9708868d52dbf656fdde60f803553be633db2
+            image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.9@sha256:2976e1374e87f5cddabcf80179d9708868d52dbf656fdde60f803553be633db2
             volumeMounts:
               - mountPath: /cd-config
                 name: cd-config-volume
