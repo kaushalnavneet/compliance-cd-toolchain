@@ -750,7 +750,7 @@ spec:
       taskRef:
         name: evidence-summarize
       runAfter:
-        - prod-deployment
+        - prod-acceptance-tests
       workspaces:
         - name: artifacts
           workspace: artifacts
