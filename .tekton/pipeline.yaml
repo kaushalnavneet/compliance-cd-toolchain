@@ -365,12 +365,8 @@ spec:
           value: $(tasks.prod-evidence-summary-create.results.formatted-summary-path)
         - name: omit-release-window
           value: "true"
-        - name: cluster
-          value: $(params.cluster)
         - name: cluster-region
           value: $(params.cluster-region)
-        - name: cluster-namespace
-          value: $(params.cluster-namespace)
         - name: deployment-bom-path
           value: $(tasks.prod-inventory-deployment-bom.results.deployment-bom-path)
         - name: emergency-label
