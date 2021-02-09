@@ -29,7 +29,8 @@ template:
         "(" + $env.repository +
           "/tree/" + $env.branch + ")"
 toolchain:
-  name: 'compliance-cd-toolchain-{{timestamp}}'
+  name: >
+    $env.toolchainName ? '{{toolchainName}}' : 'compliance-cd-toolchain-{{timestamp}}'
   template:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
@@ -70,7 +71,11 @@ services:
   privateWorker:
     service_id: private_worker
     parameters:
-      name: private-worker
+      name: >
+        $env.privateWorkerName ? '{{privateWorkerName}}' : 'private-worker'
+      workerQueueCredentials: '{{privateWorkerCreds}}'
+      # TODO: this wont be needed once a fix is in place for https://github.ibm.com/org-ids/roadmap/issues/15360
+      workerQueueIdentifier: '{{privateWorkerIdentifier}}'
 
   artifactoryComp:
     service_id: artifactory
@@ -80,6 +85,10 @@ services:
       repository_url: 'https://wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com'
       repository_name: 'wcp-compliance-automation-team-docker-local'
       type: docker
+      user_id: >
+        $env.artifactoryUser ? '{{artifactoryUser}}' : ''
+      token: >
+        $env.artifactoryToken ? '{{artifactoryToken}}' : ''
 
   tekton-definition-repo:
     service_id: github_integrated
@@ -175,13 +184,16 @@ services:
           SOURCE_ENVIRONMENT: '{{form.pipeline.parameters.source-environment}}'
           TARGET_ENVIRONMENT: '{{form.pipeline.parameters.target-environment}}'
           CANDIDATE_BRANCH: '{{form.pipeline.parameters.target-environment}}_candidate'
-          ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
+          ARTIFACTORY_DOCKER_CONFIG_JSON: >
+            $env.artifactoryDockerConfigJson ? '{{artifactoryDockerConfigJson}}' : '{{form.artifactoryComp.parameters.docker_config_json}}'
           # Private Worker for the pipeline
           PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
           DOI_TOOLCHAIN_ID: '{{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
           DOI_ENVIRONMENT: '{{form.customtool_doi-toolchain.parameters.doi-environment}}'
           COS_BUCKET_NAME: '{{form.customtool_cos-bucket.parameters.cos-bucket-name}}'
           COS_ENDPOINT: '{{form.customtool_cos-bucket.parameters.cos-endpoint}}'
+          WEBHOOK_TOKEN: >
+            $env.webhookToken ? '{{webhookToken}}' : ''
         execute: true
 
   servicenow:
@@ -221,43 +233,67 @@ form:
 
   github_integrated:
     parameters:
-      tekton-catalog-repo: 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
-      tekton-definition-repo: 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
-      incident-issues-repo:
-      evidence-locker-repo:
-      inventory-repo:
-      one-pipeline-repo: 'https://github.ibm.com/one-pipeline/hello-compliance-deployment'
+      tekton-catalog-repo: >
+        $env.tektonCatalogRepo ? '{{tektonCatalogRepo}}' : 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
+      tekton-definition-repo: >
+        $env.tektonDefinitionRepo ? '{{tektonDefinitionRepo}}' : 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
+      incident-issues-repo: >
+        $env.incidentIssuesRepo ? '{{incidentIssuesRepo}}' : ''
+      evidence-locker-repo: >
+        $env.evidenceLockerRepo ? '{{evidenceLockerRepo}}' : ''
+      inventory-repo: >
+        $env.inventoryRepo ? '{{inventoryRepo}}' : ''
+      one-pipeline-repo: >
+        $env.onePipelineRepo ? '{{onePipelineRepo}}' : 'https://github.ibm.com/one-pipeline/hello-compliance-deployment'
     schema:
       $ref: repos.json
 
   pipeline:
     parameters:
-      prod-cluster-namespace: default
-      build-cluster-namespace: staging
       emergency-label: EMERGENCY
       source-environment: master
       target-environment: prod
+      api-key: >
+        $env.ibmCloudApiKey ? '{{ibmCloudApiKey}}' : ''
+      prod-region: >
+        $env.clusterRegion ? '{{clusterRegion}}' : ''
+      prod-resource-group: >
+        $env.clusterResourceGroup ? '{{clusterResourceGroup}}' : ''
+      prod-cluster-name: >
+        $env.clusterName ? '{{clusterName}}' : ''
+      prod-cluster-namespace: >
+        $env.clusterNamespace ? '{{clusterNamespace}}' : 'default'
+      artifactory-userid: >
+        $env.artifactoryUser ? '{{artifactoryUser}}' : ''
+      artifactory-token: >
+        $env.artifactoryToken ? '{{artifactoryToken}}' : ''
     schema:
       $ref: deploy.json
 
   customtool_servicenow:
     parameters:
       api-url: https://watsontest.service-now.com
-      api-token:
-      configuration-item:
+      api-token: >
+        $env.snApiToken ? '{{snApiToken}}' : ''
+      configuration-item: >
+        $env.snConfigurationItem ? '{{snConfigurationItem}}' : ''
     schema:
       $ref: servicenow.json
 
   customtool_doi-toolchain:
     parameters:
-      doi-toolchain-id:
-      doi-environment:
+      doi-toolchain-id: >
+        $env.doiToolchainId ? '{{doiToolchainId}}' : ''
+      doi-environment: >
+        $env.doiEnvironment ? '{{doiEnvironment}}' : ''
     schema:
       $ref: doi-toolchain.json
 
   customtool_cos-bucket:
     parameters:
-      cos-bucket-name: ''
-      cos-endpoint: ''
+      cos-bucket-name: >
+        $env.cosBucketName ? '{{cosBucketName}}' : ''
+      cos-endpoint: >
+        $env.cosEndpoint ? '{{cosEndpoint}}' : ''
     schema:
       $ref: cos.json

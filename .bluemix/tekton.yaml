@@ -107,6 +107,22 @@ triggers:
   - type: manual
     name: Manual Promotion Trigger
     eventListener: promotion-listener
+  - type: generic
+    name: Promotion Webhook Trigger
+    eventListener: promotion-listener
+    secret:
+      value: ${WEBHOOK_TOKEN}
+      type: tokenMatches
+      source: header
+      keyName: sanity
+  - type: generic
+    name: CD Webhook Trigger
+    eventListener: cd-listener
+    secret:
+      value: ${WEBHOOK_TOKEN}
+      type: tokenMatches
+      source: header
+      keyName: sanity
 properties:
   - name: revision
     value: ${BRANCH}
