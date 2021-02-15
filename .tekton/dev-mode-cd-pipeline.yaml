@@ -1,0 +1,409 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: dev-mode-cd-pipeline
+spec:
+  params:
+    - name: servicenow-api-base-url
+      description: The ServiceNow API Base URL you wish to use (test or live)
+    - name: cluster
+      description: iks cluster name
+    - name: cluster-region
+      description: iks cluster region
+    - name: cluster-namespace
+      description: iks cluster namespace
+    - name: pipeline-debug
+      description: toggles debug mode for the pipeline
+    - name: one-pipeline-config
+      description: Configuration file to be used to customize pipeline behavior
+      default: .one-pipeline.yaml
+    - name: one-pipeline-config-branch
+      description: The branch where the configuration file is kept
+      default: master
+    - name: target-environment
+      description: target environment
+    - name: target-environment-ref
+      description: target environment branch name from git trigger
+      default: ""
+
+  workspaces:
+    - name: artifacts
+
+  tasks:
+    - name: setup
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: target-environment
+          value: $(params.target-environment)
+        - name: target-environment-ref
+          value: $(params.target-environment-ref)
+        - name: servicenow-api-base-url
+          value: $(params.servicenow-api-base-url)
+      taskSpec:
+        params:
+          - name: pipeline-debug
+          - name: target-environment
+          - name: target-environment-ref
+          - name: servicenow-api-base-url
+        results:
+          - name: evidence-locker-url
+          - name: evidence-locker-folder
+          - name: incident-issues-url
+          - name: inventory-url
+          - name: one-pipeline-config-url
+          - name: pipeline-run-id
+          - name: inventory-repo-owner
+          - name: inventory-repo-name
+          - name: target-environment
+          - name: change-request-url
+          - name: servicenow-api-url
+          - name: toolchain-crn
+        volumes:
+          - name: cd-config-volume
+            configMap:
+              name: toolchain
+        stepTemplate:
+          env:
+            - name: PIPELINE_DEBUG
+              value: $(params.pipeline-debug)
+            - name: PIPELINE_RUN_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['devops.cloud.ibm.com/tekton-pipeline']
+            - name: CHANGE_API_PATH
+              value: "api/ibmwc/change"
+            - name: CHANGE_REQUEST_URL_PATH
+              value: "nav_to.do?uri=change_request.do?sys_id="
+            - name: SERVICENOW_BASE_URL
+              value: $(params.servicenow-api-base-url)
+        steps:
+          - name: setup
+            image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.9@sha256:2976e1374e87f5cddabcf80179d9708868d52dbf656fdde60f803553be633db2
+            volumeMounts:
+              - mountPath: /cd-config
+                name: cd-config-volume
+            script: |
+              #!/bin/bash
+
+              set -e -o pipefail
+
+              if [ $PIPELINE_DEBUG == 1 ]; then
+                pwd
+                env
+                trap env EXIT
+                set -x
+              fi
+
+              _toolchain_read () {
+                echo $(jq -r "$1" /cd-config/toolchain.json | tr -d '\n')
+              }
+
+              EVIDENCE_LOCKER_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .dashboard_url')
+              INCIDENT_ISSUES_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="incident-issues-repo") | .dashboard_url')
+              INVENTORY_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="inventory-repo") | .dashboard_url')
+              ONE_PIPELINE_URL=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="one-pipeline-repo") | .dashboard_url')
+
+              EVIDENCE_LOCKER_FOLDER=$(_toolchain_read '.services[] | select(.toolchain_binding.name=="evidence-locker-repo") | .parameters.repo_name')
+              TOOLCHAIN_CRN=$(_toolchain_read '.crn')
+
+              EVIDENCE_LOCKER_URL=$(echo -n "${EVIDENCE_LOCKER_URL}" | sed 's:/*$::')
+              INCIDENT_ISSUES_URL=$(echo -n "${INCIDENT_URL}" | sed 's:/*$::')
+              INVENTORY_URL=$(echo -n "${INVENTORY_URL}" | sed 's:/*$::')
+              ONE_PIPELINE_URL=$(echo -n "${ONE_PIPELINE_URL}" | sed 's:/*$::')
+              TARGET=$(params.target-environment)
+
+              if [ -n "$(params.target-environment-ref)" ]; then
+                TARGET=$(echo -n "$(params.target-environment-ref)" | sed 's:.*/::' | sed 's/_.*//')
+              fi
+
+              echo -n "$EVIDENCE_LOCKER_URL" | tee "$(results.evidence-locker-url.path)"
+              echo -n "$INCIDENT_ISSUES_URL" | tee "$(results.incident-issues-url.path)"
+              echo -n "$INVENTORY_URL" | tee "$(results.inventory-url.path)"
+              echo -n "$ONE_PIPELINE_URL" | tee "$(results.one-pipeline-config-url.path)"
+              echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
+              echo -n "$TARGET" | tee "$(results.target-environment.path)"
+
+              echo -n "$TOOLCHAIN_CRN" | tee "$(results.toolchain-crn.path)"
+              echo -n "$EVIDENCE_LOCKER_FOLDER" | tee "$(results.evidence-locker-folder.path)"
+
+              IFS='/'
+              read -ra ADDR <<<"$INVENTORY_URL"
+              echo -n "${ADDR[${#ADDR[@]} - 1]}" | tee "$(results.inventory-repo-name.path)"
+              echo -n "${ADDR[${#ADDR[@]} - 2]}" | tee "$(results.inventory-repo-owner.path)"
+
+              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_REQUEST_URL_PATH}" > $(results.change-request-url.path)
+              echo -n "${SERVICENOW_BASE_URL}/${CHANGE_API_PATH}" > $(results.servicenow-api-url.path)
+
+    - name: prod-get-git-credentials
+      runAfter:
+        - setup
+      taskRef:
+        name: git-get-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: repository
+          value: $(tasks.setup.results.inventory-url)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: tag-inventory
+      taskRef:
+        name: tag-inventory
+      runAfter:
+        - prod-get-git-credentials
+      params:
+        - name: inventory-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: target-environment
+          value: $(tasks.setup.results.target-environment)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+
+    - name: prod-clone-inventory-repo
+      taskRef:
+        name: git-clone
+      runAfter:
+        - prod-get-git-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: repository
+          value: $(tasks.setup.results.inventory-url)
+        - name: branch
+          value: "$(tasks.setup.results.target-environment)"
+        - name: revision
+          value: "tags/$(tasks.setup.results.pipeline-run-id)"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: git-user
+          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
+
+    - name: prod-clone-one-pipeline-config-repo
+      taskRef:
+        name: git-clone
+      runAfter:
+        - prod-get-git-credentials
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: repository
+          value: $(tasks.setup.results.one-pipeline-config-url)
+        - name: branch
+          value: $(params.one-pipeline-config-branch)
+        - name: directory-name
+          value: "one-pipeline-config-repo"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: git-user
+          value: $(tasks.prod-get-git-credentials.results.git-auth-user)
+
+    - name: prod-normalize-config
+      runAfter:
+        - prod-clone-one-pipeline-config-repo
+      taskRef:
+        name: normalize-config
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: working-dir
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
+        - name: file
+          value: $(params.one-pipeline-config)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: prod-cd-setup-config
+      runAfter:
+        - prod-normalize-config
+      taskRef:
+        name: parse-config
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: stage
+          value: setup
+        - name: file
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)/$(params.one-pipeline-config)
+
+    - name: prod-cd-setup
+      taskRef:
+        name: run-stage
+      runAfter:
+        - prod-cd-setup-config
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: image
+          value: $(tasks.prod-cd-setup-config.results.image)
+        - name: script
+          value: $(tasks.prod-cd-setup-config.results.script)
+        - name: working-dir
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
+        - name: configmap-0
+          value: $(tasks.prod-cd-setup-config.results.configmap-0)
+        - name: configmap-1
+          value: $(tasks.prod-cd-setup-config.results.configmap-1)
+        - name: configmap-2
+          value: $(tasks.prod-cd-setup-config.results.configmap-2)
+        - name: configmap-3
+          value: $(tasks.prod-cd-setup-config.results.configmap-3)
+        - name: configmap-4
+          value: $(tasks.prod-cd-setup-config.results.configmap-4)
+        - name: secret-0
+          value: $(tasks.prod-cd-setup-config.results.secret-0)
+        - name: secret-1
+          value: $(tasks.prod-cd-setup-config.results.secret-1)
+        - name: secret-2
+          value: $(tasks.prod-cd-setup-config.results.secret-2)
+        - name: secret-3
+          value: $(tasks.prod-cd-setup-config.results.secret-3)
+        - name: secret-4
+          value: $(tasks.prod-cd-setup-config.results.secret-4)
+        - name: abort-on-failure
+          value: $(tasks.prod-cd-setup-config.results.abort-on-failure)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: params
+          value: |
+            environment: $(tasks.setup.results.target-environment)
+            cluster-name: $(params.cluster)
+            dev-region: $(params.cluster-region)
+            dev-cluster-namespace: $(params.cluster-namespace)
+            inventory-path: "../$(tasks.prod-clone-inventory-repo.results.directory-name)"
+
+    - name: prod-deployment-config
+      runAfter:
+        - prod-cd-setup
+      taskRef:
+        name: parse-config
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: stage
+          value: deploy
+        - name: file
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)/$(params.one-pipeline-config)
+
+    - name: prod-deployment
+      taskRef:
+        name: run-stage
+      runAfter:
+        - prod-cd-setup
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: image
+          value: $(tasks.prod-deployment-config.results.image)
+        - name: script
+          value: $(tasks.prod-deployment-config.results.script)
+        - name: working-dir
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
+        - name: configmap-0
+          value: $(tasks.prod-deployment-config.results.configmap-0)
+        - name: configmap-1
+          value: $(tasks.prod-deployment-config.results.configmap-1)
+        - name: configmap-2
+          value: $(tasks.prod-deployment-config.results.configmap-2)
+        - name: configmap-3
+          value: $(tasks.prod-deployment-config.results.configmap-3)
+        - name: configmap-4
+          value: $(tasks.prod-deployment-config.results.configmap-4)
+        - name: secret-0
+          value: $(tasks.prod-deployment-config.results.secret-0)
+        - name: secret-1
+          value: $(tasks.prod-deployment-config.results.secret-1)
+        - name: secret-2
+          value: $(tasks.prod-deployment-config.results.secret-2)
+        - name: secret-3
+          value: $(tasks.prod-deployment-config.results.secret-3)
+        - name: secret-4
+          value: $(tasks.prod-deployment-config.results.secret-4)
+        - name: abort-on-failure
+          value: $(tasks.prod-deployment-config.results.abort-on-failure)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: params
+          value: |
+            environment: $(tasks.setup.results.target-environment)
+            cluster-name: $(params.cluster)
+            dev-region: $(params.cluster-region)
+            dev-cluster-namespace: $(params.cluster-namespace)
+            inventory-path: "../$(tasks.prod-clone-inventory-repo.results.directory-name)"
+
+    - name: prod-acceptance-tests-config
+      taskRef:
+        name: parse-config
+      runAfter:
+        - prod-deployment
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: stage
+          value: acceptance-test
+        - name: file
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)/$(params.one-pipeline-config)
+
+    - name: prod-acceptance-tests
+      runAfter:
+        - prod-deployment
+      taskRef:
+        name: run-stage
+      workspaces:
+        - name: app
+          workspace: artifacts
+      params:
+        - name: image
+          value: $(tasks.prod-acceptance-tests-config.results.image)
+        - name: script
+          value: $(tasks.prod-acceptance-tests-config.results.script)
+        - name: working-dir
+          value: $(tasks.prod-clone-one-pipeline-config-repo.results.directory-name)
+        - name: configmap-0
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-0)
+        - name: configmap-1
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-1)
+        - name: configmap-2
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-2)
+        - name: configmap-3
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-3)
+        - name: configmap-4
+          value: $(tasks.prod-acceptance-tests-config.results.configmap-4)
+        - name: secret-0
+          value: $(tasks.prod-acceptance-tests-config.results.secret-0)
+        - name: secret-1
+          value: $(tasks.prod-acceptance-tests-config.results.secret-1)
+        - name: secret-2
+          value: $(tasks.prod-acceptance-tests-config.results.secret-2)
+        - name: secret-3
+          value: $(tasks.prod-acceptance-tests-config.results.secret-3)
+        - name: secret-4
+          value: $(tasks.prod-acceptance-tests-config.results.secret-4)
+        - name: abort-on-failure
+          value: $(tasks.prod-acceptance-tests-config.results.abort-on-failure)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: params
+          value: |
+            environment: $(tasks.setup.results.target-environment)
+            inventory-path: "../$(tasks.prod-clone-inventory-repo.results.directory-name)"

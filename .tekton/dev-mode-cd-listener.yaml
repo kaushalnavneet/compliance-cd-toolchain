@@ -1,0 +1,12 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: dev-mode-cd-listener
+spec:
+  triggers:
+    - bindings:
+        - name: cd-binding
+        - name: dev-mode-cd-binding
+      template:
+        name: cd-template

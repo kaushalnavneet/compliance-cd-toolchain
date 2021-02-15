@@ -1,0 +1,9 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: dev-mode-cd-binding
+spec:
+  params:
+    - name: pipeline-name
+      value: "dev-mode-cd-pipeline"

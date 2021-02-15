@@ -22,6 +22,48 @@ The toolchain can use a Key-Protect vault instance to store the required tokens 
 If you get stuck or experience a problem during setup, or running your pipelines, check out our [troubleshooting guide](https://github.ibm.com/one-pipeline/docs/blob/master/faq.md) before raising an issue.
 
 ---
+### Using the development mode
+The development mode enables you to quickly test the implementation of your [shift-left compliance one-pipeline.yaml](https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts) file, without executing any shift-left compliance related task, so as to optimize pipeline execution time.
+
+* Audience: developers in charge of adopting the shift-left compliance CD pipeline, implementing [the one-pipeline.yaml](https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts) file.
+
+* Purpose
+
+  - Develop, implement and quickly test a new [shift-left compliance one-pipeline.yaml](https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts) file using a simplified pipeline.
+  - Only execute the various stages of the one-pipeline.yaml file.
+  - Skip most of the shift-left compliance related task, hence optimizing the time to execute your code.
+
+* Warning: this mode should be used for **development** purpose **only**, and can not be considered as a replacement of the official shift-left compliance pipelines which remain the reference implementations.
+
+* Prereq: you already created a compliance CD toolchain.
+
+* Set-up
+  - Go to the Triggers page of your CD pipeline
+  - Create a new development mode trigger:
+
+    - name: pick a name of your choice (ex: `Dev-Mode Manual Trigger`)
+
+    - EventListener: `dev-mode-cd-listener`
+
+    - Save your changes
+
+  ![Icon](./.bluemix/dev-mode-trigger.png)
+
+* Run the Development mode pipeline
+  - Back to the `PipelineRuns` page, click on the `Run Pipeline button`.
+  - Select Dev Mode trigger you just created.
+  - Click on the `Run` button.
+
+  ![Icon](./.bluemix/run-dev-mode.png)
+
+* Development mode pipeline execution
+  - Observe: the pipeline is executed without unnecessary shift-left compliance tasks.
+  - Iterate until you're satisfied with your one-pipeline.yaml file implementation.
+
+* Switching back to shift-left compliance CD pipeline
+Either disable or delete the development mode trigger.
+
+---
 ### Learn more
 * [Getting Started with Continuous Delivery](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-getting-started&pos=2)
 * [Continuous Delivery Practices](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-gm_cd_best&pos=2)
