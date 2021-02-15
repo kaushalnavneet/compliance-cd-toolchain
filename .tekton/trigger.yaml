@@ -55,6 +55,9 @@ spec:
     - name: target-environment-ref
       description: target environment branch from git trigger binding
       default: ""
+    - name: pipeline-name
+      description: The name of the pipeline to run
+      default: cd-pipeline
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -94,7 +97,7 @@ spec:
         name: pipelinerun-$(uid)
       spec:
         pipelineRef:
-          name: cd-pipeline
+          name: $(params.pipeline-name)
         workspaces:
           - name: artifacts
             persistentVolumeClaim:
