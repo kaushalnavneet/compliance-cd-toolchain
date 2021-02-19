@@ -93,6 +93,11 @@ triggers:
     events:
       push: true
     eventListener: cd-listener
+  - type: timer
+    name: Git CD Timed Trigger
+    eventListener: cd-listener
+    disabled: ${GIT_CD_TIMED_TRIGGER_DISABLE}
+    cron: "0 4 * * *"
   - type: manual
     name: Manual CD Trigger
     eventListener: cd-listener

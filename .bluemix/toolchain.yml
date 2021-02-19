@@ -197,6 +197,8 @@ services:
           COS_ENDPOINT: '{{form.customtool_cos-bucket.parameters.cos-endpoint}}'
           WEBHOOK_TOKEN: >
             $env.webhookToken ? '{{webhookToken}}' : ''
+          GIT_CD_TIMED_TRIGGER_DISABLE: >
+            $env.disableGitCdTimedTrigger === 'false' ? false : true
         execute: true
 
   servicenow:
