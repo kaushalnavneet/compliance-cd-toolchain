@@ -186,6 +186,7 @@ services:
           EMERGENCY_LABEL: '{{form.pipeline.parameters.emergency-label}}'
           SOURCE_ENVIRONMENT: '{{form.pipeline.parameters.source-environment}}'
           TARGET_ENVIRONMENT: '{{form.pipeline.parameters.target-environment}}'
+          REGION: '{{form.pipeline.parameters.region}}'
           CANDIDATE_BRANCH: '{{form.pipeline.parameters.target-environment}}_candidate'
           ARTIFACTORY_DOCKER_CONFIG_JSON: >
             $env.artifactoryDockerConfigJson ? '{{artifactoryDockerConfigJson}}' : '{{form.artifactoryComp.parameters.docker_config_json}}'

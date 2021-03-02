@@ -40,6 +40,8 @@ spec:
       default: master
     - name: target-environment
       description: target environment
+    - name: region
+      description: target region
     - name: doi-environment
       description: doi target environment
       default: ""

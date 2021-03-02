@@ -154,6 +154,9 @@ properties:
   - name: target-environment
     value: ${TARGET_ENVIRONMENT}
     type: text
+  - name: region
+    value: ${REGION}
+    type: text
   - name: doi-environment
     value: ${DOI_ENVIRONMENT}
     type: text

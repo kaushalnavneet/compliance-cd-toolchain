@@ -49,6 +49,9 @@ spec:
     - name: target-environment
       description: target environment, this can be overridden (defaults to prod)
       default: "prod"
+    - name: region
+      description: target region (optional)
+      default: ""
     - name: doi-environment
       description: doi target environment, this can be overridden
       default: ""
@@ -133,6 +136,8 @@ spec:
             value: $(params.one-pipeline-config-branch)
           - name: target-environment
             value: $(params.target-environment)
+          - name: region
+            value: $(params.region)
           - name: doi-environment
             value: $(params.doi-environment)
           - name: target-environment-ref

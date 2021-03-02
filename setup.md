@@ -177,6 +177,7 @@ The API key is used to interact with the ibmcloud CLI tool in several tasks.
   - **Inventory Target Environment:** The environment to where you want to deploy the application
     Default: `prod`
 
+  - **Target Region:** The target region to where the application is deployed. (Optional)
 
 
 ### Delivery Pipeline Private Worker
