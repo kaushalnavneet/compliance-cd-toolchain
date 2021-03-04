@@ -1,7 +1,7 @@
 ---
 inputs:
   - type: git
-    branch: feat/redesign
+    branch: develop
     service: ${TEKTON_DEFINITION_REPO}
     path: .tekton
 triggers:
