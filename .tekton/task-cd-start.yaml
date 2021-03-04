@@ -1,0 +1,135 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cd-start
+spec:
+  params:
+    - name: compliance-baseimage
+      description: base image to run most of the built-in pipeline code
+    - name: pipeline-debug
+      description: Pipeline debug mode
+      default: "0"
+    - name: next-stage
+      default: ""
+
+  results:
+    - name: image
+      description: Docker image to be used in the specified stage.
+    - name: script
+      description: Location of the script that's going to be used to run the specified stage.
+    - name: configmap
+      description: "Name of the `ConfigMap` that's going to be mounted in `run-stage`"
+    - name: secret
+      description: "Name of the `Secret` that's going to be mounted in `run-stage`"
+    - name: working-dir
+      description: "one-pipeline working dir, the location of one-pipeline.yaml"
+    - name: abort-on-failure
+      description: "Whether abort the pipeline in case of a failure or not"
+    - name: dind
+      description: Launch Docker-in-Docker sidecar
+    - name: image-pull-policy
+      description: Set the imagePullPolicy for the Docker image in the runner task
+
+  workspaces:
+    - name: artifacts
+      mountPath: /artifacts
+
+  volumes:
+    - name: config
+      emptyDir: {}
+    - name: environment-properties
+      configMap:
+        name: environment-properties
+    - name: secure-properties
+      secret:
+        secretName: secure-properties
+    - name: toolchain
+      configMap:
+        name: toolchain
+
+  stepTemplate:
+    env:
+      - name: ONE_PIPELINE_PATH
+        value: "/opt/one-pipeline"
+      - name: WORKSPACE
+        value: "$(workspaces.artifacts.path)"
+      - name: PIPELINE_RUN_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.labels['tekton.dev/pipelineRun']
+      - name: PIPELINE_RUN_ID
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/tekton-pipeline']
+      - name: PIPELINE_RUN_URL
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/pipeline-run-url']
+      - name: BUILD_NUMBER
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/build-number']
+      - name: PIPELINE_ID
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/pipeline-id']
+      - name: TRIGGER_TYPE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/trigger-type']
+      - name: TRIGGER_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/trigger-name']
+      - name: TRIGGERED_BY
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.annotations['devops.cloud.ibm.com/triggered-by']
+      - name: PIPELINE_DEBUG
+        value: $(params.pipeline-debug)
+
+  steps:
+
+    - name: start
+      image: $(params.compliance-baseimage)
+      workingDir: $(workspaces.artifacts.path)
+      volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: environment-properties
+          mountPath: /config/environment-properties
+        - name: secure-properties
+          mountPath: /config/secure-properties
+        - name: toolchain
+          mountPath: /toolchain
+
+      script: |
+        #!/bin/bash
+
+        . "${ONE_PIPELINE_PATH}/internal/cd_start"
+
+    - name: prepare-next-stage
+      image: $(params.compliance-baseimage)
+      volumeMounts:
+        - name: environment-properties
+          mountPath: /config
+      env:
+        - name: STAGE
+          value: "$(params.next-stage)"
+      script: |
+        #!/bin/bash
+
+        if [ -z "$STAGE" ]; then
+          exit 0
+        fi
+
+        . "${ONE_PIPELINE_PATH}"/internal/stage/parse_config
+
+        echo -n "${STAGE_IMAGE}" > "$(results.image.path)"
+        echo -n "${STAGE_SCRIPT_PATH}" > "$(results.script.path)"
+        echo -n "${STAGE_DIND}" > "$(results.dind.path)"
+        echo -n "${STAGE_ABORT_ON_FAILURE}" > "$(results.abort-on-failure.path)"
+        echo -n "${STAGE_IMAGE_PULL_POLICY}" > "$(results.image-pull-policy.path)"
+        echo -n "${STAGE_CONFIGMAP}" > "$(results.configmap.path)"
+        echo -n "${STAGE_SECRET}" > "$(results.secret.path)"

@@ -26,6 +26,9 @@ spec:
     - name: target-environment-ref
       description: target environment branch name from git trigger
       default: ""
+    - name: compliance-baseimage
+      description: base image to run most of the built-in pipeline code
+      default: ""
 
   workspaces:
     - name: artifacts

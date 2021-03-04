@@ -5,40 +5,14 @@ metadata:
   name: promotion-template
 spec:
   params:
-    - name: application
-      description: name of the deployed app or service
-    - name: source-environment
-      description: promotion source, this can be overridden (defaults to master)
-      default: "master"
-    - name: target-environment
-      description: promotion target, this can be overridden (defaults to prod)
-      default: "prod"
-    - name: pipeline-debug
-      description: toggles debug mode for the pipeline
     - name: artifactory-dockerconfigjson
       description: dockerconfigjson for pullsecrets
-    - name: slack-notifications
-      description: toggles slack notifications
+    - name: pipeline-debug
+      description: toggles debug mode for the pipeline
+    - name: compliance-baseimage
+      description: one-pipeline baseimage to run most of the built-in pipeline code
+      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.5.1@sha256:1c1b13d16f9b16a886932dcdfb392fd8fd5eb09ce86bcb2673f92ec1938fc2b0"
 
-    # 'create-promotion-pull-request' parameters for the service now change request ticket
-    - name: priority
-      description: priority of the service now change request
-      default: "Critical | High | Moderate | Low | Planning"
-    - name: assignee
-      description: functional id or an email who will be assigned to the change request in service now
-      default: "_PROVIDE INFORMATION_"
-    - name: description
-      description: additional description in the change request
-      default: "_PROVIDE INFORMATION_"
-    - name: purpose
-      description: the reason of why the change request is needed
-      default: "_PROVIDE INFORMATION_"
-    - name: impact
-      description: explanation what the changes will impact
-      default: "_PROVIDE INFORMATION_"
-    - name: backout-plan
-      description: details how the change will be rolled back in case of a failure
-      default: "Revert to the previous release."
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -76,27 +50,8 @@ spec:
             persistentVolumeClaim:
               claimName: pipelinerun-$(uid)-pvc
         params:
-          - name: application
-            value: $(params.application)
-          - name: source-environment
-            value: $(params.source-environment)
-          - name: target-environment
-            value: $(params.target-environment)
           - name: pipeline-debug
             value: $(params.pipeline-debug)
-          - name: slack-notifications
-            value: $(params.slack-notifications)
-
-          - name: priority
-            value: $(params.priority)
-          - name: assignee
-            value: $(params.assignee)
-          - name: description
-            value: $(params.description)
-          - name: purpose
-            value: $(params.purpose)
-          - name: impact
-            value: $(params.impact)
-          - name: backout-plan
-            value: $(params.backout-plan)
+          - name: compliance-baseimage
+            value: $(params.compliance-baseimage)
         serviceAccountName: sa-pullsecret

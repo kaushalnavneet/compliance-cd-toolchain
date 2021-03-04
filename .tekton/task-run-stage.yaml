@@ -5,197 +5,197 @@ metadata:
   name: run-stage
 spec:
   params:
+    - name: stage
+      description: Stage in the config file
     - name: image
       description: Docker image to be used to run the stage script.
     - name: script
       description: Location of the script that is used to run the stage.
-    - name: working-dir
-      description: Used as `workingDir` for the stage step.
-    - name: params
-      description: "Extra parameters (`key: value` pairs)."
-      default: ""
-    - name: configmap-0
+    - name: dind
+      description: Launch Docker-in-Docker sidecar
+      default: "false"
+    - name: configmap
       description: "Name of a `ConfigMap` that's going to be mounted."
-      default: 'not-provided-configmap-0'
-    - name: configmap-1
-      description: "Name of a `ConfigMap` that's going to be mounted."
-      default: 'not-provided-configmap-1'
-    - name: configmap-2
-      description: "Name of a `ConfigMap` that's going to be mounted."
-      default: 'not-provided-configmap-2'
-    - name: configmap-3
-      description: "Name of a `ConfigMap` that's going to be mounted."
-      default: 'not-provided-configmap-3'
-    - name: configmap-4
-      description: "Name of a `ConfigMap` that's going to be mounted."
-      default: 'not-provided-configmap-4'
-    - name: secret-0
+      default: 'not-provided-configmap'
+    - name: secret
       description: "Name of a `Secret` that's goint to be mounted."
-      default: 'not-provided-secret-0'
-    - name: secret-1
-      description: "Name of a `Secret` that's goint to be mounted."
-      default: 'not-provided-secret-1'
-    - name: secret-2
-      description: "Name of a `Secret` that's goint to be mounted."
-      default: 'not-provided-secret-2'
-    - name: secret-3
-      description: "Name of a `Secret` that's goint to be mounted."
-      default: 'not-provided-secret-3'
-    - name: secret-4
-      description: "Name of a `Secret` that's goint to be mounted."
-      default: 'not-provided-secret-4'
+      default: 'not-provided-secret'
     - name: abort-on-failure
       description: "Whether abort the pipeline in case of a failure or not"
+    - name: image-pull-policy
+      description: Set the imagePullPolicy for the Docker image in the runner task
+      default: "IfNotPresent"
+    - name: compliance-baseimage
+      description: base image to run most of the built-in pipeline code
     - name: pipeline-debug
       description: Use debug mode
       default: "0"
+    - name: next-stage
+      default: ""
 
   results:
-    - name: exit-code
-      description: Exit code of the stage script.
-    - name: status
-      description: Stage status, which is `success` or `failure`, depending on the stage script exit code.
+    - name: image
+      description: Docker image to be used in the specified stage.
+    - name: script
+      description: Location of the script that's going to be used to run the specified stage.
+    - name: configmap
+      description: "Name of the `ConfigMap` that's going to be mounted in `run-stage`"
+    - name: secret
+      description: "Name of the `Secret` that's going to be mounted in `run-stage`"
+    - name: working-dir
+      description: "one-pipeline working dir, the location of one-pipeline.yaml"
+    - name: abort-on-failure
+      description: "Whether abort the pipeline in case of a failure or not"
+    - name: dind
+      description: Launch Docker-in-Docker sidecar
+    - name: image-pull-policy
+      description: Set the imagePullPolicy for the Docker image in the runner task
 
   workspaces:
     - name: app
       description: Workspace where the application is checked out.
 
+  volumes:
+    - name: config
+      emptyDir: {}
+    - name: one-pipeline
+      emptyDir: {}
+    - name: pipelinectl
+      emptyDir: {}
+    - name: dind-certs
+      emptyDir: {}
+    - name: environment-properties
+      configMap:
+        name: environment-properties
+    - name: secure-properties
+      secret:
+        secretName: secure-properties
+    - name: configmap
+      configMap:
+        name: $(params.configmap)
+        optional: true
+    - name: secret
+      secret:
+        secretName: $(params.secret)
+        optional: true
+    - name: toolchain
+      configMap:
+        name: toolchain
+
   stepTemplate:
     env:
+      - name: STAGE
+        value: $(params.stage)
       - name: PIPELINE_DEBUG
         value: $(params.pipeline-debug)
+      - name: WORKSPACE
+        value: "$(workspaces.app.path)"
+      - name: ONE_PIPELINE_PATH
+        value: "/opt/one-pipeline"
+      - name: DOCKER_HOST
+        value: tcp://localhost:2376
+      - name: DOCKER_TLS_VERIFY
+        value: '1'
+      - name: DOCKER_CERT_PATH
+        value: /certs/client
+
+  sidecars:
+    - name: dind
+      image: docker.io/library/docker:19-dind
+      securityContext:
+        privileged: true
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        - name: ENABLE_DIND
+          value: $(params.dind)
+      volumeMounts:
+        - name: dind-certs
+          mountPath: /certs/client
+      script: |
+        if [[ "$ENABLE_DIND" == "true" ]]; then
+          if [[ $(df -PT /var/lib/docker | awk 'NR==2 {print $2}') == virtiofs ]]; then
+            apk add e2fsprogs
+            truncate -s 20G /tmp/disk.img
+            mkfs.ext4 /tmp/disk.img
+            mount /tmp/disk.img /var/lib/docker
+          fi
+          # Set the MTU to a value that is containable in the ibmcloud calico mtu value
+          # References:
+          # - https://liejuntao001.medium.com/fix-docker-in-docker-network-issue-in-kubernetes-cc18c229d9e5
+          # - https://cloud.ibm.com/docs/containers?topic=containers-kernel#calico-mtu
+          #
+          /usr/local/bin/dockerd-entrypoint.sh --mtu=1400
+        else
+          mkdir -p /certs/client
+          touch /certs/client/ca.pem
+        fi
+      readinessProbe:
+        periodSeconds: 1
+        exec:
+          command: ['ls', '/certs/client/ca.pem']
 
   steps:
     - name: prepare
-      image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.7@sha256:282677e79ccb9d20c699d384a54093894de03675752cd848a3133266c898c14c
+      image: $(params.compliance-baseimage)
       volumeMounts:
         - name: config
           mountPath: /config
+        - name: one-pipeline
+          mountPath: /usr/share/one-pipeline
+        - name: pipelinectl
+          mountPath: /usr/share/cocoa
         - name: environment-properties
           mountPath: /config/environment-properties
         - name: secure-properties
           mountPath: /config/secure-properties
-        - name: configmap-0
-          mountPath: /config/$(params.configmap-0)
-        - name: configmap-1
-          mountPath: /config/$(params.configmap-1)
-        - name: configmap-2
-          mountPath: /config/$(params.configmap-2)
-        - name: configmap-3
-          mountPath: /config/$(params.configmap-3)
-        - name: configmap-4
-          mountPath: /config/$(params.configmap-4)
-        - name: secret-0
-          mountPath: /config/$(params.secret-0)
-        - name: secret-1
-          mountPath: /config/$(params.secret-1)
-        - name: secret-2
-          mountPath: /config/$(params.secret-2)
-        - name: secret-3
-          mountPath: /config/$(params.secret-3)
-        - name: secret-4
-          mountPath: /config/$(params.secret-4)
+        - name: configmap
+          mountPath: /config/$(params.configmap)
+        - name: secret
+          mountPath: /config/$(params.secret)
+        - name: dind-certs
+          mountPath: /certs/client
+      env:
+        - name: CUSTOM_CONFIGMAP
+          value: $(params.configmap)
+        - name: CUSTOM_SECRET
+          value: $(params.secret)
       script: |
         #!/usr/bin/env bash
 
-        set -e
+        . "${ONE_PIPELINE_PATH}"/internal/stage/prepare
 
-        if [[ "$PIPELINE_DEBUG" == 1 ]]; then
-          set -x
-          trap env EXIT
-        fi
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/environment-properties' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/secure-properties' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.configmap-0)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.configmap-1)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.configmap-2)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.configmap-3)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.configmap-4)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.secret-0)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.secret-1)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.secret-2)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.secret-3)' -type f)
-
-        while read file; do
-          ln -snf "$file" "/config/$(basename "$file")"
-        done < <(find '/config/$(params.secret-4)' -type f)
-
-        extra_params=$(mktemp)
-        cat <<'EOF' > "$extra_params"
-        ---
-        $(params.params)
-        EOF
-
-        while read -ra pair; do
-          echo -n "${pair[1]}" > "/config/${pair[0]}"
-        done < <(yq r -j "$extra_params" | jq -r 'select(.) | to_entries[] | .key + " " + .value')
+        cp -r /opt/one-pipeline /usr/share
+        cp -r /opt/cocoa/bin /usr/share/cocoa
 
     - name: run-stage
       image: $(params.image)
-      workingDir: $(workspaces.app.path)/$(params.working-dir)
+      imagePullPolicy: $(params.image-pull-policy)
+      workingDir: $(workspaces.app.path)
       volumeMounts:
         - name: config
           mountPath: /config
+        - name: one-pipeline
+          mountPath: /opt/one-pipeline
+        - name: pipelinectl
+          mountPath: /opt/cocoa
         - name: environment-properties
           mountPath: /config/environment-properties
         - name: secure-properties
           mountPath: /config/secure-properties
-        - name: configmap-0
-          mountPath: /config/$(params.configmap-0)
-        - name: configmap-1
-          mountPath: /config/$(params.configmap-1)
-        - name: configmap-2
-          mountPath: /config/$(params.configmap-2)
-        - name: configmap-3
-          mountPath: /config/$(params.configmap-3)
-        - name: configmap-4
-          mountPath: /config/$(params.configmap-4)
-        - name: secret-0
-          mountPath: /config/$(params.secret-0)
-        - name: secret-1
-          mountPath: /config/$(params.secret-1)
-        - name: secret-2
-          mountPath: /config/$(params.secret-2)
-        - name: secret-3
-          mountPath: /config/$(params.secret-3)
-        - name: secret-4
-          mountPath: /config/$(params.secret-4)
+        - name: configmap
+          mountPath: /config/$(params.configmap)
+        - name: secret
+          mountPath: /config/$(params.secret)
         - name: toolchain
           mountPath: /toolchain
+        - name: dind-certs
+          mountPath: /certs/client
       env:
+        - name: STAGE_SCRIPT_PATH
+          value: $(params.script)
+        - name: STAGE_ABORT_ON_FAILURE
+          value: $(params.abort-on-failure)
         - name: PIPELINE_RUN_NAME
           valueFrom:
             fieldRef:
@@ -231,70 +231,29 @@ spec:
       script: |
         #!/bin/sh
 
-        export WORKSPACE="$(workspaces.app.path)"
-        export CONFIG_DIR="/config"
+        . "${ONE_PIPELINE_PATH}"/internal/stage/run
 
-        # run the stage script
-        if $(workspaces.app.path)/$(params.script); then
-          echo -n $? > $(results.exit-code.path)
-          echo -n success > $(results.status.path)
-        else
-          echo -n $? > $(results.exit-code.path)
-          echo -n failure > $(results.status.path)
-          if [ "$(params.abort-on-failure)" = "true" ]; then
-            exit 1
-          fi
+    - name: prepare-next-stage
+      image: $(params.compliance-baseimage)
+      volumeMounts:
+        - name: environment-properties
+          mountPath: /config
+      env:
+        - name: STAGE
+          value: "$(params.next-stage)"
+      script: |
+        #!/bin/bash
+
+        if [ -z "$STAGE" ]; then
+          exit 0
         fi
 
-  volumes:
-    - name: config
-      emptyDir: {}
-    - name: environment-properties
-      configMap:
-        name: environment-properties
-    - name: secure-properties
-      secret:
-        secretName: secure-properties
-    - name: configmap-0
-      configMap:
-        name: $(params.configmap-0)
-        optional: true
-    - name: configmap-1
-      configMap:
-        name: $(params.configmap-1)
-        optional: true
-    - name: configmap-2
-      configMap:
-        name: $(params.configmap-2)
-        optional: true
-    - name: configmap-3
-      configMap:
-        name: $(params.configmap-3)
-        optional: true
-    - name: configmap-4
-      configMap:
-        name: $(params.configmap-4)
-        optional: true
-    - name: secret-0
-      secret:
-        secretName: $(params.secret-0)
-        optional: true
-    - name: secret-1
-      secret:
-        secretName: $(params.secret-1)
-        optional: true
-    - name: secret-2
-      secret:
-        secretName: $(params.secret-2)
-        optional: true
-    - name: secret-3
-      secret:
-        secretName: $(params.secret-3)
-        optional: true
-    - name: secret-4
-      secret:
-        secretName: $(params.secret-4)
-        optional: true
-    - name: toolchain
-      configMap:
-        name: toolchain
+        . "${ONE_PIPELINE_PATH}"/internal/stage/parse_config
+
+        echo -n "${STAGE_IMAGE}" > "$(results.image.path)"
+        echo -n "${STAGE_SCRIPT_PATH}" > "$(results.script.path)"
+        echo -n "${STAGE_DIND}" > "$(results.dind.path)"
+        echo -n "${STAGE_ABORT_ON_FAILURE}" > "$(results.abort-on-failure.path)"
+        echo -n "${STAGE_IMAGE_PULL_POLICY}" > "$(results.image-pull-policy.path)"
+        echo -n "${STAGE_CONFIGMAP}" > "$(results.configmap.path)"
+        echo -n "${STAGE_SECRET}" > "$(results.secret.path)"
