@@ -13,7 +13,7 @@ The toolchain can use a Key-Protect vault instance to store the required tokens 
 ![Icon](./.bluemix/toolchain.png)
 
 ### To get started, click this button:
-[![Deploy To Bluemix](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy?repository=https://github.ibm.com/one-pipeline/compliance-cd-toolchain&branch=feat%2Fredesign&env_id=ibm:yp:us-south)
+[![Deploy To Bluemix](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy?repository=https://github.ibm.com/one-pipeline/compliance-cd-toolchain&branch=v8&env_id=ibm:yp:us-south)
 
 **For more information about the setup process, check out this guide**
 
