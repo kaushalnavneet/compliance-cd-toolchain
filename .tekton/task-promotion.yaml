@@ -10,6 +10,10 @@ spec:
     - name: pipeline-debug
       description: Pipeline debug mode
       default: "0"
+    - name: priority
+      description: priority of the service now change request
+    - name: assignee
+      description: functional id or an email who will be assigned to the change request in service now
 
   workspaces:
     - name: artifacts
@@ -59,5 +63,8 @@ spec:
           mountPath: /toolchain
       script: |
         #!/bin/bash
+
+        echo -n "$(params.priority)" >> /config/priority
+        echo -n "$(params.assignee)" >> /config/assignee
 
         . "${ONE_PIPELINE_PATH}/internal/promotion"
