@@ -9,6 +9,10 @@ spec:
       description: toggles debug mode for the pipeline
     - name: compliance-baseimage
       description: base image to run most of the built-in pipeline code
+    - name: priority
+      description: priority of the service now change request
+    - name: assignee
+      description: functional id or an email who will be assigned to the change request in service now
   workspaces:
     - name: artifacts
 
@@ -24,3 +28,7 @@ spec:
           value: $(params.compliance-baseimage)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
+        - name: priority
+          value: $(params.priority)
+        - name: assignee
+          value: $(params.assignee)
