@@ -152,6 +152,22 @@ spec:
         - name: pipeline-debug
           value: $(params.pipeline-debug)
 
+    - name: tag-inventory
+      taskRef:
+        name: tag-inventory
+      runAfter:
+        - prod-get-git-credentials
+      params:
+        - name: inventory-url
+          value: $(tasks.setup.results.inventory-url)
+        - name: target-environment
+          value: $(tasks.setup.results.target-environment)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+
     - name: prod-clone-inventory-repo
       taskRef:
         name: git-clone
