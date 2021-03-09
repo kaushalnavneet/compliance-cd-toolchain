@@ -165,9 +165,6 @@ spec:
 
         . "${ONE_PIPELINE_PATH}"/internal/stage/prepare
 
-        cp -r /opt/one-pipeline /usr/share
-        cp -r /opt/cocoa/bin /usr/share/cocoa
-
     - name: run-stage
       image: $(params.image)
       imagePullPolicy: $(params.image-pull-policy)

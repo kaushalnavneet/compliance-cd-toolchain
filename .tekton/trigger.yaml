@@ -17,7 +17,7 @@ spec:
       default: cd-pipeline
     - name: compliance-baseimage
       description: one-pipeline baseimage to run most of the built-in pipeline code
-      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.6.0@sha256:d83bc896af1099e67dcb2e062f35ca9926a1b107ca8723b7383443f6dfbc29f6"
+      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.6.3@sha256:d85b84b1ac1bbb6fffa191a35412d3f5b777c2d2926c43a50c813d4f10b4a605"
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
