@@ -1,0 +1,11 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: promotion-listener
+spec:
+  triggers:
+    - binding:
+        name: promotion-binding
+      template:
+        name: promotion-template

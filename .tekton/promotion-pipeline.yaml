@@ -1,0 +1,184 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: promotion-pipeline
+spec:
+  params:
+    - name: application
+      description: the name of the application that's going to be promoted (defaults to the application name)
+    - name: source-environment
+      description: promotion source
+    - name: target-environment
+      description: promotion target
+    - name: pipeline-debug
+      description: toggles debug mode for the pipeline
+    - name: slack-notifications
+      description: toggles slack notifications
+
+    # 'create-promotion-pull-request' parameters for the service now change request ticket
+    - name: priority
+      description: priority of the service now change request
+    - name: assignee
+      description: functional id or an email who will be assigned to the change request in service now
+    - name: description
+      description: additional description in the change request
+    - name: purpose
+      description: the reason of why the change request is needed
+    - name: impact
+      description: explanation what the changes will impact
+    - name: backout-plan
+      description: details how the change will be rolled back in case of a failure
+  workspaces:
+    - name: artifacts
+
+  tasks:
+    - name: setup-variables
+      params:
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: target
+          value: $(params.target-environment)
+        - name: application
+          value: $(params.application)
+        - name: source
+          value: $(params.source-environment)
+      taskSpec:
+        params:
+          - name: pipeline-debug
+          - name: target
+          - name: application
+          - name: source
+        results:
+          - name: inventory-owner
+          - name: inventory-name
+          - name: pipeline-run-id
+          - name: pull-request-title
+        stepTemplate:
+          env:
+            - name: PIPELINE_DEBUG
+              value: $(params.pipeline-debug)
+            - name: PIPELINE_RUN_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['devops.cloud.ibm.com/tekton-pipeline']
+        steps:
+          - name: setup
+            image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.6@sha256:7f588468622a981f89cf5e1212aaf75fface9da6169b5345ca52ab63d8215907
+            script: |
+              #!/bin/bash
+              set -e -o pipefail
+              if [ $PIPELINE_DEBUG == 1 ]; then
+                pwd
+                env
+                trap env EXIT
+                set -x
+              fi
+              echo -n "$PIPELINE_RUN_ID" | tee "$(results.pipeline-run-id.path)"
+              TARGET=$(params.target)_candidate
+              if [ "$(params.application)" == "" ]; then
+                echo -n "Promote applications from '$(params.source)' to '$TARGET'" | tee "$(results.pull-request-title.path)"
+              else
+                echo -n "Promote '$(params.application)' from '$(params.source)' to '$TARGET'" | tee "$(results.pull-request-title.path)"
+              fi
+
+    - name: get-inventory-url
+      taskRef:
+        name: toolchain-extract-value
+      runAfter:
+        - setup-variables
+      params:
+        - name: expression
+          value: '.services[] | select(.toolchain_binding.name=="inventory-repo") | .parameters.owner_id + "/" + .parameters.repo_name'
+
+    - name: get-inventory-variables
+      runAfter:
+        - get-inventory-url
+      params:
+        - name: inventory-url
+          value: $(tasks.get-inventory-url.results.extracted-value)
+      taskSpec:
+        params:
+          - name: inventory-url
+        results:
+          - name: inventory-owner
+          - name: inventory-name
+          - name: inventory-url
+        steps:
+          - name: get-owner-and-repo-name
+            image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.6@sha256:7f588468622a981f89cf5e1212aaf75fface9da6169b5345ca52ab63d8215907
+            script: |
+              #!/usr/bin/env python3
+              url = "$(params.inventory-url)"
+              splitted = url.split("/")
+              with open("$(results.inventory-owner.path)", "w") as owner_out:
+                owner_out.write(splitted[-2])
+              with open("$(results.inventory-name.path)", "w") as name_out:
+                name_out.write(splitted[-1])
+              with open("$(results.inventory-url.path)", "w") as url_out:
+                url_out.write("https://github.ibm.com/$(params.inventory-url)")
+
+    - name: get-git-credentials
+      taskRef:
+        name: git-get-credentials
+      runAfter:
+        - get-inventory-url
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: repository
+          value: $(tasks.get-inventory-variables.results.inventory-url)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: inventory-promote
+      taskRef:
+        name: inventory-promote
+      runAfter:
+        - get-git-credentials
+      workspaces:
+        - name: secrets
+          workspace: artifacts
+      params:
+        - name: source
+          value: $(params.source-environment)
+        - name: target
+          value: $(params.target-environment)
+        - name: priority
+          value: $(params.priority)
+        - name: assignee
+          value: $(params.assignee)
+        - name: description
+          value: $(params.description)
+        - name: purpose
+          value: $(params.purpose)
+        - name: impact
+          value: $(params.impact)
+        - name: backout-plan
+          value: $(params.backout-plan)
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+
+    - name: notify-pipeline-end
+      when:
+        - input: $(params.slack-notifications)
+          operator: in
+          values: ["1"]
+      taskRef:
+        name: slack-post-message
+      runAfter:
+        - inventory-promote
+      workspaces:
+        - name: workspace
+          workspace: artifacts
+      params:
+        - name: message-script
+          value: |
+              #!/usr/bin/env python3
+              import os
+              print("Promotion Pipeline finished!")
+              print("<https://cloud.ibm.com/devops/pipelines/tekton/" + os.getenv("PIPELINE_ID") + "/runs/" + os.getenv("PIPELINE_RUN_ID") + "?env_id=ibm:yp:" + os.getenv("TOOLCHAIN_REGION") + " | See the Pipeline Logs>")
+              print("<$(tasks.inventory-promote.results.promotion-pr-url)|See the Promotion Pull Request>")
