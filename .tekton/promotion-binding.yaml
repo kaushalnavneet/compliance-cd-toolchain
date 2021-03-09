@@ -1,7 +1,0 @@
----
-apiVersion: tekton.dev/v1beta1
-kind: TriggerBinding
-metadata:
-  name: promotion-binding
-spec:
-  params:
