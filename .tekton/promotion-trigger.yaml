@@ -16,6 +16,9 @@ spec:
       description: priority of the service now change request
     - name: assignee
       description: functional id or an email who will be assigned to the change request in service now
+    - name: event-payload
+      description: event payload from the trigger webhook
+      default: ""
 
   resourcetemplates:
     - apiVersion: v1
@@ -42,6 +45,14 @@ spec:
         - name: artifactory-pull-secret
       metadata:
         name: sa-pullsecret
+    - apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: trigger
+        labels:
+          app.kubernetes.io/version: "1.0.0"
+      data:
+        payload.json: $(params.event-payload)
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
