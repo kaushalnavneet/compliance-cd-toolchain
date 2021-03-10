@@ -5,5 +5,7 @@ metadata:
   name: cd-binding
 spec:
   params:
+    - name: event-payload
+      value: $(event)
     - name: target-environment-ref
       value: $(event.ref)

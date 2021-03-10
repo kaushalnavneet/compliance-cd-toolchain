@@ -81,6 +81,9 @@ spec:
     - name: toolchain
       configMap:
         name: toolchain
+    - name: trigger
+      configMap:
+        name: trigger
 
   stepTemplate:
     env:
@@ -188,6 +191,8 @@ spec:
           mountPath: /toolchain
         - name: dind-certs
           mountPath: /certs/client
+        - name: trigger
+          mountPath: /trigger
       env:
         - name: STAGE_SCRIPT_PATH
           value: $(params.script)

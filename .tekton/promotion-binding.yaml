@@ -5,6 +5,8 @@ metadata:
   name: promotion-binding
 spec:
   params:
+    - name: event-payload
+      value: $(event)
     - name: priority
       value: $(event.priority)
     - name: assignee

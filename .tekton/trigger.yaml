@@ -15,6 +15,9 @@ spec:
     - name: pipeline-name
       description: The name of the pipeline to run
       default: cd-pipeline
+    - name: event-payload
+      description: event payload from the trigger webhook
+      default: ""
     - name: compliance-baseimage
       description: one-pipeline baseimage to run most of the built-in pipeline code
       default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.6.4@sha256:0b9ea26371bef6171073d68b05dfdd38bb3c7097c8e595e93323374605ca12f9"
@@ -51,6 +54,14 @@ spec:
         - name: onepipeline-pull-secret
       metadata:
         name: sa-pullsecret
+    - apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: trigger
+        labels:
+          app.kubernetes.io/version: "1.0.0"
+      data:
+        payload.json: $(params.event-payload)
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
