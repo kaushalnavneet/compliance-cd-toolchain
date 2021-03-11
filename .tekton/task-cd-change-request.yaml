@@ -30,6 +30,8 @@ spec:
       description: Launch Docker-in-Docker sidecar
     - name: image-pull-policy
       description: Set the imagePullPolicy for the Docker image in the runner task
+    - name: change-request-id
+      description: The id of the created change request
 
   workspaces:
     - name: artifacts
@@ -113,6 +115,7 @@ spec:
         #!/bin/bash
 
         . "${ONE_PIPELINE_PATH}/internal/cd_change_request"
+        echo -n "${CHANGE_REQUEST_ID}" > "$(results.change-request-id.path)"
 
     - name: prepare-next-stage
       image: $(params.compliance-baseimage)
