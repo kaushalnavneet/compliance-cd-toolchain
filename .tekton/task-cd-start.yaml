@@ -47,9 +47,6 @@ spec:
     - name: toolchain
       configMap:
         name: toolchain
-    - name: trigger
-      configMap:
-        name: trigger
 
   stepTemplate:
     env:
@@ -57,6 +54,11 @@ spec:
         value: "/opt/one-pipeline"
       - name: WORKSPACE
         value: "$(workspaces.artifacts.path)"
+      - name: TRIGGER_PAYLOAD
+        valueFrom:
+          configMapKeyRef:
+            name: trigger
+            key: payload.json
       - name: PIPELINE_RUN_NAME
         valueFrom:
           fieldRef:
@@ -93,7 +95,6 @@ spec:
         value: $(params.pipeline-debug)
 
   steps:
-
     - name: start
       image: $(params.compliance-baseimage)
       workingDir: $(workspaces.artifacts.path)
@@ -106,8 +107,6 @@ spec:
           mountPath: /config/secure-properties
         - name: toolchain
           mountPath: /toolchain
-        - name: trigger
-          mountPath: /trigger
 
       script: |
         #!/bin/bash
