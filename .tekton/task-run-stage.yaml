@@ -81,9 +81,6 @@ spec:
     - name: toolchain
       configMap:
         name: toolchain
-    - name: trigger
-      configMap:
-        name: trigger
 
   stepTemplate:
     env:
@@ -101,6 +98,11 @@ spec:
         value: '1'
       - name: DOCKER_CERT_PATH
         value: /certs/client
+      - name: TRIGGER_PAYLOAD
+        valueFrom:
+          configMapKeyRef:
+            name: trigger
+            key: payload.json
 
   sidecars:
     - name: dind
@@ -191,8 +193,6 @@ spec:
           mountPath: /toolchain
         - name: dind-certs
           mountPath: /certs/client
-        - name: trigger
-          mountPath: /trigger
       env:
         - name: STAGE_SCRIPT_PATH
           value: $(params.script)

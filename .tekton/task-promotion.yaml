@@ -31,9 +31,6 @@ spec:
     - name: toolchain
       configMap:
         name: toolchain
-    - name: trigger
-      configMap:
-        name: trigger
 
   stepTemplate:
     env:
@@ -43,6 +40,11 @@ spec:
         value: "$(workspaces.artifacts.path)"
       - name: PIPELINE_DEBUG
         value: $(params.pipeline-debug)
+      - name: TRIGGER_PAYLOAD
+        valueFrom:
+          configMapKeyRef:
+            name: trigger
+            key: payload.json
       - name: PIPELINE_RUN_ID
         valueFrom:
           fieldRef:
@@ -64,8 +66,6 @@ spec:
           mountPath: /config/secure-properties
         - name: toolchain
           mountPath: /toolchain
-        - name: trigger
-          mountPath: /trigger
       script: |
         #!/bin/bash
 

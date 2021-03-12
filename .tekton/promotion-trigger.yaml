@@ -53,7 +53,8 @@ spec:
         labels:
           app.kubernetes.io/version: "1.0.0"
       data:
-        payload.json: $(params.event-payload)
+        payload.json: |
+          $(params.event-payload)
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
