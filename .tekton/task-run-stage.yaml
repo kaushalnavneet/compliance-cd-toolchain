@@ -106,7 +106,7 @@ spec:
 
   sidecars:
     - name: dind
-      image: docker.io/library/docker:19-dind
+      image: wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/docker:19-dind
       securityContext:
         privileged: true
       env:
