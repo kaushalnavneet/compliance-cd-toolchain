@@ -114,8 +114,8 @@ spec:
       script: |
         #!/bin/bash
 
+        export CR_ID_PATH="$(results.change-request-id.path)"
         . "${ONE_PIPELINE_PATH}/internal/cd_change_request"
-        echo -n "${CHANGE_REQUEST_ID}" > "$(results.change-request-id.path)"
 
     - name: prepare-next-stage
       image: $(params.compliance-baseimage)
