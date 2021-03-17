@@ -95,7 +95,7 @@ properties:
     value: ${DOI_TOOLCHAIN_ID}
     type: text
   - name: slack-notifications
-    value: "0"
+    value: "1"
     type: text
   - name: cos-endpoint
     value: ${COS_ENDPOINT}
