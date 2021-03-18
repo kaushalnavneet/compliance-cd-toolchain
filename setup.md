@@ -192,7 +192,7 @@ The Delivery Pipeline Private Worker tool integration connects with one or more 
 ### Artifactory
 
 The template comes with an artifactory integration to enable using cocoa compliance custom base image in the tekton tasks.
-Note: You can access the Artifactory [here](https://eu.artifactory.swg-devops.com/artifactory/webapp/#/home)
+Note: You can access the Artifactory [here](https://na.artifactory.swg-devops.com/artifactory/webapp/#/home)
       Further material and guides about the artifactory are available [here](https://taas.w3ibm.mybluemix.net/guides#artifactory)
 
 | ![Artifactory](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/artifactory.png) |
@@ -209,7 +209,7 @@ Note: You can access the Artifactory [here](https://eu.artifactory.swg-devops.co
 - **User ID:** The artifactory user
     Required field.
 - **Authentication token:** The artifactory API key
-    An artifactory token can be created [here](https://eu.artifactory.swg-devops.com/artifactory/webapp/#/profile) and stored in Key Protect
+    An artifactory token can be created [here](https://na.artifactory.swg-devops.com/artifactory/webapp/#/profile) and stored in Key Protect
     When an artifactory API key already exists in Key Protect, it can be imported here.
     Required field.
 - **Release URL:**  The url of the artifactory repository
