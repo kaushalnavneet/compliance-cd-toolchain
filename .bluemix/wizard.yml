@@ -1,0 +1,21 @@
+---
+version: '1'
+messages:
+  $i18n: locales.yml
+welcome:
+  description: 
+    $ref: "#/messages/wizard.welcome.description"
+  git_accept:
+    label: 
+      $ref: "#/messages/wizard.welcome.git.accept.label"
+steps:
+  - name: app
+    label:
+      $ref: "#/messages/wizard.step.app.label"
+    form:
+      name: wizard_app
+      title:
+        $ref: "#/messages/wizard.step.app.form.title"
+    validator: incident-issues-repo
+    expert_mode:
+      service_label: incident-issues-repo
