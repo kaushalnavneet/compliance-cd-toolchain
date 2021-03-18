@@ -305,3 +305,9 @@ form:
         $env.cosEndpoint ? '{{cosEndpoint}}' : ''
     schema:
       $ref: cos.json
+
+  wizard_app:
+    wizard: true
+    schema:
+      $ref: wizard_app.json
+
