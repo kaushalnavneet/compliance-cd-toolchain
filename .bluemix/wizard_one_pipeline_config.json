@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "messages": {
+    "$i18n": "locales.yml"
+  },
+  "title": {
+    "$ref": "#/messages/wizard.config.title"
+  },
+  "description": "",
+  "longDescription": {
+    "$ref": "#/messages/wizard.config.longDescription"
+  },
+  "type": "object",
+  "form": [{
+      "type": "info",
+      "text": {
+        "$ref": "#/messages/wizard.config.info"
+      }
+    },
+    {
+      "type": "selectfieldset",
+      "display": {
+        "component": "tilegroup",
+        "orientation": "horizontal",
+        "showLabel": false,
+        "invalidOptionMsg": {
+          "$ref": "#/messages/wizard.repo.invalidOptionMsg"
+        }
+      },
+      "key": "type",
+      "enum": ["link", "clone"],
+      "titleMap": {
+        "clone": {
+          "$ref": "#/messages/wizard.onepipeline.clone"
+        },
+        "link": {
+          "$ref": "#/messages/wizard.onepipeline.link"
+        }
+      },
+      "items": [{
+          "type": "section",
+          "items": [
+            "repo_url"
+          ]
+        },
+        {
+          "type": "section",
+          "items": [
+            "repo_name"
+          ]
+        }
+      ]
+    }
+  ]
+}

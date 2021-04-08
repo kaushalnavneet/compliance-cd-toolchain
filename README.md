@@ -38,7 +38,7 @@ The development mode enables you to quickly test the implementation of your [shi
 * Prereq: you already created a compliance CD toolchain.
 
 * Set-up
-  - Go to the Triggers page of your CD pipeline
+  - Go to the Triggers page of your CD pipeline.
   - Create a new development mode trigger:
 
     - name: pick a name of your choice (ex: `Dev-Mode Manual Trigger`)

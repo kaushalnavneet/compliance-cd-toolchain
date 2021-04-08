@@ -1,0 +1,381 @@
+---
+version: '1'
+messages:
+  $i18n: locales.yml
+welcome:
+  description:
+    $ref: "#/messages/wizard.welcome.description"
+  git_accept:
+    label:
+      $ref: "#/messages/wizard.welcome.git.accept.label"
+steps:
+  - name: inv
+    label:
+      $ref: "#/messages/wizard.step.inv.label"
+    form:
+      name: wizard_inventory
+      title:
+        $ref: "#/messages/wizard.step.inv.form.title"
+    validator: inventory-repo
+    expert_mode:
+      service_label: inventory-repo
+  - name: issues
+    label:
+      $ref: "#/messages/wizard.step.issues.label"
+    form:
+      name: wizard_issues
+      title:
+        $ref: "#/messages/wizard.step.issues.form.title"
+    validator: incident-issues-repo
+    expert_mode:
+      service_label: incident-issues-repo
+  - name: onepipelineconfig
+    label:
+      $ref: "#/messages/wizard.step.config.label"
+    form:
+      name: wizard_one_pipeline_config
+      title:
+        $ref: "#/messages/wizard.step.config.form.title"
+    validator: one-pipeline-repo
+    expert_mode:
+      service_label: one-pipeline-repo
+  - name: vault
+    label:
+      $ref: "#/messages/wizard.step.vault.label"
+    form:
+      name: wizard_vault
+      title:
+        $ref: "#/messages/wizard.step.vault.form.title"
+    events:
+      - condition:
+          any:
+            - parameter: key-protect
+              value: true
+        actions:
+          - type: create-service
+            service: keyprotect
+            service_label: kp-vault
+            parameters:
+              name: kp-compliance-secrets
+      - condition:
+          any:
+            - parameter: key-protect
+              value: false
+        actions:
+          - type: delete-service
+            service: keyprotect
+            service_label: kp-vault
+      - condition:
+          any:
+            - parameter: secrets-manager
+              value: true
+        actions:
+          - type: create-service
+            service: secretsmanager
+            service_label: sm-vault
+            parameters:
+              name: sm-compliance-secrets
+      - condition:
+          any:
+            - parameter: secrets-manager
+              value: false
+        actions:
+          - type: delete-service
+            service: secretsmanager
+            service_label: sm-vault
+      - condition:
+          any:
+            - parameter: hashicorp-vault
+              value: true
+        actions:
+          - type: create-service
+            service: hashicorpvault
+            service_label: hc-vault
+            parameters:
+              name: 'hc-compliance-secrets'
+              server_url: 'https://vserv.sos.ibm.com:8200'
+              dashboard_url: 'https://vserv.sos.ibm.com:8200/ui'
+              authentication_method: 'approle'
+      - condition:
+          any:
+            - parameter: hashicorp-vault
+              value: false
+        actions:
+          - type: delete-service
+            service: hashicorpvault
+            service_label: hc-vault
+  - name: keyprotect
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.keyprotect.label"
+    form:
+      name: keyprotect
+      title:
+        $ref: "#/messages/wizard.step.keyprotect.form.title"
+    validator: kp-vault
+    visible:
+      condition:
+        any:
+          - form: wizard_vault
+            parameter: key-protect
+            value: true
+  - name: secretsmanager
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.secretsmanager.label"
+    form:
+      name: secretsmanager
+      title:
+        $ref: "#/messages/wizard.step.secretsmanager.form.title"
+    validator: sm-vault
+    visible:
+      condition:
+        any:
+          - form: wizard_vault
+            parameter: secrets-manager
+            value: true
+  - name: hashicorpvault
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.hashicorpvault.label"
+    form:
+      name: hashicorpvault
+      title:
+        $ref: "#/messages/wizard.step.hashicorpvault.form.title"
+    validator: hc-vault
+    visible:
+      condition:
+        any:
+          - form: wizard_vault
+            parameter: hashicorp-vault
+            value: true
+  - name: evidence
+    label:
+      $ref: "#/messages/wizard.step.evidence.label"
+    form:
+      name: wizard_evidence
+      title:
+        $ref: "#/messages/wizard.step.evidence.form.title"
+    validator: evidence-locker-repo
+    expert_mode:
+      service_label: evidence-locker-repo
+    events:
+      - condition:
+          any:
+            - parameter: cos
+              value: true
+        actions:
+          - type: create-service
+            service: customtool
+            service_label: cos-bucket
+            parameters:
+              type: cos-bucket
+              lifecyclePhase: "MANAGE"
+              imageUrl:
+                $ref: cos-logo.png
+                $refType: image-data-uri
+              documentationUrl: 'https://cloud.ibm.com/catalog/services/cloud-object-storage'
+              name: Cloud Object Storage
+              dashboard_url: 'https://cloud.ibm.com/catalog/services/cloud-object-storage'
+              description: The information required to connect the toolchain with your Cloud Object Storage instance.
+      - condition:
+          any:
+            - parameter: cos
+              value: false
+        actions:
+          - type: delete-service
+            service: customtool
+            service_label: cos-bucket
+  - name: cos
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.cos.label"
+    form:
+      name: customtool_cos-bucket
+      title:
+        $ref: "#/messages/wizard.step.cos.form.title"
+      image_url:
+        $ref: cos-logo.png
+        $refType: image-data-uri
+    visible:
+      condition:
+        any:
+          - form: evidence-locker-repo
+            parameter: cos
+            value: true
+  - name: pipeline
+    label:
+      $ref: "#/messages/wizard.step.pipeline.label"
+    form:
+      name: wizard_pipeline
+      title:
+        $ref: "#/messages/wizard.step.pipeline.form.title"
+      image_url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjggMjgiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDI4IDI4OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHN0eWxlIHR5cGU9InRleHQvY3NzIj4uc3Qwe2ZpbGw6I0ZENzgzRDt9LnN0MXtmaWxsOiNGREE1Nzg7fS5zdDJ7ZmlsbDojMUNCM0EwO30uc3Qze2ZpbGw6IzRBRDVDMzt9PC9zdHlsZT48Zz48ZyBpZD0iZzMtMiIgdHJhbnNmb3JtPSJzY2FsZSgxLjc1MDAwMDEsMS43NTAwMDAxKSI+PGc+PHBhdGggY2xhc3M9InN0MCIgZD0iTTE0LjIsOS4yYy0wLjcsMi45LTMuMiw1LTYuMyw1Yy0yLjEsMC0zLjgtMC45LTQuOS0yLjRsMy40LTMuNGwwLjQsMC40TDYuNCw4LjRsMCwwTDYuOSw5bDAuOC0yLjdMNSw3LjFsMC41LDAuNUw0LjcsOC41bC0yLjMsMi4zQzIsMTAuMSwxLjcsOS4zLDEuNiw4LjNsLTEtMS40QzAuNSw3LjIsMC41LDcuNSwwLjUsNy45YzAsNC4xLDMuNCw3LjUsNy41LDcuNWMzLjMsMCw2LjEtMi4xLDcuMS01TDE0LjIsOS4yeiIvPjxwb2x5bGluZSBjbGFzcz0ic3QxIiBwb2ludHM9IjIuMywxMC44IDUuNSw3LjYgNSw3LjEgNy43LDYuMyAzLDEwLjkgIi8+PC9nPjxnPjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik03LjksMTUuM2MzLjMsMCw2LjEtMi4xLDcuMS01bC0wLjUtMC42Yy0wLjgsMi45LTMuNSw1LjEtNi42LDUuMWMtMy44LDAtNi45LTMuMS02LjktNi45YzAtMC4xLDAtMC4yLDAtMC4zTDAuNiw2LjlDMC41LDcuMiwwLjUsNy41LDAuNSw3LjlDMC41LDEyLDMuOCwxNS4zLDcuOSwxNS4zeiIvPjxsaW5lIGNsYXNzPSJzdDEiIHgxPSIyLjMiIHkxPSIxMC45IiB4Mj0iMyIgeTI9IjExLjEiLz48L2c+PC9nPjxnIGlkPSJnMy0yXzFfIiB0cmFuc2Zvcm09InNjYWxlKDEuNzUwMDAwMSwxLjc1MDAwMDEpIj48Zz48cGF0aCBjbGFzcz0ic3QyIiBkPSJNMS44LDYuOGMwLjctMi45LDMuMi01LDYuMy01YzIuMSwwLDMuOCwwLjksNC45LDIuNEw5LjYsNy42TDkuMyw3LjJsMC40LDAuNGwwLDBMOS4xLDdMOC4zLDkuN0wxMSw4LjlsLTAuNS0wLjVsMC45LTAuOWwyLjMtMi4zYzAuNCwwLjcsMC42LDEuNiwwLjcsMi41bDEsMS40YzAuMS0wLjMsMC4xLTAuNiwwLjEtMC45YzAtNC4xLTMuNC03LjUtNy41LTcuNUM0LjgsMC43LDIsMi44LDEsNS43TDEuOCw2Ljh6Ii8+PHBvbHlsaW5lIGNsYXNzPSJzdDMiIHBvaW50cz0iMTMsNC4yIDkuNiw3LjYgOS4xLDcgOC4zLDkuNyAxMi45LDUuMSAiLz48L2c+PGc+PHBhdGggY2xhc3M9InN0MyIgZD0iTTguMSwwLjdDNC44LDAuNywyLDIuOCwxLDUuN2wwLjUsMC42YzAuOC0yLjksMy41LTUuMSw2LjYtNS4xYzMuOCwwLDYuOSwzLjEsNi45LDYuOWMwLDAuMSwwLDAuMiwwLDAuM2wwLjUsMC43YzAuMS0wLjMsMC4xLTAuNiwwLjEtMC45QzE1LjUsNCwxMi4yLDAuNyw4LjEsMC43eiIvPjxsaW5lIGNsYXNzPSJzdDMiIHgxPSIxMy43IiB5MT0iNS4xIiB4Mj0iMTMiIHkyPSI0LjkiLz48L2c+PC9nPjwvZz48L3N2Zz4='
+    validator: tekton-definition-repo
+    expert_mode:
+      service_label: tekton-definition-repo
+
+  - name: deploy
+    label:
+      $ref: "#/messages/wizard.step.deploy.label"
+    form:
+      name: pipeline
+      title:
+        $ref: "#/messages/wizard.step.deploy.form.title"
+
+  - name: artifactory
+    label:
+      $ref: "#/messages/wizard.step.artifactory.label"
+    form:
+      name: wizard_artifactory
+      title:
+        $ref: "#/messages/wizard.step.artifactory.form.title"
+    validator: artifactoryComp
+    expert_mode:
+      service_label: artifactoryComp
+
+  - name: servicenow
+    label:
+      $ref: "#/messages/wizard.step.servicenow.label"
+    form:
+      name: customtool_servicenow
+      title:
+        $ref: "#/messages/wizard.step.servicenow.form.title"
+
+  - name: doi-toolchain
+    label:
+      $ref: "#/messages/wizard.step.doi-toolchain.label"
+    form:
+      name: customtool_doi-toolchain
+      title:
+        $ref: "#/messages/wizard.step.doi-toolchain.form.title"
+
+  - name: optionaltools
+    label:
+      $ref: "#/messages/wizard.step.optionaltools.label"
+    form:
+      name: wizard_optional_tools
+      title:
+        $ref: "#/messages/wizard.step.optionaltools.form.title"
+    events:
+      - condition:
+          any:
+            - parameter: slack-tool
+              value: true
+        actions:
+          - type: create-service
+            service: slack
+            service_label: slack
+            parameters:
+              channel_name: >
+                $env.slackChannelName ? '{{slackChannelName}}' : ''
+              api_token: >
+                $env.slackWebhook ? '{{slackWebhook}}' : ''
+              team_url: >
+                $env.slackTeamName ? '{{slackTeamName}}' : ''
+      - condition:
+          any:
+            - parameter: slack-tool
+              value: false
+        actions:
+          - type: delete-service
+            service: slack
+            service_label: slack
+
+      - condition:
+          any:
+            - parameter: doi
+              value: true
+        actions:
+          - type: create-service
+            service: draservicebroker
+            service_label: devops-insights
+      - condition:
+          any:
+            - parameter: doi
+              value: false
+        actions:
+          - type: delete-service
+            service: draservicebroker
+            service_label: devops-insights
+      - condition:
+          any:
+            - parameter: fortress-tool
+              value: true
+        actions:
+          - type: create-service
+            service: security_compliance
+            service_label: fortress
+      - condition:
+          any:
+            - parameter: fortress-tool
+              value: false
+        actions:
+          - type: delete-service
+            service: security_compliance
+            service_label: fortress
+      - condition:
+          any:
+            - parameter: pw-tool
+              value: true
+        actions:
+          - type: create-service
+            service: private_worker
+            service_label: privateWorker
+      - condition:
+          any:
+            - parameter: pw-tool
+              value: false
+        actions:
+          - type: delete-service
+            service: private_worker
+            service_label: privateWorker
+  - name: slack
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.slack.label"
+    form:
+      name: slack
+      title:
+        $ref: "#/messages/wizard.step.slack.form.title"
+    visible:
+      condition:
+        any:
+          - form: wizard_optional_tools
+            parameter: slack-tool
+            value: true
+  - name: fortress
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.fortress.label"
+    form:
+      name: security_compliance
+      title:
+        $ref: "#/messages/wizard.step.fortress.form.title"
+    visible:
+      condition:
+        any:
+          - form: wizard_optional_tools
+            parameter: fortress-tool
+            value: true
+  - name: privateWorker
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.privateworker.label"
+    form:
+      name: private_worker
+      title:
+        $ref: "#/messages/wizard.step.privateworker.form.title"
+    visible:
+      condition:
+        any:
+          - form: wizard_optional_tools
+            parameter: pw-tool
+            value: true
+  - name: summary
+    label:
+      $ref: "#/messages/wizard.step.summary.label"
+    form:
+      name: wizard_summary
+      title:
+        $ref: "#/messages/wizard.step.summary.form.title"

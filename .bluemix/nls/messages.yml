@@ -1,6 +1,6 @@
 ---
 #The format for creating a link with a URL and text is [link text](link url) with no spaces or characters between the two sets of brackets- []()
-template.name: "Deploy a FedRAMP compliant Kubernetes app"
+template.name: "Deploy a secure and compliant app based on Shift Left DevSecOps best practices"
 template.description: "This is the toolchain template for continuous deployment with Compliance for Kubernetes. It is preconfigured for continuous delivery with inventory integration, change management with Servicenow, evidence collection and deployment to the IBM Kubernetes Service.\n\n The integrated repositories, target cluster and artifactory integrations are configured during the setup process. \n\nThe toolchain includes a Tekton delivery pipeline, which can be manually triggered to initiate a new deployment. \n\nThe toolchain can use a Key-Protect vault instance to store the required tokens and API keys."
 template.gettingStarted: " **Your toolchain is ready!**\n**Quick start:** Using an already built image from the CI/PR toolchain template and an initial Change Request from ServiceNow this pipeline will check and deploy you application in your Kubernetes cluster."
 repos.title: "GitHub Enterprise repositories"
@@ -67,20 +67,121 @@ headerSVG.cluster: "Cluster"
 servicenow.title: "ServiceNow"
 servicenow.apitokenTitle: "ServiceNow API token"
 servicenow.apitokenDescription: "API token to access ServiceNow for Change Management"
-servicenow.longDescription: "ServiceNow Change Management"
+servicenow.longDescription: "ServiceNow is the IBM Cloud IT Service Management platform. Please refer to this [documentation](https://pages.github.ibm.com/one-pipeline/docs/#/change-management?id=servicenow) for more information. To acquire a ServiceNow API token, [submit a request on the Service Portal](https://watson.service-now.com/ess_portal?id=sc_cat_item&sys_id=02594e86db2c83408799327e9d961999). Make sure the environment you request for matches the ServiceNow instance in the API URL field below. "
 servicenow.apitokenHelp: "To acquire a ServiceNow API token, [submit a request on the Service Portal](https://watson.service-now.com/ess_portal?id=sc_cat_item&sys_id=02594e86db2c83408799327e9d961999). Make sure the environment you request for matches the ServiceNow instance in the API URL field below."
 servicenow.apiUrlTitle: "ServiceNow API Base URL"
-servicenow.apiUrlDescription: "ServiceNow API endpoint Base URL"
 servicenow.apiUrlHelp: "The ServiceNow API endpoint for Change Management integration in the pipeline"
 servicenow.initialCrTitle: "ServiceNow Change Request ID"
 servicenow.configurationItemTitle: "ServiceNow Configuration Item"
-servicenow.configurationItemHelp: "Registered name in ServiceNow of the service/app to be associated with Change Requests"
-servicenow.configurationItemDescription: "ServiceNow Configuration Item name, exactly as it is registered in ServiceNow"
+servicenow.configurationItemHelp: "Registered name in ServiceNow of the service/app to be associated with Change Requests. Must match exactly as it is registered in ServiceNow."
 doiToolchain.title: "Link DOI Toolchain"
 doiToolchain.idDescription: "The ID of the toolchain with DOI instance"
 doiToolchain.envDescription: "(Optional) The environment for the DOI interactions. If you provide this parameter, it will be used instead of the target environment from the inventory."
 doiToolchain.description: "The ID of the toolchain that contains the DevOps Insights instance CD interacts with."
-doiToolchain.longDescription: "Link toolchain for DevOps Insights"
+doiToolchain.longDescription: "Link an existing DevOps Insights instance from another toolchain."
 doiToolchain.id: "DOI Toolchain ID"
 doiToolchain.env: "DOI target environment"
-doiToolchain.help: "CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so that it is able to publish the deployment records to insights."
+doiToolchain.help: "CD toolchain can publish the deployment records to an existing DevOps Insights instance. To enable this provide the ID of the toolchain that contains the existing DOI instance."
+wizard.welcome.description: "Continuously deploy with DevSecOps including evidence collection, quality gates, change management and more."
+wizard.welcome.git.accept.label: "I understand that all users with [access to this toolchain](https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-toolchains-using#managing_access) will be able to access artifacts derived from the toolchain repositories, such as build artifacts in the Delivery Pipeline. You must accept this to continue."
+wizard.step.app.label: Application
+wizard.step.app.form.title: Application
+wizard.step.inv.label: Inventory
+wizard.step.inv.form.title: Inventory
+wizard.step.issues.label: Issues
+wizard.step.issues.form.title: Issues
+wizard.step.config.label: OnePipeline Config
+wizard.step.config.form.title:  OnePipeline Config
+wizard.step.vault.label: Secrets
+wizard.step.vault.form.title: Secrets
+wizard.step.keyprotect.label: IBM Key Protect
+wizard.step.keyprotect.form.title: IBM Key Protect
+wizard.step.secretsmanager.label: IBM Secrets Manager
+wizard.step.secretsmanager.form.title: IBM Secrets Manager
+wizard.step.hashicorpvault.label: HashiCorp Vault
+wizard.step.hashicorpvault.form.title: HashiCorp Vault
+wizard.step.evidence.label: Evidence
+wizard.step.evidence.form.title: Evidence
+wizard.step.cos.label: COS bucket
+wizard.step.cos.form.title: COS bucket
+wizard.step.pipeline.label: Tekton Pipeline
+wizard.step.pipeline.form.title: Tekton Pipeline
+wizard.step.deploy.label: Deploy
+wizard.step.deploy.form.title: Deployment Target
+wizard.step.private_worker.label: Image Signing
+wizard.step.private_worker.form.title: Image Signing
+wizard.step.artifactory.label: Artifactory
+wizard.step.artifactory.form.title: Artifactory
+wizard.step.optionaltools.label: Optional Tools
+wizard.step.optionaltools.form.title: Optional Tools
+wizard.step.slack.label: Slack
+wizard.step.slack.form.title: Slack
+wizard.step.doi-toolchain.label: Insights Toolchain
+wizard.step.doi-toolchain.form.title: Link DevOps Insights Toolchain
+wizard.step.summary.label: Summary
+wizard.step.summary.form.title: Summary
+wizard.repo.invalidOptionMsg: "Unsupported configuration option. Try **Expert mode**."
+wizard.app.title: "Application"
+wizard.app.longDescription: "By default, it provides you with a sample NodeJS app. You can bring your own app by replacing the sample URL with a URL to your own source code repository."
+wizard.app.clone: "Use default sample"
+wizard.app.link: "Bring your own app"
+wizard.config.longDescription: "Your one pipeline configuration repository is a centralized repository for custom deployment scripts"
+wizard.config.info: "For more information please read this [documentation](https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts) "
+wizard.artifactory.title: "Artifactory"
+wizard.artifactory.longDescription: "The Deploy Pipeline needs your Artifactory credentials in order to access a required compliance image. Go [here](https://na.artifactory.swg-devops.com/ui/admin/artifactory/user_profile) to get your API key credentials."
+wizard.artifactory.docker: "Docker registry"
+wizard.evidence.title: "Evidence"
+wizard.evidence.longDescription: "This toolchain collects and stores evidence for all of the tasks it performs. A Git repository is used as the evidence locker."
+wizard.evidence.info: "For further information on evidence management. Please read this [documentation](https://pages.github.ibm.com/one-pipeline/docs/#/evidence)."
+wizard.evidence.clone: "Create new evidence locker repository"
+wizard.evidence.link: "Use existing evidence locker"
+wizard.evidence.cos.notification.title: "COS Bucket"
+wizard.evidence.cos.notification.sutitle: "To meet compliance audit standards, evidence must be maintained in a secure and durable storage service like Cloud Object Storage. The default Git-based option should only be used for evaluation purposes."
+wizard.evidence.cos.title: "COS bucket"
+wizard.inventory.title: "Inventory"
+wizard.inventory.longDescription: "Details of any artifacts built by CI toolchains are recorded in an inventory. This inventory is implemented as a Git repository. Please choose an existing inventory repository."
+wizard.inventory.info: "For more information on how the inventory works please read this [documentation](https://pages.github.ibm.com/one-pipeline/docs/#/inventory)."
+wizard.inventory.clone: "Create new inventory"
+wizard.inventory.link: "Use existing inventory"
+wizard.issues.title: "Issues"
+wizard.issues.longDescription: "Any problems encountered when running the pipelines in this toolchain are recorded as issues in a Git repository. Please choose an existing issues repository. "
+wizard.issues.info: "For more information on managing Git issues please read this [documentation](https://guides.github.com/features/issues/)."
+wizard.issues.clone: "Create new issues repository"
+wizard.issues.link: "Use existing issues repository"
+wizard.step.fortress.form.title: "Security and Compliance"
+wizard.optional.tools.title: "Other Tools"
+wizard.optional.tools.longDescription: "These are optional tools that can be included in your compliance toolchain."
+wizard.optional.tools.doi.tc.title: "Common DevOps Insights Toolchain"
+wizard.optional.tools.doi.tc.description: "Publish the deployment records to a common DevOps Insights Toolchain."
+wizard.optional.tools.doi.title: "DevOps Insights (no configuration required)"
+wizard.optional.tools.doi.description: "DevOps Insights provides comprehensive insights from popular continuous integration and continuous delivery tools to increase the speed and control of your application delivery."
+wizard.optional.tools.webide.title: "Orion WebIDE (no configuration required)"
+wizard.optional.tools.webide.description: "Develop for the web and the cloud in this browser-based integrated development environment (IDE)."
+wizard.optional.tools.slack.title: "Slack"
+wizard.optional.tools.slack.description: "With Slack, you can collaborate with your team and receive notifications from your tools."
+wizard.pipeline.title: "Tekton Pipeline"
+wizard.pipeline.longDescription: "Tekton resources are defined in YAML files managed in source repositories. The repository information below is used when triggering pipeline runs."
+wizard.pipeline.link: "Use existing repository"
+wizard.summary.title: "Summary"
+wizard.summary.success.title: "Congratulations"
+wizard.summary.success.subtitle: "You have completed the configuration of your Shift Left DevSecOps compliance toolchain. Click the 'Create' button below to create the toolchain with your chosen tools and settings."
+wizard.vault.title: "Secrets Management"
+wizard.vault.longDescription: "Several tools in this toolchain require secrets to access privileged resources. An IBM Cloud API key is an example of such a secret. All secrets should be stored securely in a secrets vault and then referenced as required by the toolchain."
+wizard.vault.keyProtect.title: "IBM Key Protect"
+wizard.vault.keyProtect.description: "Key Protect is a cloud-based security service that provides life cycle management for encryption keys that are used in IBM Cloud services or customer-built applications."
+wizard.vault.secretsManager.title: "Secrets Manager"
+wizard.vault.secretsManager.description: "With Secrets Manager you can create, lease, and centrally manage secrets that are used in IBM Cloud services or your custom-built applications."
+wizard.vault.hashicorp.title: "HashiCorp Vault"
+wizard.vault.hashicorp.description: "HashiCorp Vault is a secrets management solution that brokers access to systems for both humans and machines through programmatic access."
+wizard.vault.info: "Please identify the secrets providers containing your secrets:"
+wizard.step.servicenow.label: "ServiceNow"
+wizard.step.servicenow.title: "ServiceNow"
+wizard.step.servicenow.description: "ServiceNow description"
+wizard.step.servicenow.form.title: "ServiceNow Change Management"
+wizard.optional.tools.fortress.title: "Security and Compliance Centre"
+wizard.step.fortress.label: "Security and Compliance"
+wizard.step.privateworker.label: "Private Worker"
+wizard.optional.tools.privateworker.title: "Private Worker"
+wizard.step.privateworker.form.title: "Private Worker"
+wizard.onepipeline.clone: "Clone deployment configuration"
+wizard.onepipeline.link: "Use existing deployment configuration"

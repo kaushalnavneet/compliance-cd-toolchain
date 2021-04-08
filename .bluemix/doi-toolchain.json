@@ -37,8 +37,8 @@
       "widths": ["100%"],
       "items": [
         {
-          "type": "label",
-          "title": {
+          "type": "info",
+          "text": {
             "$ref": "#/messages/doiToolchain.help"
           }
         }

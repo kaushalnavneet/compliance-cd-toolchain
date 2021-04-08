@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "messages": {
+    "$i18n": "locales.yml"
+  },
+  "title": {
+    "$ref": "#/messages/wizard.artifactory.title"
+  },
+  "description": "",
+  "longDescription": {
+    "$ref": "#/messages/wizard.artifactory.longDescription"
+  },
+  "type": "object",
+  "form": [{
+    "type": "selectfieldset",
+    "description": "",
+    "display": {
+      "component": "tilegroup",
+      "orientation": "horizontal",
+      "showLabel": false,
+      "invalidOptionMsg": {
+        "$ref": "#/messages/wizard.repo.invalidOptionMsg"
+      }
+    },
+    "key": "type",
+    "enum": ["docker"],
+    "titleMap": {
+      "docker": {
+        "$ref": "#/messages/wizard.artifactory.docker"
+      }
+    },
+    "items": [{
+      "type": "section",
+      "items": [
+        "user_id",
+        "token",
+        "repository_name"
+      ]
+    }]
+  }]
+}
