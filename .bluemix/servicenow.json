@@ -23,14 +23,14 @@
     },
     "api-url": {
       "description": {
-        "$ref": "#/messages/servicenow.apiUrlDescription"
+        "$ref": "#/messages/servicenow.apiUrlHelp"
       },
       "type": "string",
       "pattern": "\\S"
     },
     "configuration-item": {
       "description": {
-        "$ref": "#/messages/servicenow.configurationItemDescription"
+        "$ref": "#/messages/servicenow.configurationItemHelp"
       },
       "type": "string",
       "pattern": "\\S"
@@ -42,19 +42,6 @@
   ],
   "form": [
     {
-      "type": "table",
-      "columnCount": 1,
-      "widths": ["100%"],
-      "items": [
-        {
-          "type": "label",
-          "title": {
-            "$ref": "#/messages/servicenow.apitokenHelp"
-          }
-        }
-      ]
-    },
-    {
       "title": {
         "$ref": "#/messages/servicenow.apitokenTitle"
       },
@@ -63,38 +50,12 @@
       "readonly": false
     },
     {
-      "type": "table",
-      "columnCount": 1,
-      "widths": ["100%"],
-      "items": [
-        {
-          "type": "label",
-          "title": {
-            "$ref": "#/messages/servicenow.configurationItemHelp"
-          }
-        }
-      ]
-    },
-    {
       "title": {
         "$ref": "#/messages/servicenow.configurationItemTitle"
       },
       "key": "configuration-item",
       "type": "text",
       "readonly": false
-    },
-    {
-      "type": "table",
-      "columnCount": 1,
-      "widths": ["100%"],
-      "items": [
-        {
-          "type": "label",
-          "title": {
-            "$ref": "#/messages/servicenow.apiUrlHelp"
-          }
-        }
-      ]
     },
     {
       "title": {
