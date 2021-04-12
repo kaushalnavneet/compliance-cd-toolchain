@@ -84,43 +84,30 @@ doiToolchain.env: "DOI target environment"
 doiToolchain.help: "CD toolchain can publish the deployment records to an existing DevOps Insights instance. To enable this provide the ID of the toolchain that contains the existing DOI instance."
 wizard.welcome.description: "Continuously deploy with DevSecOps including evidence collection, quality gates, change management and more."
 wizard.welcome.git.accept.label: "I understand that all users with [access to this toolchain](https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-toolchains-using#managing_access) will be able to access artifacts derived from the toolchain repositories, such as build artifacts in the Delivery Pipeline. You must accept this to continue."
-wizard.step.app.label: Application
-wizard.step.app.form.title: Application
-wizard.step.inv.label: Inventory
-wizard.step.inv.form.title: Inventory
-wizard.step.issues.label: Issues
-wizard.step.issues.form.title: Issues
-wizard.step.config.label: OnePipeline Config
-wizard.step.config.form.title:  OnePipeline Config
-wizard.step.vault.label: Secrets
-wizard.step.vault.form.title: Secrets
-wizard.step.keyprotect.label: IBM Key Protect
-wizard.step.keyprotect.form.title: IBM Key Protect
-wizard.step.secretsmanager.label: IBM Secrets Manager
-wizard.step.secretsmanager.form.title: IBM Secrets Manager
-wizard.step.hashicorpvault.label: HashiCorp Vault
-wizard.step.hashicorpvault.form.title: HashiCorp Vault
-wizard.step.evidence.label: Evidence
-wizard.step.evidence.form.title: Evidence
-wizard.step.cos.label: COS bucket
-wizard.step.cos.form.title: COS bucket
-wizard.step.pipeline.label: Tekton Pipeline
-wizard.step.pipeline.form.title: Tekton Pipeline
-wizard.step.deploy.label: Deploy
-wizard.step.deploy.form.title: Deployment Target
-wizard.step.private_worker.label: Image Signing
-wizard.step.private_worker.form.title: Image Signing
-wizard.step.artifactory.label: Artifactory
-wizard.step.artifactory.form.title: Artifactory
-wizard.step.optionaltools.label: Optional Tools
-wizard.step.optionaltools.form.title: Optional Tools
-wizard.step.slack.label: Slack
-wizard.step.slack.form.title: Slack
-wizard.step.doi-toolchain.label: Insights Toolchain
-wizard.step.doi-toolchain.form.title: Link DevOps Insights Toolchain
-wizard.step.summary.label: Summary
-wizard.step.summary.form.title: Summary
-wizard.repo.invalidOptionMsg: "Unsupported configuration option. Try **Expert mode**."
+wizard.step.inv.title: "Inventory"
+wizard.step.issues.title: "Issues"
+wizard.step.config.title:  "OnePipeline Config"
+wizard.step.vault.title: "Secrets"
+wizard.step.keyprotect.title: "IBM Key Protect"
+wizard.step.secretsmanager.title: "IBM Secrets Manager"
+wizard.step.hashicorpvault.title: "HashiCorp Vault"
+wizard.step.evidence.title: "Evidence"
+wizard.step.cos.title: "COS bucket"
+wizard.step.pipeline.title: "Tekton Pipeline"
+wizard.step.deploy.label: "Deploy"
+wizard.step.deploy.title: "Deployment Target"
+wizard.step.artifactory.title: "Artifactory"
+wizard.step.optionaltools.title: "Optional Tools"
+wizard.step.slack.title: "Slack"
+wizard.step.doi-toolchain.label: "Insights Toolchain"
+wizard.step.doi-toolchain.title: "Link DevOps Insights Toolchain"
+wizard.step.summary.title: "Summary"
+wizard.step.fortress.title: "Security and Compliance"
+wizard.step.privateworker.title: "Private Worker"
+wizard.step.servicenow.label: "ServiceNow"
+wizard.step.servicenow.description: "ServiceNow description"
+wizard.step.servicenow.title: "ServiceNow Change Management"
+wizard.repo.invalidOptionMsg: "You have chosen an unsupported configuration option. Please enable **Advanced Options**."
 wizard.app.title: "Application"
 wizard.app.longDescription: "By default, it provides you with a sample NodeJS app. You can bring your own app by replacing the sample URL with a URL to your own source code repository."
 wizard.app.clone: "Use default sample"
@@ -132,7 +119,7 @@ wizard.artifactory.longDescription: "The Deploy Pipeline needs your Artifactory 
 wizard.artifactory.docker: "Docker registry"
 wizard.evidence.title: "Evidence"
 wizard.evidence.longDescription: "This toolchain collects and stores evidence for all of the tasks it performs. A Git repository is used as the evidence locker."
-wizard.evidence.info: "For further information on evidence management. Please read this [documentation](https://pages.github.ibm.com/one-pipeline/docs/#/evidence)."
+wizard.evidence.info: "For further information on evidence management please read this [documentation](https://pages.github.ibm.com/one-pipeline/docs/#/evidence)."
 wizard.evidence.clone: "Create new evidence locker repository"
 wizard.evidence.link: "Use existing evidence locker"
 wizard.evidence.cos.notification.title: "COS Bucket"
@@ -148,7 +135,6 @@ wizard.issues.longDescription: "Any problems encountered when running the pipeli
 wizard.issues.info: "For more information on managing Git issues please read this [documentation](https://guides.github.com/features/issues/)."
 wizard.issues.clone: "Create new issues repository"
 wizard.issues.link: "Use existing issues repository"
-wizard.step.fortress.form.title: "Security and Compliance"
 wizard.optional.tools.title: "Other Tools"
 wizard.optional.tools.longDescription: "These are optional tools that can be included in your compliance toolchain."
 wizard.optional.tools.doi.tc.title: "Common DevOps Insights Toolchain"
@@ -174,14 +160,7 @@ wizard.vault.secretsManager.description: "With Secrets Manager you can create, l
 wizard.vault.hashicorp.title: "HashiCorp Vault"
 wizard.vault.hashicorp.description: "HashiCorp Vault is a secrets management solution that brokers access to systems for both humans and machines through programmatic access."
 wizard.vault.info: "Please identify the secrets providers containing your secrets:"
-wizard.step.servicenow.label: "ServiceNow"
-wizard.step.servicenow.title: "ServiceNow"
-wizard.step.servicenow.description: "ServiceNow description"
-wizard.step.servicenow.form.title: "ServiceNow Change Management"
 wizard.optional.tools.fortress.title: "Security and Compliance Centre"
-wizard.step.fortress.label: "Security and Compliance"
-wizard.step.privateworker.label: "Private Worker"
 wizard.optional.tools.privateworker.title: "Private Worker"
-wizard.step.privateworker.form.title: "Private Worker"
 wizard.onepipeline.clone: "Clone deployment configuration"
 wizard.onepipeline.link: "Use existing deployment configuration"
