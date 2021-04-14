@@ -21,7 +21,7 @@ spec:
 
     - name: compliance-baseimage
       description: one-pipeline baseimage to run most of the built-in pipeline code
-      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.9.0@sha256:153c5039327e8d3b8a933674b02ccbc5cb84e7156fb1a85cee4482cec0da48e2"
+      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.9.1@sha256:716eec42716fd9013fcaa3bd877fa7d1e7e5ffca2648ba902e82d1c3a634c34a"
 
   resourcetemplates:
     - apiVersion: v1
