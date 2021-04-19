@@ -18,11 +18,9 @@ spec:
     - name: event-payload
       description: event payload from the trigger webhook
       default: ""
-
     - name: compliance-baseimage
       description: one-pipeline baseimage to run most of the built-in pipeline code
-      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.10.2@sha256:5e46451e43287457ef78922c244169aa60138d828e44db3f064c724c7849789a"
-
+      default: !<false> "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:0.2.3@sha256:5e46451e43287457ef78922c244169aa60138d828e44db3f064c724c7849789a"
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
