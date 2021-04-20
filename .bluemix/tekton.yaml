@@ -99,3 +99,15 @@ properties:
   - name: git-token
     value: ""
     type: SECURE
+  - name: inventory-repo
+    value: inventory-repo
+    type: INTEGRATION
+    path: parameters.repo_url
+  - name: evidence-repo
+    value: evidence-locker-repo
+    type: INTEGRATION
+    path: parameters.repo_url
+  - name: incident-repo
+    value: incident-issues-repo
+    type: INTEGRATION
+    path: parameters.repo_url
