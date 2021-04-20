@@ -199,8 +199,6 @@ services:
           COS_BUCKET_NAME: '{{form.customtool_cos-bucket.parameters.cos-bucket-name}}'
           COS_ENDPOINT: '{{form.customtool_cos-bucket.parameters.cos-endpoint}}'
           COS_API_KEY: '{{form.customtool_cos-bucket.parameters.cos-api-key}}'
-          WEBHOOK_TOKEN: >
-            $env.webhookToken ? '{{webhookToken}}' : ''
           GIT_CD_TIMED_TRIGGER_DISABLE: >
             $env.disableGitCdTimedTrigger === 'false' ? false : true
         execute: true
