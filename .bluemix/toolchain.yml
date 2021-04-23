@@ -12,7 +12,6 @@ template:
   required:
     - build
     - tekton-definition-repo
-    - tekton-catalog-repo
     - incident-issues-repo
     - evidence-locker-repo
     - inventory-repo
@@ -106,16 +105,6 @@ services:
       legal: true
       kind: ['pipeline']
 
-  tekton-catalog-repo:
-    service_id: github_integrated
-    parameters:
-      repo_url: '{{form.github_integrated.parameters.tekton-catalog-repo}}'
-      type: link
-      has_issues: false
-      enable_traceability: false
-      legal: true
-      kind: ['pipeline']
-
   incident-issues-repo:
     service_id: github_integrated
     parameters:
@@ -158,7 +147,6 @@ services:
     parameters:
       services:
         - tekton-definition-repo
-        - tekton-catalog-repo
         - incident-issues-repo
         - evidence-locker-repo
         - inventory-repo
@@ -171,9 +159,8 @@ services:
         content:
           $text: tekton.yaml
         env:
-          # repo for Tekton definitions and catalog
+          # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
-          TEKTON_CATALOG_REPO: tekton-catalog-repo
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
@@ -262,10 +249,8 @@ form:
 
   github_integrated:
     parameters:
-      tekton-catalog-repo: >
-        $env.tektonCatalogRepo ? '{{tektonCatalogRepo}}' : 'https://github.ibm.com/one-pipeline/common-tekton-tasks'
       tekton-definition-repo: >
-        $env.tektonDefinitionRepo ? '{{tektonDefinitionRepo}}' : 'https://github.ibm.com/one-pipeline/compliance-cd-toolchain'
+        $env.tektonDefinitionRepo ? '{{tektonDefinitionRepo}}' : 'https://github.ibm.com/cocoa/compliance-pipelines'
       incident-issues-repo: >
         $env.incidentIssuesRepo ? '{{incidentIssuesRepo}}' : ''
       evidence-locker-repo: >
