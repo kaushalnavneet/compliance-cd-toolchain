@@ -62,12 +62,11 @@ spec:
         git config --global user.name "Tekton"
 
         list_entries () {
-          git checkout $1 > /dev/null
-          for app_name in $(find -P . -mindepth 1 -type f -not -path '*/\.*' -type f); do
-              if [[ -f "$app_name" ]] && [[ "$app_name" != *.md ]]; then
-                  echo "${app_name/.\//}"
-              fi
-          done
+          git checkout "$1" > /dev/null
+
+          while IFS= read -r app_name; do
+            echo "${app_name//.\//}"
+          done <<< "$(find -P . -mindepth 1 -type f -not -path '*/\.*' -not -path '*.md' -type f)"
         }
 
         diff() {
@@ -75,14 +74,13 @@ spec:
           local commit_second="$2"
 
           if [ -n "$commit_second" ]; then
-            git diff --name-only "$commit_first" "$commit_second"
+            git diff --name-only --diff-filter=d "$commit_second" "$commit_first"  | awk '!/\.md$/ && !/^\./'
           else
-            git checkout $commit_first > /dev/null
-            for app_name in $(find -P . -mindepth 1 -type f -not -path '*/\.*' -type f); do
-                if [[ -f "$app_name" ]] && [[ "$app_name" != *.md ]]; then
-                    echo "${app_name/.\//}"
-                fi
-            done
+            git checkout "$commit_first" > /dev/null
+            local IFS=
+            while read -r app_name; do
+              echo "${app_name//.\//}"
+            done <<< "$(find -P . -mindepth 1 -type f -not -path '*/\.*' -not -path '*.md' -type f)"
           fi
         }
 
