@@ -20,7 +20,7 @@ spec:
       default: ""
     - name: compliance-baseimage
       description: one-pipeline baseimage to run most of the built-in pipeline code
-      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.12.2@ba222360778faf3e2cee305f24aa59d6101f7c9a952bb7c774ca03d7e4ee0a83"
+      default: "wcp-compliance-automation-team-docker-local.artifactory.swg-devops.com/compliance-baseimage:2.12.2@sha256:ba222360778faf3e2cee305f24aa59d6101f7c9a952bb7c774ca03d7e4ee0a83"
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
