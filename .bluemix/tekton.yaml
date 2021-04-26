@@ -1,9 +1,9 @@
 ---
 inputs:
   - type: git
-    branch: develop
+    branch: master
     service: ${TEKTON_DEFINITION_REPO}
-    path: .definitions
+    path: definitions
 triggers:
   - type: git
     name: Git CD Trigger

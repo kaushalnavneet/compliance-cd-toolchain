@@ -250,7 +250,7 @@ form:
   github_integrated:
     parameters:
       tekton-definition-repo: >
-        $env.tektonDefinitionRepo ? '{{tektonDefinitionRepo}}' : 'https://github.ibm.com/cocoa/compliance-pipelines'
+        $env.tektonDefinitionRepo ? '{{tektonDefinitionRepo}}' : 'https://github.ibm.com/one-pipeline/compliance-pipelines'
       incident-issues-repo: >
         $env.incidentIssuesRepo ? '{{incidentIssuesRepo}}' : ''
       evidence-locker-repo: >
