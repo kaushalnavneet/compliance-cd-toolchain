@@ -86,26 +86,6 @@ spec:
         - name: scripts
           workspace: artifacts
 
-    - name: clone-common-tasks
-      taskRef:
-        name: git-clone
-      runAfter:
-        - git-get-credentials
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: repository
-          value: "https://github.ibm.com/one-pipeline/common-tekton-tasks"
-        - name: branch
-          value: "master"
-        - name: directory-name
-          value: "common-tekton-tasks"
-        - name: git-user
-          value: $(tasks.git-get-credentials.results.git-auth-user)
-
     - name: yaml-lint-github-status-pending
       taskRef:
         name: github-set-status
@@ -134,7 +114,6 @@ spec:
       taskRef:
         name: yaml-lint
       runAfter:
-        - clone-common-tasks
         - setup-repo
       workspaces:
         - name: artifacts

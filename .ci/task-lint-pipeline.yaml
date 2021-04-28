@@ -23,7 +23,6 @@ spec:
 
         npm i -g tekton-lint
         set -x
-        export COMMON_TEKTON_TASKS_DIR="$(workspaces.artifacts.path)/common-tekton-tasks"
         export COMPLIANCE_CD_TOOLCHAIN_DIR="$(workspaces.artifacts.path)/compliance-cd-toolchain"
 
         cd "$COMPLIANCE_CD_TOOLCHAIN_DIR"
