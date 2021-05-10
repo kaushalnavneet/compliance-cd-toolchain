@@ -22,6 +22,18 @@ The toolchain can use a Key-Protect vault instance to store the required tokens 
 If you get stuck or experience a problem during setup, or running your pipelines, check out our [troubleshooting guide](https://github.ibm.com/one-pipeline/docs/blob/master/faq.md) before raising an issue.
 
 ---
+### The IAM permissions needed for each of the various IBM cloud resources
+
+| Role | Resource |
+|--|--|
+|  Administrator, Writer  |  Cloud Object Storage service in <your team's resource group name> resource group  |
+|  Administrator, Writer  |  Continuous Delivery service in <your team's resource group name> resource group  |
+|  Administrator  |  Toolchain service in <your team's resource group name> resource group  |
+|  KeyPurge, Writer, Editor, Manager, Administrator  |   Key Protect service in <your team's resource group name> resource group  |
+|  Viewer, Reader, Writer  |   	Kubernetes Service  |
+|  Viewer, ReaderPlus  |  Key Protect service in <your team's resource group name> resource group  |
+
+---
 ### Using the development mode
 The development mode enables you to quickly test the implementation of your [shift-left compliance one-pipeline.yaml](https://pages.github.ibm.com/one-pipeline/docs/#/custom-scripts) file, without executing any shift-left compliance related task, so as to optimize pipeline execution time.
 
