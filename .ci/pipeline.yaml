@@ -148,64 +148,6 @@ spec:
         - name: description
           value: Tekton Yaml Lint
 
-    - name: tekton-lint-github-status-pending
-      taskRef:
-        name: github-set-status
-      runAfter:
-        - git-get-credentials
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: secret-name
-          value: git-token
-        - name: repo-url
-          value: $(params.statuses-repo-url)
-        - name: commit-sha
-          value: $(params.revision)
-        - name: state
-          value: pending
-        - name: context
-          value: Tekton
-        - name: description
-          value: Running Tekton Linter...
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: tekton-lint
-      taskRef:
-        name: lint-pipeline
-      workspaces:
-        - name: artifacts
-          workspace: artifacts
-      runAfter:
-        - yaml-lint
-      params:
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
-    - name: tekton-lint-github-status-result
-      taskRef:
-        name: github-set-status
-      workspaces:
-        - name: secrets
-          workspace: artifacts
-      params:
-        - name: secret-name
-          value: git-token
-        - name: repo-url
-          value: $(params.statuses-repo-url)
-        - name: commit-sha
-          value: $(params.revision)
-        - name: state
-          value: $(tasks.tekton-lint.results.status)
-        - name: context
-          value: Tekton
-        - name: description
-          value: Running Tekton Linter...
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
-
     - name: check-pr-github-status-pending
       runAfter:
         - git-get-credentials
@@ -231,8 +173,6 @@ spec:
           value: $(params.pipeline-debug)
 
     - name: pr-check
-      runAfter:
-        - tekton-lint
       taskRef:
         name: check-pull-request
       params:
@@ -253,7 +193,7 @@ spec:
         - name: from-commit
           value: $(params.base-commit)
         - name: repo-url
-          value: $(tasks.clone-repo.results.git-url)
+          value: "https://github.ibm.com/one-pipeline/compliance-cd-toolchain"
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -283,8 +223,6 @@ spec:
           value: $(params.pipeline-debug)
 
     - name: code-pipeline-evaluator
-      runAfter:
-        - tekton-lint
       taskRef:
         name: util-evaluate-pipeline-results
       params:
@@ -295,11 +233,6 @@ spec:
                 "name": "yaml-lint",
                 "expected": "success",
                 "actual": "$(tasks.yaml-lint.results.status)"
-              },
-              {
-                "name": "tekton-lint",
-                "expected": "success",
-                "actual": "$(tasks.tekton-lint.results.status)"
               },
               {
                 "name": "pr-check",
