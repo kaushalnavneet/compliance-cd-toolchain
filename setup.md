@@ -234,14 +234,19 @@ Service Now is used to keep tack of change requests.
 
 
 
-### Security and Compliance
+### Security and Compliance (Not Required)
 
 To integrate the toolchain with the Security and Compliance Service (Project Fortress), you need to provide a project name and the evidence locker repository name for the Fortress data collector.
 
-| ![Security and Compliance](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/fortress.png) |
+| ![Security and Compliance without Trigger](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/fortress-without-trigger.png) |
 | :--: |
 
+You can also configure the Security and Compliance integration to trigger a validation after a deployment:
 
+| ![Security and Compliance with Trigger](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/fortress-with-trigger.png) |
+| :--: |
+
+Read more about the [Security and Compliance Center here](https://cloud.ibm.com/security-compliance/overview).
 
 ### Link DOI toolchain
 
