@@ -321,7 +321,7 @@ form:
   wizard_vault:
     parameters:
       key-protect: true
-      secrets-manager: false
+      secrets-manager: true
       hashicorp-vault: true
     schema:
       $ref: wizard_vault.json
@@ -351,8 +351,6 @@ form:
       $ref: wizard_evidence.json
 
   wizard_summary:
-    parameters:
-      test: true
     schema:
       $ref: wizard_summary.json
 

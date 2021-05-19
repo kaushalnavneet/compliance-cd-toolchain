@@ -42,6 +42,11 @@ services:
     parameters:
       name: 'kp-compliance-secrets'
 
+  sm-vault:
+    service_id: secretsmanager
+    parameters:
+      name: 'sm-compliance-secrets'
+
   hc-vault:
     service_id: hashicorpvault
     parameters:
