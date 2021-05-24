@@ -61,14 +61,18 @@
         },
         "subtitle": {
           "$ref": "#/messages/wizard.evidence.cos.notification.sutitle"
-        }
+        },
+        "showInAdvancedMode": true,
+        "advancedModePosition": "bottom"
       }
     },
     {
       "type": "boolean",
       "display": {
         "component": "toggle",
-        "style": "standalone"
+        "style": "standalone",
+        "showInAdvancedMode": true,
+        "advancedModePosition": "bottom"
       },
       "title": {
         "$ref": "#/messages/wizard.evidence.cos.title"
