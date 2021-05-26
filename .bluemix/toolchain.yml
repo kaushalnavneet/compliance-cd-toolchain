@@ -142,6 +142,8 @@ services:
   one-pipeline-repo:
     service_id: github_integrated
     parameters:
+      repo_name: 'compliance-deployment-{{timestamp}}'
+      source_repo_url: 'https://github.ibm.com/one-pipeline/hello-compliance-deployment'
       repo_url: '{{form.github_integrated.parameters.one-pipeline-repo}}'
       type: link
       has_issues: false
