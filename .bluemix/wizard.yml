@@ -359,6 +359,6 @@ form:
       doi: true
       fortress-tool: true
       slack-tool: true
-      pw-tool: true
+      pw-tool: false
     schema:
       $ref: wizard_optional_tools.json
