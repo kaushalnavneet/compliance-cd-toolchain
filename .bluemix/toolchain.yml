@@ -79,15 +79,6 @@ services:
       team_url: >
         $env.slackTeamName ? '{{slackTeamName}}' : ''
 
-  privateWorker:
-    service_id: private_worker
-    parameters:
-      name: >
-        $env.privateWorkerName ? '{{privateWorkerName}}' : 'private-worker'
-      workerQueueCredentials: '{{privateWorkerCreds}}'
-      # TODO: this wont be needed once a fix is in place for https://github.ibm.com/org-ids/roadmap/issues/15360
-      workerQueueIdentifier: '{{privateWorkerIdentifier}}'
-
   artifactoryComp:
     service_id: artifactory
     parameters:
