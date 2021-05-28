@@ -39,9 +39,12 @@
       },
       "items": [{
           "type": "section",
-          "items": [
-            "repo_url"
-          ]
+          "items": [{
+          "key":"repo_url",
+          "placeholder": {
+              "$ref": "#/messages/repos.onePipelineRepoPlaceholder"
+            }
+          }]
         },
         {
           "type": "section",

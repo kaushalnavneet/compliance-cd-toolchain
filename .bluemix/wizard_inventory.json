@@ -12,6 +12,12 @@
   },
   "type": "object",
   "form": [{
+      "type": "info",
+      "text": {
+        "$ref": "#/messages/wizard.inventory.info"
+      }
+    },
+    {
     "type": "selectfieldset",
     "display": {
       "component": "tilegroup",
@@ -34,7 +40,7 @@
       "key":"repo_url",
       "placeholder": {
           "$ref": "#/messages/repos.inventoryRepoPlaceholder"
-        } 
+        }
       }]
     }]
   }]

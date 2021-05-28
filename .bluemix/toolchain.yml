@@ -219,7 +219,7 @@ services:
         $ref: devops-insights.png
         $refType: image-data-uri
       documentationUrl: 'https://cloud.ibm.com/devops/insights/overviewNew?toolchainId={{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
-      name: Link DOI Toolchain
+      name: Link existing DOI to Toolchain
       dashboard_url: 'https://cloud.ibm.com/devops/insights/overviewNew?toolchainId={{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
       description:
         $ref: "#/messages/doiToolchain.service.description"
