@@ -44,7 +44,9 @@
    },
    {
       "type": "label",
-      "title": "#/messages/cos.info"
+      "title": {
+        "$ref": "#/messages/cos.info"
+      }
     },
     {
       "title": {
