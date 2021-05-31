@@ -160,8 +160,8 @@ steps:
             parameters:
               configuration:
                 env:
-                  COS_BUCKET_NAME: ""
-                  COS_ENDPOINT: ""
+                  COS_BUCKET_NAME: ''
+                  COS_ENDPOINT: "brian1"
                   COS_API_KEY: ""
   - name: cos
     indent_level: 1
