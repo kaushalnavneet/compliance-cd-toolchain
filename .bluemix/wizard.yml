@@ -154,6 +154,15 @@ steps:
           - type: delete-service
             service_id: customtool
             service_label: cos-bucket
+          - type: update-service-parameters
+            service_id: pipeline
+            service_label: build
+            parameters:
+              configuration:
+                env:
+                  COS_BUCKET_NAME: ""
+                  COS_ENDPOINT: ""
+                  COS_API_KEY: ""
   - name: cos
     indent_level: 1
     form: customtool_cos-bucket
@@ -257,6 +266,14 @@ steps:
           - type: delete-service
             service_id: draservicebroker
             service_label: devops-insights
+          - type: update-service-parameters
+            service_id: pipeline
+            service_label: build
+            parameters:
+              configuration:
+                env:
+                  DOI_TOOLCHAIN_ID: ""
+                  DOI_ENVIRONMENT: ""
       - condition:
           any:
             - parameter: fortress-tool
