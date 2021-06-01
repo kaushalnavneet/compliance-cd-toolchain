@@ -167,6 +167,8 @@ services:
         env:
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
+          TEKTON_DEFINITION_BRANCH: >
+            $env.pipelineDefinitionBranch ? '{{pipelineDefinitionBranch}}' : 'v9'
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
