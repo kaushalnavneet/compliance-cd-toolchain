@@ -130,15 +130,11 @@
      },
      {
         "type":"table",
-        "columnCount":7,
+        "columnCount":3,
         "widths":[
-           "24%",
-           "2%",
-           "24%",
-           "3%",
-           "23%",
-           "1%",
-           "23%"
+           "48%",
+           "4%",
+           "48%"
         ],
         "items":[
            {
@@ -158,8 +154,17 @@
               }
            },
            {
+              "type":"select",
+              "key":"prod-region"
+           },
+           {
               "type":"label",
               "title":""
+           },
+           {
+              "type":"select",
+              "key":"prod-resource-group",
+              "readonly":false
            },
            {
               "type":"label",
@@ -179,23 +184,6 @@
            },
            {
               "type":"select",
-              "key":"prod-region"
-           },
-           {
-              "type":"label",
-              "title":""
-           },
-           {
-              "type":"select",
-              "key":"prod-resource-group",
-              "readonly":false
-           },
-           {
-              "type":"label",
-              "title":""
-           },
-           {
-              "type":"select",
               "key":"prod-cluster-name",
               "readonly":false
            },
@@ -209,6 +197,27 @@
               "readonly":false
            }
         ]
+     },
+     {
+        "type":"table",
+        "columnCount":1,
+        "widths":[
+           "100%"
+        ],
+        "items": [
+            {
+               "type": "info",
+               "text": {
+                  "$ref": "#/messages/deploy.clusterDescription"
+               }
+            },
+            {
+               "type": "info",
+               "text": {
+                  "$ref": "#/messages/deploy.clusternsDescription"
+               }
+            }
+         ]
      },
      {
         "title":{
@@ -245,27 +254,6 @@
         "type":"text",
         "readonly":false,
         "value":"EMERGENCY"
-     },
-     {
-        "type":"table",
-        "columnCount":1,
-        "widths":[
-           "100%"
-        ],
-        "items": [
-            {
-               "type": "info",
-               "text": {
-                  "$ref": "#/messages/deploy.clusterDescription"
-               }
-            },
-            {
-               "type": "info",
-               "text": {
-                  "$ref": "#/messages/deploy.clusternsDescription"
-               }
-            }
-         ]        
      }
   ]
 }

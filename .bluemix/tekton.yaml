@@ -1,7 +1,7 @@
 ---
 inputs:
   - type: git
-    branch: v9
+    branch: ${TEKTON_DEFINITION_BRANCH}
     service: ${TEKTON_DEFINITION_REPO}
     path: definitions
 triggers:

@@ -195,13 +195,6 @@ steps:
     title:
       $ref: "#/messages/wizard.step.servicenow.title"
 
-  - name: doi-toolchain
-    label:
-      $ref: "#/messages/wizard.step.doi-toolchain.label"
-    form: customtool_doi-toolchain
-    title:
-      $ref: "#/messages/wizard.step.doi-toolchain.title"
-
   - name: optionaltools
     form: wizard_optional_tools
     title:
@@ -230,6 +223,23 @@ steps:
           - type: delete-service
             service_id: slack
             service_label: slack
+
+      - condition:
+          any:
+            - parameter: doi-tc
+              value: true
+        actions:
+          - type: create-service
+            service_id: customtool
+            service_label: doi-toolchain
+      - condition:
+          any:
+            - parameter: doi-tc
+              value: false
+        actions:
+          - type: delete-service
+            service_id: customtool
+            service_label: doi-toolchain
 
       - condition:
           any:
@@ -290,6 +300,19 @@ steps:
           - form: wizard_optional_tools
             parameter: slack-tool
             value: true
+  - name: doi-toolchain
+    indent_level: 1
+    label:
+      $ref: "#/messages/wizard.step.doi-toolchain.label"
+    form: customtool_doi-toolchain
+    title:
+      $ref: "#/messages/wizard.step.doi-toolchain.title"
+    visible:
+      condition:
+        any:
+          - form: wizard_optional_tools
+            parameter: doi-tc
+            value: true
   - name: fortress
     indent_level: 1
     form: security_compliance
@@ -321,7 +344,7 @@ form:
   wizard_vault:
     parameters:
       key-protect: true
-      secrets-manager: false
+      secrets-manager: true
       hashicorp-vault: true
     schema:
       $ref: wizard_vault.json
@@ -351,8 +374,6 @@ form:
       $ref: wizard_evidence.json
 
   wizard_summary:
-    parameters:
-      test: true
     schema:
       $ref: wizard_summary.json
 
@@ -362,5 +383,6 @@ form:
       fortress-tool: true
       slack-tool: true
       pw-tool: true
+      doi-tc: true
     schema:
       $ref: wizard_optional_tools.json

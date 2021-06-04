@@ -42,6 +42,11 @@ services:
     parameters:
       name: 'kp-compliance-secrets'
 
+  sm-vault:
+    service_id: secretsmanager
+    parameters:
+      name: 'sm-compliance-secrets'
+
   hc-vault:
     service_id: hashicorpvault
     parameters:
@@ -61,7 +66,8 @@ services:
       documentationUrl: 'https://cloud.ibm.com/catalog/services/cloud-object-storage'
       name: Cloud Object Storage
       dashboard_url: 'https://cloud.ibm.com/catalog/services/cloud-object-storage'
-      description: The information required to connect the toolchain with your Cloud Object Storage instance.
+      description:
+        $ref: "#/messages/cos.service.description"
 
   slack:
     service_id: slack
@@ -161,6 +167,8 @@ services:
         env:
           # repo for Tekton definitions
           TEKTON_DEFINITION_REPO: tekton-definition-repo
+          TEKTON_DEFINITION_BRANCH: >
+            $env.pipelineDefinitionBranch ? '{{pipelineDefinitionBranch}}' : 'v9'
           # IBM Cloud cluster data
           API_KEY: '{{form.pipeline.parameters.api-key}}'
           PROD_CLUSTER_NAME: '{{form.pipeline.parameters.prod-cluster-name}}'
@@ -201,7 +209,8 @@ services:
       documentationUrl: https://watson.service-now.com/ess_portal?id=kb_category&kb_category=92518934db4e3300fc0e389f9d961990
       name: ServiceNow Change Management
       dashboard_url: '{{form.customtool_servicenow.parameters.api-url}}'
-      description: IBM Cloud Employee Service Portal
+      description:
+        $ref: "#/messages/servicenow.service.description"
 
   doi-toolchain:
     service_id: customtool
@@ -212,9 +221,10 @@ services:
         $ref: devops-insights.png
         $refType: image-data-uri
       documentationUrl: 'https://cloud.ibm.com/devops/insights/overviewNew?toolchainId={{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
-      name: Link DOI Toolchain
+      name: Link existing DOI to Toolchain
       dashboard_url: 'https://cloud.ibm.com/devops/insights/overviewNew?toolchainId={{form.customtool_doi-toolchain.parameters.doi-toolchain-id}}'
-      description: The toolchain that contains the Devops Insights instance CD interacts with.
+      description:
+        $ref: "#/messages/doiToolchain.service.description"
 
   fortress:
     service_id: security_compliance

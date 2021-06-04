@@ -1,65 +1,73 @@
 # Setup Guide for Tekton CD Pipeline with Compliance
 
 ## Prerequisites:
-* **K8S Cluster**
-* **Artifactory access**
-* **IBM Cloud CLI**
-* **IBM Cloud Api Key**
+* K8S Cluster access
+* Artifactory access
+* IBM Cloud access
+* IBM Cloud API Key
+* (optional, but highly recommended) [One-Pipeline's CI Toolchain](https://github.ibm.com/one-pipeline/compliance-ci-toolchain) with configured DevOps Insights Service.
 * (optional) [COS Bucket configured as a Compliance Evidence Locker](https://github.ibm.com/one-pipeline/docs/cos-evidence-locker-buckets.md#bucket-configuration)
 
 
 
 ## Table of Contents
 
-1. [Create toolchain](#1-create-toolchain)
-2. [Set toolchain name and toolchain region](#2-set-toolchain-name-and-toolchain-region)
-3. [Set up tool integrations](#3-set-up-tool-integrations)
+1. [Start Toolchain Setup](#1-start-toolchain-setup)
+2. [Set Toolchain Name and Region](#2-set-toolchain-name-and-region)
+3. [Setup Tool Integrations](#3-setup-tool-integrations)
     - [HashiCorp Vault](#hashicorp-vault)
     - [Key Protect](#key-protect)
-    - [Repositories](#repositories)
+    - [GitHub Repositories](#github-repositories)
       - [Tekton definitions](#tekton-definitions)
       - [Application related repositories](#application-related-repositories)
     - [Delivery Pipeline](#delivery-pipeline)
       - [IBM Cloud API Key](#ibm-cloud-api-key)
       - [Inventory target and source branches](#inventory-target-and-source-branches)
-    - [Delivery Pipeline Private Worker](#delivery-pipeline-private-worker)
     - [Artifactory](#artifactory)
     - [ServiceNow](#servicenow)
-    - [Security and Compliance](#security-and-compliance)
-    - [DOI toolchain](#link-doi-toolchain)
-    - [Cloud Object Storage](#cloud-object-storage-not-required)
-    - [Slack Integration](#slack-integration-not-required)
-4. [Create toolchain](#4-create-toolchain)
+    - [Optional Tools](#optional-tools)
+      - [Link Existing DOI to Toolchain](#link-existing-doi-to-toolchain)
+      - [Security and Compliance](#security-and-compliance)
+      - [Private Worker](#private-worker)
+      - [Cloud Object Storage](#cloud-object-storage)
+      - [Slack Integration](#slack-integration)
+4. [Create Toolchain](#4-create-toolchain)
 5. [Run the CD Pipeline](#5-run-the-cd-pipeline)
 
 
 
-## 1. Create toolchain:
+## 1. Start Toolchain Setup
 
-A toolchain can be created by
+A toolchain can be created in two ways:
 * **Create button** in the README
 
    [![Deploy To Bluemix](https://console.bluemix.net/devops/graphics/create_toolchain_button.png)](https://cloud.ibm.com/devops/setup/deploy?repository=https://github.ibm.com/one-pipeline/compliance-cd-toolchain&env_id=ibm:yp:us-south)
 
-* **Using the URL**
+* **Using the URL:**
 <https://cloud.ibm.com/devops/setup/deploy?repository=https://github.ibm.com/one-pipeline/compliance-cd-toolchain&env_id=ibm:yp:us-south&branch=master>
 
-Using the url, modifications can be tried out before merging into master by changing the branch to a feature branch.
+**Note:** By using the url, you can test any modifications to the toolchain before merging into master by changing the branch parameter in the url to the feature branch.
+
+When your browser opens the link to the IBM Cloud page to create the toolchain, you'll be taken to our "guided" installer. This is the preferred way to do this install, since the native or "classic" way IBM Cloud setups toolchains has a very painful user experience for large toolchains.
+
+You do have the option to use the "classic" installer of the toolchain, but we recommend that you use the guided installer, since its UX is far better.
+
+Please note, if you ever need to go back to a previous section in the guided installer, you may notice that UI makes it look like that the stages you've already completed, after the stage you went back to, have been undone. Do not panic, this is just a flaw in the UI, the toolchain installer retains all the info you've entered on those successive stages.
 
 
 
-## 2. Set toolchain name and toolchain region
+## 2. Set Toolchain Name and Region
 
 | ![Toolchain Name](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/name.png) |
 | :--: |
 
-Note: toolchain region can differ from the cluster region
+**Note:** Toolchain region can differ from the cluster region.
 
 
 
-## 3. Set up tool integrations
+## 3. Setup Tool Integrations
 
-
+This section covers the setup of the various tool and service integrations the the CD toolchain uses. Please note, that this section may or may not follow the order in which the IBM Cloud installer wishes you to setup these tools.
 
 ### HashiCorp Vault
 
@@ -93,43 +101,40 @@ A Key Protect tool integration is included in this template to securely manage t
 
 
 
-### Repositories
+### GitHub Repositories
 
 | ![Repositories](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/repositories.png) |
 | :--: |
 
-#### Tekton definitions
+#### Tekton Definitions
 
-Tekton definitions can be changed also after the toolchain is created. These repositories can be contributed to or can be forked.
+Tekton definitions can be changed also after the toolchain is created. These repositories can be contributed too or can be forked.
 All fields are required.
 
-- **Tekton Catalog repo URL:**
+- **Tekton Catalog Repo:**
     The common tekton tasks are contained in this repo.
     Default: <https://github.ibm.com/one-pipeline/common-tekton-tasks>
 
-- **Tekton Definition repo URL:**
+- **Tekton Definition Repo:**
     The tekton pipeline defintions (pipeline(s), triggers, listeners, etc.) are kept in this repo.
-    Default: <https://github.ibm.com/one-pipeline/compliance-cd-toolchain>
+    Default: <https://github.ibm.com/one-pipeline/compliance-pipelines>
 
-#### Application related repositories
+#### Application Related Repositories
 
-If you used the <https://github.ibm.com/one-pipeline/compliance-ci-toolchain> template to set up your CI process, check out your CI toolchain and copy the names of the repositories used there.
-If you set up your CI toolchain from scratch, you will still need to add these repositories there, and use the same ones here.
+If you used our [CI Pipeline Toolchain Template](https://github.ibm.com/one-pipeline/compliance-ci-toolchain) to set up your CI process, check out your CI toolchain and copy the names of the repositories used there.
 
-- **Incident issues repo URL:** Issues about incidents that happen during the build and deployment process are stored here.
-    Default: `""`
-    E.g.: <https://github.ibm.com/myorg/my-compliance-ci-issues>
+If you used set up your CI toolchain from scratch, you will still need to add these repositories there, and use the same ones here.
 
-- **Evidence locker repo URL:** All raw compliance evidence that belongs to the application is collected here.
-    Default: `""`
-    E.g.: <https://github.ibm.com/myorg/my-compliance-ci-evidence>
+- **Incident Issues Repo:** Issues about incidents that happen during the build and deployment process are stored here.
+    E.g.: `https://github.ibm.com/myorg/my-compliance-ci-issues`
 
-- **Inventory repo URL:** Change management is tracked in this repository. CD pipeline creates a new branch named as the created CR number, and merges it to master after deplyment is concluded.
-    Default: `""`
-    E.g.: <https://github.ibm.com/myorg/my-compliance-ci-inventory>
+- **Evidence locker Repo:** All raw compliance evidence that belongs to the application is collected here.
+    E.g.: `https://github.ibm.com/myorg/my-compliance-ci-evidence`
 
-- **One-Pipeline Configuration repo URL:** The custom scripts used in the CD Pipeline (`.one-pipeline.yaml`) should come from this repository. As a default, we provide a sample repo with some basic configuration and scripts (https://github.ibm.com/one-pipeline/hello-compliance-deployment)
+- **Inventory Repo:** Change management is tracked in this repository. CD pipeline creates a new branch named as the created CR number, and merges it to master after deplyment is concluded.
+    E.g.: `https://github.ibm.com/myorg/my-compliance-ci-inventory`
 
+- **One-Pipeline Configuration Repo:** The custom scripts used in the CD Pipeline (`.one-pipeline.yaml`) should come from this repository. As a default, we have provided a sample repo with some basic configuration and scripts; <https://github.ibm.com/one-pipeline/hello-compliance-deployment>.
 
 
 ### Delivery Pipeline
@@ -180,14 +185,6 @@ The API key is used to interact with the ibmcloud CLI tool in several tasks.
   - **Target Region:** The target region to where the application is deployed. (Optional)
 
 
-### Delivery Pipeline Private Worker
-
-| ![Private Worker](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/private-worker-tool.png) |
-| :--: |
-
-The Delivery Pipeline Private Worker tool integration connects with one or more private workers that are capable of running Delivery Pipeline workloads in isolation. For more information, see [Working with Private Workers](https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-private-workers).
-
-
 
 ### Artifactory
 
@@ -233,17 +230,11 @@ Service Now is used to keep tack of change requests.
     Default: `https://watsontest.service-now.com`
 
 
+### Optional Tools
 
-### Security and Compliance
+The following tools are optional for the CD pipeline, many of them simply enhance your user experience, or provide simple convenience.
 
-To integrate the toolchain with the Security and Compliance Service (Project Fortress), you need to provide a project name and the evidence locker repository name for the Fortress data collector.
-
-| ![Security and Compliance](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/fortress.png) |
-| :--: |
-
-
-
-### Link DOI toolchain
+#### Link Existing DOI to Toolchain
 
 CD toolchain needs a toolchain ID with an existing DevOps Insights instance, so that it is able to publish the deployment records to insights. You can use your CI toolchain since that has DOI integrated.
 
@@ -255,14 +246,32 @@ A toolchain's URL follows this pattern: `https://cloud.ibm.com/devops/toolchains
 
 For example, if the URL is: `https://cloud.ibm.com/devops/toolchains/aaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee?env_id=ibm:yp:us-south` then the toolchain's ID is: `aaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee`.
 
-Note: Make sure to only include the ID here, not the full URL.
-
+**Note:** Make sure to only include the ID here, not the full URL.
 
 You can also set a target environment for the DOI interactions, this parameter is optional. If you provide this parameter, it will be used instead of the target environment from the inventory.
 
+#### Security and Compliance
 
+To integrate the toolchain with the Security and Compliance Service (Project Fortress), you need to provide a project name and the evidence locker repository name for the Fortress data collector.
 
-### Cloud Object Storage (Not Required)
+| ![Security and Compliance without Trigger](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/fortress-without-trigger.png) |
+| :--: |
+
+You can also configure the Security and Compliance integration to trigger a validation after a deployment:
+
+| ![Security and Compliance with Trigger](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-cd-toolchain/fortress-with-trigger.png) |
+| :--: |
+
+Read more about the [Security and Compliance Center here](https://cloud.ibm.com/security-compliance/overview).
+
+#### Private Worker
+
+| ![Private Worker](https://github.ibm.com/one-pipeline/docs/blob/master/assets/compliance-ci-toolchain/private-worker-tool.png) |
+| :--: |
+
+The Delivery Pipeline Private Worker tool integration connects with one or more private workers that are capable of running Delivery Pipeline workloads in isolation. For more information, see [Working with Private Workers](https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-private-workers).
+
+#### Cloud Object Storage
 
 Cloud Object Storage is used to store the evidences and artifacts generated by the Compliance Pipelines.
 If you wish to use this feature, you must have a Cloud Object Storage instance and a Bucket. [Read the recommendation for configuring a Bucket that can act as a Compliance Evidence Locker](https://github.ibm.com/one-pipeline/docs/cos-evidence-locker-buckets.md#bucket-configuration).
@@ -275,7 +284,7 @@ You need to provide the following information for the Pipelines to reach the afo
 - Cloud Object Storage Endpoint
 - Bucket Name
 
-You can set up the COS locker later, by providing the necessari `cos-bucket-name` and `cos-endpoint`
+You can set up the COS locker later, by providing the necessary `cos-bucket-name` and `cos-endpoint`
 
 To get the **Cloud Object Storage Endpoint**, please visit your COS Instance's page and select the _'Endpoints'_ section in the menu. You will need to copy the Public Endpoint matching the Bucket's _region_ and _resiliency_.
 
@@ -284,9 +293,7 @@ To get the **Cloud Object Storage Endpoint**, please visit your COS Instance's p
 
 If You decide not to use Cloud Object Storage as an evidence locker, You can also set the required values after the creation of the toolchain by setting the `cos-bucket-name`, `cos-endpoint` environment variables in the CD Pipeline.
 
-
-
-### Slack Integration (Not Required)
+#### Slack Integration
 
 If you want to receive notifications about your CD Pipeline events, you can configure the Slack Tool during the setup from the toolchain template, or you can add the Slack Tool later.
 
